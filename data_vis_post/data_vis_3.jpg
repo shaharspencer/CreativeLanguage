@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:lang="en" id="f59daa4ebd6c4691a0a9054a0aaed0af-0" class="displacy" width="925" height="137.0" direction="ltr" style="max-width: none; height: 137.0px; color: #000000; background: #ffffff; font-family: Arial; direction: ltr">
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="47.0">
+    <tspan class="displacy-word" fill="currentColor" x="50">           </tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="50">SPACE</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="47.0">
+    <tspan class="displacy-word" fill="currentColor" x="225">testing!!!</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="225">VERB</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="47.0">
+    <tspan class="displacy-word" fill="currentColor" x="400"> </tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="400">SPACE</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="47.0">
+    <tspan class="displacy-word" fill="currentColor" x="575">testing!!!</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="575">VERB</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="47.0">
+    <tspan class="displacy-word" fill="currentColor" x="750">         </tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="750">SPACE</tspan>
+</text>
+</svg>

@@ -1,1 +1,1 @@
-# indexing_text
+# indexed_corpus

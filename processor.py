@@ -27,7 +27,7 @@ def process_file_and_create_nlp_objs(file, print_pos=False, view_dep=False):
     nlp = spacy.load('en_core_web_trf')
 
     # create DocBin object
-    doc_bin = DocBin(attrs=["DEP", "POS"])
+    doc_bin = DocBin(attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE", "ENT_KB_ID", "LEMMA", "MORPH", "POS"])
 
     # read csv file
     df = pandas.read_csv(file)
@@ -46,7 +46,7 @@ def process_file_and_create_nlp_objs(file, print_pos=False, view_dep=False):
             for sent in doc.sents:
                 svg = spacy.displacy.render(sent, style='dep', jupyter=False)
                 output_path = Path(
-                    "data_vis_pre/data_vis_" + str(i)+".svg")  # you can keep there only "dependency_plot.svg" if you want to save it in the same folder where you run the script
+                    "data_vis_pre/data_vis_" + str(i)+".svg")
                 output_path.open("w", encoding="utf-8").write(svg)
                 break
 

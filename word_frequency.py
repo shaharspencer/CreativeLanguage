@@ -72,16 +72,20 @@ def create_word_histogram(csv_path:str, k:int, side:str, hist_path:str):
         plt.ylabel("Frequency")
         plt.xticks(rotation=90, size=4.5)
         plt.savefig(hist_path)
-    # if side == "least":
-        # x_axis = df['word'][k]
-        # y_axis = df['frequency'][:k]
-        # from matplotlib import pyplot as plt
-        # plt.bar(x_axis, y_axis)
-        # plt.title("Word frequency histogram in blog text corpus, "
-        #           ""+k+" most frequent words")
-        # plt.xlabel("Word")
-        # plt.ylabel("Frequency")
-        # plt.xticks(rotation=90, size=5)
+    if side == "least":
+        x_axis = df['word'][len(df)-k:]
+        y_axis = df['frequency'][len(df)-k:]
+        import os
+        os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+        from matplotlib import pyplot as plt
+        plt.bar(x_axis, y_axis)
+        plt.title("Word frequency histogram in blog text corpus, "
+                  ""+str(k)+" least frequent words")
+        plt.xlabel("Word")
+        plt.ylabel("Frequency")
+        plt.xticks(rotation=90, size=5)
+
+        plt.savefig(hist_path)
 
 
 if __name__ == '__main__':

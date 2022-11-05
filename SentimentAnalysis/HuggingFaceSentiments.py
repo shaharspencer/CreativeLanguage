@@ -12,4 +12,8 @@ small_test_dataset = imdb["test"].shuffle(seed=42).select([i for i in list(range
 
 # preprocess data using AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+from datasets import load_metric
+
+def compute_metrics(eval_pred):
+
 

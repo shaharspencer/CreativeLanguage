@@ -1,5 +1,4 @@
 from transformers import pipeline
-import torch
 
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 

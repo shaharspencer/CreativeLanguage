@@ -4,6 +4,9 @@ torch.cuda.is_available()
 from datasets import load_dataset
 imdb = load_dataset("imdb")
 
+from huggingface_hub import notebook_login
+notebook_login()
+
 small_train_dataset = imdb["train"].shuffle(seed=42).select([i for i in list(range(3000))])
 small_test_dataset = imdb["test"].shuffle(seed=42).select([i for i in list(range(300))])
 
@@ -41,8 +44,7 @@ def compute_metrics(eval_pred):
     f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
     return {"accuracy": accuracy, "f1": f1}
 
-from huggingface_hub import notebook_login
-notebook_login()
+
 
 from transformers import TrainingArguments, Trainer
 

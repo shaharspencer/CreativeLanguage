@@ -17,9 +17,9 @@ Usage:
 class CreateWhCsv():
     def __init__(self,
                  spacy_path=
-                 r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_1000_posts.spacy",
-                 csv_path="csv_first_1000_posts.csv",
-                 counter_csv_path = "counter_first_1000_posts.csv",
+                 r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_15000_posts.spacy",
+                 csv_path="first_15000_posts_sents.csv",
+                 counter_csv_path = "counter_first_15000_posts.csv",
                  arrange_deps_as_list = False):
         self.counter_csv_path = counter_csv_path
         self.arrange_deps_as_list = arrange_deps_as_list
@@ -142,6 +142,8 @@ class CreateWhCsv():
 
         self.dict_for_csv[token.lemma_.lower()] \
             [token_dep_comb]["instances"].add(dict_tuple)
+        if token.lemma_.lower() == "continue" and token_dep_comb == "xcomp":
+            x = 0
         self.dict_for_csv[token.lemma_.lower()] \
             [token_dep_comb]["counter"] += 1
 
@@ -220,10 +222,14 @@ class CreateWhCsv():
             for word in self.dict_for_csv.keys():
                 for comb in self.possible_combs:
                     try:
+                        comb_count = self.dict_for_csv[word][comb]["counter"]
+                        if comb == "":
+                            comb = "NO_DEPS"
+
                         n_dict = {'Lemma (V)': word,
 
                           'Dep struct': comb,
-                                  "Dep struct count": self.dict_for_csv[comb]["counter"]
+                                  "Dep struct count": comb_count
                          }
                         writer.writerow(n_dict)
                     except KeyError:

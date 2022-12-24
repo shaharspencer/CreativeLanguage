@@ -20,9 +20,9 @@ class CreateWhCsv():
     def __init__(self,
                  spacy_path=
                  r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_15000_posts.spacy",
-                 csv_path="first_15000_posts_sents_arg_struct_dim.csv",
-                 counter_csv_path = "counter_first_15000_posts_arg_struct_dim.csv",
-                 arrange_deps_as_list = False):
+                 csv_path="first_15000_posts_sents_deg_struct_dim.csv",
+                 counter_csv_path = "counter_first_15000_posts_dep_struct_dim.csv",
+                 arrange_deps_as_list = True):
         self.counter_csv_path = counter_csv_path
         self.arrange_deps_as_list = arrange_deps_as_list
         self.csv_path = csv_path
@@ -36,18 +36,20 @@ class CreateWhCsv():
             , "whateva", "whoever", "whichever", "when", "whenever", "how"}
         # TODO are there more???
         self.illegal_heads = {"relcl", "advcl", "acl"}
-
+        self.counter = 0
         self.dict_for_csv = {}
         self.doc_bin = DocBin().from_disk(self.spacy_path)
 
     def create_csv(self):
         self.create_csv_dict()
+        self.output_csv()
         self.write_dict_to_csv()
         # self.write_counter_csv()
         if not self.arrange_deps_as_list:
             self.write_counter_colwise_csv_for_set()
-        # else:
-        #     self.write_counter_dep_struct_csv()
+        else:
+            self.write_counter_dep_struct_csv()
+        print(self.counter)
 
     def verify_token_type(self, token)-> bool:
         if token.pos_ != "VERB" or not token.text.isalpha():
@@ -74,7 +76,7 @@ class CreateWhCsv():
 
     # TODO check complex wh words
     def check_legal_token_deps(self, token: spacy.tokens,
-                               token_dep_list: list[spacy.tokens]):
+                               token_dep_list: list[spacy.tokens])->bool:
         # check if it is a relcl
         def check_if_relcl()->bool:
             for child in [child for child in token.head.children]:
@@ -131,28 +133,36 @@ class CreateWhCsv():
 
     def add_token_to_dict(self, doc_index: int, sent_indx: int,
                           token: spacy.tokens)->bool:
+
         token_children = self.clean_token_children(token)
         # verify that we want to add this token
         if not self.check_if_add_token(token, token_children):
             return False
         # arrange dependencies
+
         token_dep_comb = self.arrange_deps(token, token_children, arrange_as_list=
         self.arrange_deps_as_list)
+        if token.lemma_.lower() == "bring" and token_dep_comb == "V_dobj":
+            x = 0
         self.possible_combs.add(token_dep_comb)
         dict_tuple = (token.text, doc_index, sent_indx,
                  token.sent.text)
 
-        if not token_dep_comb in self.dict_for_csv[token.lemma_.lower()]:
+        if token_dep_comb in self.dict_for_csv[token.lemma_.lower()]:
             self.dict_for_csv[token.lemma_.lower()] \
-                [token_dep_comb] = {"instances": set(), "counter": 0}
+                [token_dep_comb]["counter"] += 1
+            self.dict_for_csv[token.lemma_.lower()] \
+                [token_dep_comb]["instances"].add(dict_tuple)
 
-        self.dict_for_csv[token.lemma_.lower()] \
-            [token_dep_comb]["instances"].add(dict_tuple)
-        self.dict_for_csv[token.lemma_.lower()] \
-            [token_dep_comb]["counter"] += 1
+        else:
+            self.dict_for_csv[token.lemma_.lower()] \
+                [token_dep_comb] = {"instances": set(), "counter": 1}
+            self.dict_for_csv[token.lemma_.lower()] \
+                [token_dep_comb]["instances"].add(dict_tuple)
 
     def add_doc_to_dict(self, doc: nlp, doc_index):
         for j, sent in enumerate(doc.sents):
+
             for token in sent:
                self.add_token_to_dict(doc_index, j, token)
 
@@ -189,6 +199,7 @@ class CreateWhCsv():
         for word in self.dict_for_csv.keys():
             for comb in self.possible_combs:
                 try:
+
                     for entry in self.dict_for_csv[word][comb]["instances"]:
                         counter += 1
                         #(token.text, doc_index, sent_indx,
@@ -261,15 +272,20 @@ class CreateWhCsv():
             writer.writerow(d)
             for word in self.dict_for_csv.keys():
                 n_dict = {'Lemma (V)': word}
-                sum_word = sum(self.dict_for_csv[word][comb]["counter"] for comb in
-                               self.dict_for_csv[word])
+                sum_word = sum(
+                    len(
+                        self.dict_for_csv[word][comb]["instances"]
+                    )
+                    for comb in
+                    self.dict_for_csv[word])
                 for comb in self.possible_combs:
                     comb_name = comb
                     if comb == "":
                         comb_name = "NO_DEPS"
                     try:
-                        n_dict[comb_name+"_COUNT"] = self.dict_for_csv[word][comb]["counter"]
-                        n_dict[comb_name + "%"] = self.dict_for_csv[word][comb]["counter"] / sum_word
+                        counter = len(self.dict_for_csv[word][comb]["instances"])
+                        n_dict[comb_name+"_COUNT"] = counter
+                        n_dict[comb_name + "%"] = counter / sum_word
 
                     except KeyError:
                         n_dict[comb_name + "_COUNT"] = 0
@@ -289,21 +305,42 @@ class CreateWhCsv():
             for word in self.dict_for_csv.keys():
                 n_dict = {'Lemma (V)': word}
                 sum_word = sum(
-                    self.dict_for_csv[word][comb]["counter"] for comb in
+                    len(
+                        self.dict_for_csv[word][comb]["instances"]
+                    )
+                        for comb in
                     self.dict_for_csv[word])
                 for comb in self.possible_combs:
-                    comb_name = comb
                     try:
-                        n_dict[comb_name + "_COUNT"] = \
-                        self.dict_for_csv[word][comb]["counter"]
-                        n_dict[comb_name + "%"] = \
-                        self.dict_for_csv[word][comb]["counter"] / sum_word
+                        n_dict[comb + "_COUNT"] = \
+                        len(self.dict_for_csv[word][comb]["instances"])
+                        n_dict[comb + "%"] = \
+                        len(self.dict_for_csv[word][comb]["instances"]) / sum_word
 
                     except KeyError:
-                        n_dict[comb_name + "_COUNT"] = 0
-                        n_dict[comb_name + "%"] = 0
+                        n_dict[comb + "_COUNT"] = 0
+                        n_dict[comb + "%"] = 0
                 writer.writerow(n_dict)
+    def output_csv(self):
+        c = 0
+        t = 0
 
+        with open("hi.csv", 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(["word", "count"])
+            for word in self.dict_for_csv.keys():
+                try:
+
+                    c+=self.dict_for_csv[word]["V_dobj"]["counter"]
+                    t+= len(self.dict_for_csv[word]["V_dobj"]["instances"])
+                    if c != t:
+                        x=0
+                    for item in self.dict_for_csv[word]["V_dobj"]["instances"]:
+                        writer.writerow(["word", item])
+                except KeyError:
+                    pass
+        print(c)
+        print(t)
 
 def print_fieldnames(given_lst: iter):
     dic = {}

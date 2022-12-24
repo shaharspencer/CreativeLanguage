@@ -19,7 +19,7 @@ Usage:
 class CreateWhCsv():
     def __init__(self,
                  spacy_path=
-                 r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_1000_posts.spacy",
+                 r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_15000_posts.spacy",
                  csv_path="first_15000_posts_sents_arg_struct_dim.csv",
                  counter_csv_path = "counter_first_15000_posts_arg_struct_dim.csv",
                  arrange_deps_as_list = False):
@@ -46,6 +46,8 @@ class CreateWhCsv():
         # self.write_counter_csv()
         if not self.arrange_deps_as_list:
             self.write_counter_colwise_csv_for_set()
+        # else:
+        #     self.write_counter_dep_struct_csv()
 
     def verify_token_type(self, token)-> bool:
         if token.pos_ != "VERB" or not token.text.isalpha():
@@ -146,8 +148,6 @@ class CreateWhCsv():
 
         self.dict_for_csv[token.lemma_.lower()] \
             [token_dep_comb]["instances"].add(dict_tuple)
-        if token.lemma_.lower() == "continue" and token_dep_comb == "xcomp":
-            x = 0
         self.dict_for_csv[token.lemma_.lower()] \
             [token_dep_comb]["counter"] += 1
 
@@ -185,10 +185,12 @@ class CreateWhCsv():
 
 
     def write_all_rows(self, writer):
+        counter = 0
         for word in self.dict_for_csv.keys():
             for comb in self.possible_combs:
                 try:
                     for entry in self.dict_for_csv[word][comb]["instances"]:
+                        counter += 1
                         #(token.text, doc_index, sent_indx,
                  #token.sent.text)
                         lemma = word
@@ -206,6 +208,8 @@ class CreateWhCsv():
                         writer.writerow(n_dict)
                 except KeyError:
                     pass
+
+        print(counter)
 
     def clean_token_children(self, token, clean_punct = True) -> list:
         token_children = [child for child in token.children]
@@ -266,6 +270,34 @@ class CreateWhCsv():
                     try:
                         n_dict[comb_name+"_COUNT"] = self.dict_for_csv[word][comb]["counter"]
                         n_dict[comb_name + "%"] = self.dict_for_csv[word][comb]["counter"] / sum_word
+
+                    except KeyError:
+                        n_dict[comb_name + "_COUNT"] = 0
+                        n_dict[comb_name + "%"] = 0
+                writer.writerow(n_dict)
+
+    def write_counter_dep_struct_csv(self):
+        with open(self.counter_csv_path, 'w', encoding='utf-8',
+                  newline='') as f:
+            clean_possible_combs = copy.deepcopy(self.possible_combs)
+            fieldnames_for_combs = print_fieldnames(clean_possible_combs)
+            fieldnames = ["Lemma (V)"] + list(fieldnames_for_combs.keys())
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            d = {"Lemma (V)": "Lemma (V)"}
+            d.update(fieldnames_for_combs)
+            writer.writerow(d)
+            for word in self.dict_for_csv.keys():
+                n_dict = {'Lemma (V)': word}
+                sum_word = sum(
+                    self.dict_for_csv[word][comb]["counter"] for comb in
+                    self.dict_for_csv[word])
+                for comb in self.possible_combs:
+                    comb_name = comb
+                    try:
+                        n_dict[comb_name + "_COUNT"] = \
+                        self.dict_for_csv[word][comb]["counter"]
+                        n_dict[comb_name + "%"] = \
+                        self.dict_for_csv[word][comb]["counter"] / sum_word
 
                     except KeyError:
                         n_dict[comb_name + "_COUNT"] = 0

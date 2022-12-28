@@ -96,32 +96,12 @@ def write_dict_to_csv(dict, csv_path):
                 n_dict[pos+"_count"] = dict[word][pos]["Counter"]
                 n_dict[pos+"%"] = dict[word][pos]["Counter"] / total
                 n_dict[pos+"_lemma"] = dict[word][pos]["lemma"]
-                # if any(not (ele.islower() or ele.isupper()) for ele in word):
-                #     link = str("current_verbs/weird_words_"+pos+".txt")
-                #     link = '=HYPERLINK('+link+')'
-                #     n_dict[
-                #         pos + "_sents"] = link
-                # else:
-                #     if os.path.exists(
-                #             "current_verbs/"
-                #             +pos+"_"+word+".txt"):
-                #         link=str("current_verbs/" + pos + "_" + word + ".txt", pos + "_" + word + ".txt")
-                #         link = '=HYPERLINK('+link+')'
-                #         n_dict[pos+"_sents"] = link
+
             writer.writerow(n_dict)
     # dataFrame = pd.read_csv(csv_path)
     # dataFrame = dataFrame.sort_values("VERB_count", axis=0, ascending=True, inplace=True,na_position='first',)
 
 
-# def encode(m):
-#     encoded = [c for c in m]
-#     for i, c in enumerate(m):
-#         try:
-#             encoded[i] = illegal_char[c]
-#         except KeyError:
-#             pass
-#     return ''.join(encoded)
-#
 
 def create_text_files(dict):
     # forbbiden_chars = ["%", "?", "*", "'", "/", "'\'", " ", "@", "|", "!", "+","=", ":", "<", ">", "`",

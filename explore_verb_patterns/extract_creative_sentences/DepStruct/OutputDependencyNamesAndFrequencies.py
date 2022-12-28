@@ -12,7 +12,8 @@ Usage:
 '''
 
 class DependencyFrequency:
-    def __init__(self, source_csv = r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\Dependencies\deps_15000_posts.csv"):
+    def __init__(self, source_csv =
+    r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\extract_creative_sentences\DepStruct\files\counter_first_15000_posts_dep_struct_dim.csv"):
         self.source_csv= source_csv
 
 
@@ -25,11 +26,9 @@ class DependencyFrequency:
             if not colName.endswith("COUNT"):
                 continue
             col_sum = colCont.sum()
-            if colName == "V_COUNT":
-                count_dict["NO_DEP"] = col_sum
-            else:
-                newColName = colName[:len(colName)-len("COUNT")-1]
-                count_dict[newColName] = col_sum
+
+            newColName = colName[:len(colName)-len("COUNT")-1]
+            count_dict[newColName] = col_sum
 
         # sort columns by their sum
         totalSum = sum(count_dict.values())

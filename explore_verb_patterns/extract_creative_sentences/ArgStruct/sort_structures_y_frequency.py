@@ -12,7 +12,7 @@ Usage:
 '''
 
 class DependencyFrequency:
-    def __init__(self, source_csv = r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\Dependencies\counter_first_15000_posts_arg_struct_dim.csv"):
+    def __init__(self, source_csv = r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\extract_creative_sentences\ArgStruct\files\counter_first_15000_posts_arg_struct_dim.csv"):
         self.source_csv= source_csv
 
 

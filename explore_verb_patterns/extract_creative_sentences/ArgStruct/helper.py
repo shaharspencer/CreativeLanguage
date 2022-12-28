@@ -1,6 +1,6 @@
 import pandas as pd
 import csv
-def helper(csv_path=r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\Dependencies\first_15000_posts_sents_arg_struct_dim.csv", output_path = "hi.csv"):
+def helper(csv_path=r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\extract_creative_sentences\DepStruct\files\first_15000_posts_sents_deg_struct_dim.csv", output_path = "hi.csv"):
     dic = dict()
     for indx, row in pd.read_csv(csv_path, encoding = 'utf-8').iterrows():
         dic[row['Dep struct']] = dic.get(row['Dep struct'], 0) + 1

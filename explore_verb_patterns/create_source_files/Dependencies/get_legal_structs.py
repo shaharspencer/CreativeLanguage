@@ -20,9 +20,9 @@ class CreateWhCsv():
     def __init__(self,
                  spacy_path=
                  r"C:\Users\User\PycharmProjects\CreativeLanguage\training_data\spacy_data\data_from_first_15000_posts.spacy",
-                 csv_path="first_15000_posts_sents_deg_struct_dim.csv",
-                 counter_csv_path = "counter_first_15000_posts_dep_struct_dim.csv",
-                 arrange_deps_as_list = True):
+                 csv_path="first_15000_posts_sents_arg_struct_dim.csv",
+                 counter_csv_path = "counter_first_15000_posts_arg_struct_dim.csv",
+                 arrange_deps_as_list = False):
         self.counter_csv_path = counter_csv_path
         self.arrange_deps_as_list = arrange_deps_as_list
         self.csv_path = csv_path
@@ -42,7 +42,6 @@ class CreateWhCsv():
 
     def create_csv(self):
         self.create_csv_dict()
-        self.output_csv()
         self.write_dict_to_csv()
         # self.write_counter_csv()
         if not self.arrange_deps_as_list:
@@ -129,7 +128,7 @@ class CreateWhCsv():
             return "_".join(TokenDependencies)
         # currently sorted by default order
         else:
-            return "_".join(list(sorted([x.dep_ for x in token_children])))
+            return "_".join(set(sorted([x.dep_ for x in token_children])))
 
     def add_token_to_dict(self, doc_index: int, sent_indx: int,
                           token: spacy.tokens)->bool:
@@ -321,26 +320,7 @@ class CreateWhCsv():
                         n_dict[comb + "_COUNT"] = 0
                         n_dict[comb + "%"] = 0
                 writer.writerow(n_dict)
-    def output_csv(self):
-        c = 0
-        t = 0
 
-        with open("hi.csv", 'w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(["word", "count"])
-            for word in self.dict_for_csv.keys():
-                try:
-
-                    c+=self.dict_for_csv[word]["V_dobj"]["counter"]
-                    t+= len(self.dict_for_csv[word]["V_dobj"]["instances"])
-                    if c != t:
-                        x=0
-                    for item in self.dict_for_csv[word]["V_dobj"]["instances"]:
-                        writer.writerow(["word", item])
-                except KeyError:
-                    pass
-        print(c)
-        print(t)
 
 def print_fieldnames(given_lst: iter):
     dic = {}

@@ -84,7 +84,7 @@ def print_interesting(spacy_path):
 
 if __name__ == '__main__':
     dict = create_dep_csv(
-        "../training_data/spacy_data/data_from_first_15000_posts.spacy", "has_dobj.csv")
+        "../../training_data/spacy_data/data_from_first_15000_posts.spacy", "has_dobj.csv")
     # write_dict_to_csv(dict,"verbed.csv")
     print_interesting(
-        "../training_data/spacy_data/data_from_first_15000_posts.spacy")
+        "../../training_data/spacy_data/data_from_first_15000_posts.spacy")

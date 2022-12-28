@@ -10,7 +10,7 @@ class GetRarestArgStructs:
 
                               k_val = 20):
         self.rarity_df = pd.read_csv(rarest_dep_structs_csv).sort_values(
-            by='count', ascending=True)
+            by='count', ascending=True).copy()
         # get dep structures by rarity
         self.verbs_df = pd.read_csv(verb_csv)
 
@@ -22,8 +22,19 @@ class GetRarestArgStructs:
 
     def get_lowest_sentences(self,):
         # new_df = self.verbs_df[self.verbs_df.loc[self.verbs_df['Dep struct'].isin(self.rarity_set)]]
-        new_df = self.verbs_df.loc[self.verbs_df['Dep struct'].isin(self.rarity_set)]
+        new_df = self.verbs_df.loc[self.verbs_df['Dep struct'].isin(self.rarity_set)].copy()
+        percent_column = []
+        count_column = []
+
+        for indx, row in new_df.iterrows():
+            dep_row = self.rarity_df[self.rarity_df['dep_struct'] == row["Dep struct"]].squeeze()
+            percent_column.append(dep_row["%of_total"])
+            count_column.append(dep_row["count"])
+        new_df["count of dep struct"] = count_column
+        new_df["percent of dep struct"] = percent_column
+
         new_df.to_csv("rarest_arg_structs.csv")
+
 
 
 

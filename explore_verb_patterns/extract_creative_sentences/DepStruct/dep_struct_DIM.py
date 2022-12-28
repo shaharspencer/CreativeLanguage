@@ -4,9 +4,9 @@ import os
 
 class GetRarestDepStructs:
     def explore_simple_method(self, rarest_dep_structs_csv =
-                              r"C:\Users\User\PycharmProjects\CreativeLanguage\extract_creative_sentences\DepStruct\files\no_relcl_freqs.csv",
+                              r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\extract_creative_sentences\DepStruct\files\dep_freqs_15000_sents.csv",
                               verb_csv =
-                              r"C:\Users\User\PycharmProjects\CreativeLanguage\extract_creative_sentences\DepStruct\files\deps_15000_posts_no_relcl.csv",
+                              r"C:\Users\User\PycharmProjects\CreativeLanguage\explore_verb_patterns\extract_creative_sentences\DepStruct\files\first_15000_posts_sents_deg_struct_dim.csv",
                               text_file_dir='None',
                               k_val = 20):
         self.rarity_df = pd.read_csv(rarest_dep_structs_csv).sort_values(
@@ -22,21 +22,21 @@ class GetRarestDepStructs:
 
 
     def get_lowest_sentences(self,):
-        for colname, colvals in self.verbs_df.iteritems():
-            remove_count_from_endstr = len(colname) - len('_COUNT')
-            if colname[:remove_count_from_endstr] in self.rarity_set:
-                # get all non-zero items in the column
-                non_zero_words = colvals[colvals != 0].index
-                # get word at indexes
-                verbs_with_non_zero_val = self.verbs_df.iloc[non_zero_words]
-                # get associated senetences
-                for idx, r in verbs_with_non_zero_val.iterrows():
-                    sent_path = os.path.join(self.text_file_dir,
-                                             r['word'] + colname[
-                                                         :remove_count_from_endstr])
-                    with open(sent_path, encoding='utf-8') as f:
-                        for line in f.readlines():
-                            pass
+        new_df = self.verbs_df.loc[
+            self.verbs_df['Dep struct'].isin(self.rarity_set)].copy()
+
+        percent_column = []
+        count_column = []
+
+        for indx, row in new_df.iterrows():
+            dep_row = self.rarity_df[self.rarity_df['dep_struct'] == row["Dep struct"]].squeeze()
+            percent_column.append(dep_row["%of_total"])
+            count_column.append(dep_row["count"])
+        new_df["count of dep struct"] = count_column
+        new_df["percent of dep struct"] = percent_column
+
+        new_df.to_csv("rarest_dep_structs.csv")
+
 
 
 

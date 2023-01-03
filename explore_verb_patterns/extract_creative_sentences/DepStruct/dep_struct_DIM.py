@@ -34,8 +34,10 @@ class GetRarestDepStructs:
             count_column.append(dep_row["count"])
         new_df["count of dep struct"] = count_column
         new_df["percent of dep struct"] = percent_column
-
-        new_df.to_csv("rarest_dep_structs.csv")
+        from datetime import datetime
+        datetime = datetime.today().strftime('%Y_%m_%d')
+        self.output_path = "dependent_order_by_count_" + datetime + ".csv"
+        new_df.to_csv(self.output_path)
 
 
 

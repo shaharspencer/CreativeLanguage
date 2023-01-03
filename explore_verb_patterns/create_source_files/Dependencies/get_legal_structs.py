@@ -104,9 +104,11 @@ class CreateWhCsv():
         def check_token_dep_types():
             token_dep_types = [t.dep_ for t in token_dep_list]
             return set(token_dep_types).issubset(self.DEP_LIST)
-
-        return (check_if_relcl() and check_if_core_dep_wh_word() and
-                check_complex_dobj_wh_word() and check_token_dep_types())
+        if  self.arrange_deps_as_list:
+            return (check_if_relcl() and check_if_core_dep_wh_word() and
+                    check_complex_dobj_wh_word() and check_token_dep_types())
+        else:
+            return (check_if_relcl() and check_token_dep_types())
 
     def check_if_add_token(self, token: spacy.tokens, token_dep_list: list):
         if not self.verify_token_type(token):
@@ -138,14 +140,20 @@ class CreateWhCsv():
         if not self.check_if_add_token(token, token_children):
             return False
         # arrange dependencies
+        import os
+        import pathlib
+        if doc_index == 6457 and sent_indx == 14:
+            svg = spacy.displacy.render(token.sent, style="dep")
+            output_path = pathlib.Path(os.path.join("./", "sentence.svg"))
+            output_path.open('w', encoding="utf-8").write(svg)
 
         token_dep_comb = self.arrange_deps(token, token_children, arrange_as_list=
         self.arrange_deps_as_list)
-        if token.lemma_.lower() == "bring" and token_dep_comb == "V_dobj":
-            x = 0
+        # if token.lemma_.lower() == "bring" and token_dep_comb == "V_dobj":
+        #     x = 0
         self.possible_combs.add(token_dep_comb)
         dict_tuple = (token.text, doc_index, sent_indx,
-                 token.sent.text)
+                 token.sent.text.strip())
 
         if token_dep_comb in self.dict_for_csv[token.lemma_.lower()]:
             self.dict_for_csv[token.lemma_.lower()] \

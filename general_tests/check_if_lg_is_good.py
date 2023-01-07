@@ -3,7 +3,7 @@ import os.path
 import pandas as pd
 from docopt import docopt
 
-from verbs_exploration.create_dep_tree import Renderer
+from general_tests.create_dep_tree import Renderer
 
 usage = '''
 check_if_lg_is_good CLI.

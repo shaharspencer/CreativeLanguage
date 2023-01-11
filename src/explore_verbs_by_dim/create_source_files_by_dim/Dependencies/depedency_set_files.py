@@ -6,8 +6,7 @@ import csv
 
 import os
 
-from explore_verbs_by_dim.create_source_files_by_dim.\
-    Dependencies.abstract_dependency_files import \
+from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files import \
     DependencyDimensionFiles
 
 import utils.path_configurations as paths
@@ -20,15 +19,19 @@ class DependencySetFiles(DependencyDimensionFiles):
                  model="en_core_web_lg",
                  spacy_dir_path=r"withought_context_lg_model",
                  spacy_file_path=r"data_from_first_50000_lg_model.spacy"):
-        # initialize super
-        DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
-        spacy_dir_path, spacy_file_path=
-                                          spacy_file_path)
 
+        # TODO make sure these are correct deps
+        # TODO make sure code is proper with proper tests etc
+        # TODO sanity checks with counter and sentences csv's
         self.DEP_LIST = {"ccomp", "xcomp",
                         "prt", "dobj", "prep", "dative"}
 
         self.ILLEGAL_HEADS = {"relcl", "advcl", "acl"}
+
+        # initialize super
+        DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
+        spacy_dir_path, spacy_file_path=
+                                          spacy_file_path)
 
     """
     removes dependencies we don't want in dep list
@@ -75,18 +78,20 @@ class DependencySetFiles(DependencyDimensionFiles):
         token_dep_types = [t.dep_ for t in token_dep_list]
         return set(token_dep_types).issubset(self.DEP_LIST)
 
-
-
     """
         arranges deps as a set
         @:param token: the verb
         @token_children: cleaned token dependencies
     """
-
     def arrange_deps(self, token: spacy.tokens,
                      token_children: list[spacy.tokens]) -> str:
         return "_".join(set(sorted([x.dep_ for x in token_children])))
 
+
+    def check_legal_token_deps(self, token: spacy.tokens,
+                               token_dep_list: list[spacy.tokens]) -> bool:
+        return self.check_if_relcl(token) and self.check_token_dep_types(
+            token_dep_list)
 
     """
      this function is used when we are analyzing the dependency list
@@ -186,6 +191,28 @@ class DependencySetFiles(DependencyDimensionFiles):
                         writer.writerow(n_dict)
                 except KeyError:
                     pass
+
+
+
+
+
+if __name__ == '__main__':
+    from datetime import datetime
+
+    datetime = datetime.today().strftime('%Y_%m_%d')
+
+    file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
+                                       "data_from_first_50_lg_model_no_nbsp.spacy")
+
+    csv_path = "{n}_dependency_set_from_first_50_posts_lg_sents.csv".format(
+        n=datetime)
+    file_creator.write_dict_to_csv(csv_path)
+
+    counter_path = "{n}_dependency_set_from_first_25000_posts_lg_counter.csv".format(
+        n=datetime)
+
+    file_creator.write_counter_csv(counter_path)
+
 
 
 

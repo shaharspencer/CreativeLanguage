@@ -5,6 +5,8 @@ files_directory = r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles
 
 spacy_files_directory = r"training_data\spacy_data"
 
+training_data_files_directory = r"training_data\blogtext_files"
+
 
 # dependency set files
 dependency_set_directory = r"dependency_set_dimension"

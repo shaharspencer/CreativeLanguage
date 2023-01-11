@@ -6,6 +6,8 @@ from spacy.tokens import DocBin
 from zipfile import ZipFile
 from tqdm import tqdm
 
+import utils.path_configurations as paths
+
 
 
 #TODO: are these the correct parts of speech?
@@ -45,19 +47,24 @@ And save occurences of that word in the part of speech
 class AnalyzeVerbs:
     def __init__(self, model="en_core_web_lg", doc_limit=31000,
                  spacy_file_path = \
-            r"data_from_first_30000_lg_model.spacy",
+            r"data_from_first_50_lg_model_no_nbsp.spacy",
                  spacy_directory=
-                 r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\spacy_data\withought_context_lg_model",
+                 r"withought_context_lg_model",
                  ):
-        self.spacy_file_path = spacy_file_path
-        self.nlp = spacy.load(model)
 
-        # self.spacy_part_of_speech = self.nlp.get_pipe("tagger").labels
-        self.spacy_part_of_speech = parts_of_speech
+        self.spacy_path = os.path.join(paths.files_directory,
+                                       paths.spacy_files_directory,
+                                       spacy_directory,
+                                       spacy_file_path)
 
-        self.spacy_path = os.path.join(spacy_directory, self.spacy_file_path)
 
         self.doc_bin = DocBin().from_disk(self.spacy_path)
+
+
+        self.nlp = spacy.load(model)
+
+        self.spacy_part_of_speech = parts_of_speech
+
         # find all words which at some point are classified as verbs
         self.words_classed_as_verb = self.find_all_verbs_in_file(doc_limit=
                                                                  doc_limit)

@@ -5,12 +5,10 @@ import spacy
 
 import csv
 from spacy.tokens import DocBin
-import docopt
 
 import utils.path_configurations as paths
 
-from explore_verbs_by_dim.create_source_files_by_dim.\
-    Dependencies.abstract_dependency_files import \
+from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files import \
     DependencyDimensionFiles
 
 usage = '''
@@ -44,9 +42,6 @@ class DependencyListFiles(DependencyDimensionFiles):
                  spacy_dir_path=r"withought_context_lg_model",
                  spacy_file_path=r"data_from_first_30000_lg_model.spacy"):
 
-        DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
-                                          spacy_dir_path, spacy_file_path=
-            spacy_file_path)    # initialize super
 
         self.DEP_LIST = {"nsubj", "nsubjpass", "ccomp", "csubj"
             , "xcomp", "prt", "dobj", "prep", "dative"}
@@ -56,6 +51,11 @@ class DependencyListFiles(DependencyDimensionFiles):
 
 
         self.ILLEGAL_HEADS = {"relcl", "advcl", "acl"}
+
+
+        DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
+                                          spacy_dir_path, spacy_file_path=
+            spacy_file_path)    # initialize super
 
 
     """
@@ -282,24 +282,29 @@ class DependencyListFiles(DependencyDimensionFiles):
                     pass
 
 
-
-
-
-
 if __name__ == '__main__':
-    # from datetime import datetime
-    #
-    # datetime = datetime.today().strftime('%Y_%m_%d')
-    #
-    # import datetime
-    #
-    # output_dir = r"dependency_set_dimension"
-    #
-    # csv_path = "{n}_dependency_set_from_first_25000_posts_lg_sents.csv".format(
-    #     n=datetime)
-    #
-    # counter_path = "{n}_dependency_set_from_first_25000_posts_lg_counter.csv".format(
-    #     n=datetime)
+    from datetime import datetime
+
+    datetime = datetime.today().strftime('%Y_%m_%d')
+
+
+
+    file_creator = DependencyListFiles(model="en_core_web_lg",
+                                       spacy_file_path=
+                                       "data_from_first_50_lg_model_no_nbsp.spacy")
+
+    csv_path = "{n}_dependency_list_from_first_50_posts_lg_sents.csv".format(
+        n=datetime)
+    file_creator.write_dict_to_csv(csv_path)
+
+    counter_path = "{n}_dependency_list_from_first_25000_posts_lg_counter.csv".\
+        format(
+        n=datetime)
+
+    file_creator.write_counter_csv(counter_path)
+
+
+
     # args = docopt.docopt(usage)
     # if args["spacy_path"] and args["csv_path"]:
     #     createWhCsv = CreateWhCsv(args["spacy_path"], args["csv_path"],
@@ -310,6 +315,6 @@ if __name__ == '__main__':
     #                               counter_csv_path=os.path.join(output_dir,
     #                                                             counter_path),
     #                               )
-    # createWhCsv.create_csv()
-    pass
+
+
 

@@ -15,6 +15,8 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
+import utils.path_configurations as paths
+
 usage = '''
 Processor CLI.
 Usage:
@@ -32,26 +34,31 @@ Creates a .spacy doc_bin of given csv file.
         None
 """
 
-# REMEMBER THAT TAKING OUT &NBSP; WAS DONE STRAIGHT ON THE CSV FILE
-#&amp;
-#&nbsp;
+
 class Processor:
     def __init__(self,
                  source_file =
-                 r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\blogtext_files\blogtext.csv",
-                 output_file_directory = r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\spacy_data\withought_context_lg_model",
+                r"blogtext.csv",
+                 output_file_dir= r"withought_context_lg_model",
+                 model="en_core_web_lg", number_of_blogposts=40000,
 
-                 model="en_core_web_lg", number_of_blogposts=30000,
-                 output_file_name="data_from_first_30000_lg_model.spacy"
                  ):
+        # get a .csv file that contains the unprocessed data
+        self.source_file_path = os.path.join(paths.files_directory,
+                                             paths.training_data_files_directory,
+                                             source_file)
         # the name of the file we want to write to
-        self.output_file_directory = output_file_directory
+        output_file_name = "data_from_first_{n}_lg_model.spacy".format(
+            n=number_of_blogposts)
+        self.output_file_path = os.path.join(paths.files_directory,
+                                             paths.spacy_files_directory,
+                                             output_file_dir,
+                                             output_file_name)
+
         self.number_of_blogposts = number_of_blogposts
-        self.output_file_name = output_file_name
-        # a .csv file that contains the unprocessed data
-        self.source_file = source_file
+
         # create a dataframe from the .csv file
-        self.df = pandas.read_csv(self.source_file, encoding = 'utf-8'
+        self.df = pandas.read_csv(self.source_file_path, encoding ='utf-8'
                                   ).head(self.number_of_blogposts)
         # initialize a docBin object with the following attributes
         self.doc_bin = DocBin(
@@ -83,15 +90,14 @@ class Processor:
     def process_file_and_create_nlp_objs(self):
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
-        output_path = os.path.join(self.output_file_directory,
-                                   self.output_file_name)
+
 
         with tqdm(total=self.df.shape[0]) as pbar:
             for index, row in self.df.iterrows():
                 pbar.update(1)
                 self.add_blogpost_to_docbin(index, row)
 
-        self.doc_bin.to_disk(output_path)
+        self.doc_bin.to_disk(self.output_file_path)
 
 
 
@@ -143,13 +149,15 @@ class Processor:
     these are all html remanants
     """
     def clean_text_data(self, blogpost:str)->str:
-        blogpost.replace("&nbsp;", " ")
-        blogpost.replace("nbsp;", " ")
-        blogpost.replace("&nbsp", " ")
-        blogpost.replace("&amp;", "&")
-        blogpost.replace("amp;", "&")
-        blogpost.replace("&amp", "&")
-        blogpost.strip()
+        if "&nbsp;" in blogpost:
+            x = 0
+        blogpost = blogpost.replace("&nbsp;", " ")
+        blogpost = blogpost.replace("nbsp;", " ")
+        blogpost = blogpost.replace("&nbsp", " ")
+        blogpost = blogpost.replace("&amp;", "&")
+        blogpost = blogpost.replace("amp;", "&")
+        blogpost = blogpost.replace("&amp", "&")
+        blogpost = blogpost.strip()
         return blogpost
 
 

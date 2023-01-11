@@ -7,6 +7,7 @@ import pathlib
 import os
 from spacy import displacy
 import docopt
+import pandas as pd
 
 
 
@@ -50,6 +51,17 @@ class Renderer:
         svg = spacy.displacy.render(sent, style="dep")
         output_path = pathlib.Path(output_path)
         output_path.open('w', encoding="utf-8").write(svg)
+
+    """
+    takes a csv file with a column names "Sentence" and outputs a rendering
+    for each sentence in the file
+    """
+    def create_renderings_with_csv_file(self, csv_path, output_dir):
+        sents_df = pd.read_csv(csv_path, encoding='utf-8')
+        for ind, r in sents_df.iterrows():
+            self.output_sent_to_svg(r["Sentence"],
+                                    os.path.join(output_dir, r["Sentence"][:6]))
+
 
 if __name__ == '__main__':
     sent = ""

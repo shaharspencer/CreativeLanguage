@@ -1,9 +1,10 @@
 import copy
+import os.path
 
 import spacy
 
 
-nlp = spacy.load("en_core_web_trf")
+
 import csv
 from spacy.tokens import DocBin
 import docopt
@@ -22,20 +23,30 @@ Usage:
 
 
 class CreateWhCsv():
-    def __init__(self,
-                 spacy_path,
-                 csv_path,
+    # we want to find subsets of these for dependency list
+    # dimension
+    DEPS_FOR_LIST = {"nsubj", "nsubjpass", "ccomp", "csubj"
+        , "xcomp", "prt", "dobj", "prep", "dative",
+                          }
+    # we want to find subsests of these for dependency set
+    DEPS_FOR_SET = {"ccomp", "xcomp",
+                         "prt", "dobj", "prep", "dative"}
+    def __init__(self,  csv_path,
                  counter_csv_path,
-                 arrange_deps_as_list = False):
+                 model = "en_core_web_lg",
+                 spacy_dir_path= r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\spacy_data\withought_context_lg_model",
+                 spacy_file_path=r"data_from_first_50000_lg_model.spacy",
+                 arrange_deps_as_list=True):
+        self.nlp = spacy.load(model)
+
+        self.spacy_path = os.path.join(spacy_dir_path, spacy_file_path)
         self.counter_csv_path = counter_csv_path
         self.arrange_deps_as_list = arrange_deps_as_list
         self.csv_path = csv_path
-        self.spacy_path = spacy_path
+
         self.possible_combs = set()
         self.count_structs = {}
-        self.DEP_LIST = {"nsubj", "nsubjpass", "ccomp", "csubj"
-            , "xcomp", "prt", "dobj", "prep", "dative",
-                         }
+
         self.WH_WORDS = {"what", "which", "whatever", "who", "whom"
             , "whateva", "whoever", "whichever", "when", "whenever", "how"}
         # TODO are there more???
@@ -47,12 +58,10 @@ class CreateWhCsv():
     def create_csv(self):
         self.create_csv_dict()
         self.write_dict_to_csv()
-        # self.write_counter_csv()
         if not self.arrange_deps_as_list:
             self.write_counter_colwise_csv_for_set()
         else:
             self.write_counter_dep_struct_csv()
-        print(self.counter)
 
     def verify_token_type(self, token)-> bool:
         if token.pos_ != "VERB" or not token.text.isalpha():
@@ -63,7 +72,7 @@ class CreateWhCsv():
     def create_verb_set(self):
         self.verbs = set()
         # don't need to convert to list because it is an iterator
-        for doc in list(self.doc_bin.get_docs(nlp.vocab)):
+        for doc in self.doc_bin.get_docs(self.nlp.vocab):
             for token in doc:
                 if token.pos_ != "VERB" or not token.text.isalpha():
                     continue
@@ -72,13 +81,16 @@ class CreateWhCsv():
     # returns true if there is such descendanct
     def check_if_has_desc_which_is_wh(self, token: spacy.tokens)->bool:
         filtered_subtree = set(
-            filter(lambda k: k.dep_ in self.DEP_LIST and k != token,
+            filter(lambda k: k.dep_ in DEP_LIST and k != token,
                    [t for t in token.subtree]))
         return \
             (len(set([t.text for t in filtered_subtree]
                      ).intersection(self.WH_WORDS)) != 0)
 
     # TODO check complex wh words
+    """
+    
+    """
     def check_legal_token_deps(self, token: spacy.tokens,
                                token_dep_list: list[spacy.tokens])->bool:
         # check if it is a relcl
@@ -114,7 +126,15 @@ class CreateWhCsv():
                     check_complex_dobj_wh_word() and check_token_dep_types())
         else:
             return (check_if_relcl() and check_token_dep_types())
-
+    """
+    checks:
+    that token is of the type we want to add
+    that token dependency list is of the type we want
+    if either if false, we don't add token to dictionary
+    @:param token - token to check whether to add
+    @:param token_dep_list - token dependency list, after cleaning it
+    via clean_token_children
+    """
     def check_if_add_token(self, token: spacy.tokens, token_dep_list: list):
         if not self.verify_token_type(token):
             return False
@@ -122,7 +142,11 @@ class CreateWhCsv():
         if not (self.check_legal_token_deps(token, token_dep_list)):
             return False
         return True
-
+    """
+    arranges deps as either a list or a set, depending on arrange_as_list
+    arrange_as_list = True if we want to create dependency structure
+    arrange_as_list = False if we want to create dependency set
+    """
     def arrange_deps(self, token: spacy.tokens,
                      token_children: list[spacy.tokens],
                      arrange_as_list = True)->str:
@@ -136,7 +160,13 @@ class CreateWhCsv():
         # currently sorted by default order
         else:
             return "_".join(set(sorted([x.dep_ for x in token_children])))
-
+    """
+    adds a single token to dictionary
+    first checks the token is the type we want to add
+    (is a verb, checks the deps are the type we want)
+    then verifys token has a key in the dictionary
+    then adds to dictionary
+    """
     def add_token_to_dict(self, doc_index: int, sent_indx: int,
                           token: spacy.tokens)->bool:
 
@@ -144,11 +174,12 @@ class CreateWhCsv():
         # verify that we want to add this token
         if not self.check_if_add_token(token, token_children):
             return False
+        # create key for token if not yet in dict keys
+        self.add_verb_template_to_dict(token)
         # arrange dependencies
         token_dep_comb = self.arrange_deps(token, token_children, arrange_as_list=
         self.arrange_deps_as_list)
-        # if token.lemma_.lower() == "bring" and token_dep_comb == "V_dobj":
-        #     x = 0
+
         self.possible_combs.add(token_dep_comb)
         dict_tuple = (token.text, doc_index, sent_indx,
                  token.sent.text.strip())
@@ -171,7 +202,7 @@ class CreateWhCsv():
     each doc should only have one sentence
     """
 
-    def add_doc_to_dict(self, doc: nlp):
+    def add_doc_to_dict(self, doc):
         for sent in doc.sents:
             for token in sent:
                self.add_token_to_dict(doc.user_data["DOC_INDEX"],
@@ -180,9 +211,9 @@ class CreateWhCsv():
 
     def create_csv_dict(self):
         self.create_verb_set()
-        for verb in self.verbs:
-            self.dict_for_csv[verb] = {}
-        for doc in self.doc_bin.get_docs(nlp.vocab):
+        # for verb in self.verbs:
+        #     self.dict_for_csv[verb] = {}
+        for doc in self.doc_bin.get_docs(self.nlp.vocab):
             self.add_doc_to_dict(doc)
 
 
@@ -237,7 +268,11 @@ class CreateWhCsv():
                                          token_children))
         return token_children
 
-
+    """
+    this function is used when we are analyzing the dependency set
+    we are writing a csv with the percentages and counts of the 
+    different dependency set across all verbs
+    """
     def write_counter_colwise_csv_for_set(self):
         with open(self.counter_csv_path, 'w', encoding='utf-8', newline='') as f:
             clean_possible_combs = copy.deepcopy(self.possible_combs)
@@ -271,6 +306,11 @@ class CreateWhCsv():
                         n_dict[comb_name + "%"] = 0
                 writer.writerow(n_dict)
 
+    """
+     this function is used when we are analyzing the dependency list
+     we are writing a csv with the percentages and counts of the 
+     different dependency lists across all verbs
+     """
     def write_counter_dep_struct_csv(self):
         with open(self.counter_csv_path, 'w', encoding='utf-8',
                   newline='') as f:
@@ -301,6 +341,14 @@ class CreateWhCsv():
                         n_dict[comb + "%"] = 0
                 writer.writerow(n_dict)
 
+    """
+    each token needs a key in the final dictionary
+    if the token.lemma_lower() is not yet a key, add as key
+    """
+    def add_verb_template_to_dict(self, token:spacy.tokens):
+        if not token.lemma_.lower() in self.dict_for_csv.keys():
+            self.dict_for_csv[token.lemma_.lower()] = {}
+
 
 def print_fieldnames(given_lst: iter):
     dic = {}
@@ -312,17 +360,27 @@ def print_fieldnames(given_lst: iter):
 
 
 if __name__ == '__main__':
+    from datetime import datetime
+
+    datetime = datetime.today().strftime('%Y_%m_%d')
+
+    import datetime
+
+    output_dir = r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\dependency_set_dimension"
+
+    csv_path = "{n}_dependency_set_from_first_25000_posts_lg_sents.csv".format(
+       n= datetime)
+
+    counter_path = "{n}_dependency_set_from_first_25000_posts_lg_counter.csv".format(
+       n=datetime)
     args = docopt.docopt(usage)
     if args["spacy_path"] and args["csv_path"]:
         createWhCsv = CreateWhCsv(args["spacy_path"], args["csv_path"],
                                   arrange_deps_as_list=args["as_list"])
+
     else:
-        createWhCsv = CreateWhCsv()
+        createWhCsv = CreateWhCsv(csv_path=os.path.join(output_dir, csv_path),
+                                  counter_csv_path=os.path.join(output_dir, counter_path),
+                                  )
     createWhCsv.create_csv()
-
-
-
-
-
-
 

@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import spacy
 import pandas
+from spacy.tokens import Doc
 from spacy.tokens import DocBin
 from docopt import docopt
 from pathlib import Path
@@ -31,14 +32,17 @@ Creates a .spacy doc_bin of given csv file.
         None
 """
 
+# REMEMBER THAT TAKING OUT &NBSP; WAS DONE STRAIGHT ON THE CSV FILE
+#&amp;
+#&nbsp;
 class Processor:
     def __init__(self,
                  source_file =
                  r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\blogtext_files\blogtext.csv",
                  output_file_directory = r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles\training_data\spacy_data\withought_context_lg_model",
 
-                 model = "en_core_web_lg", number_of_blogposts=50000,
-                 output_file_name="data_from_first_50000_lg_model.spacy"
+                 model="en_core_web_lg", number_of_blogposts=30000,
+                 output_file_name="data_from_first_30000_lg_model.spacy"
                  ):
         # the name of the file we want to write to
         self.output_file_directory = output_file_directory
@@ -60,7 +64,7 @@ class Processor:
         self.add_attrs_to_nlp()
 
     def add_attrs_to_nlp(self, no_split_hyphens = False,
-                         add_i_m_case = True):
+                         add_i_m_case=True):
         if add_i_m_case:
             special_case = [{ORTH: "i"}, {ORTH: "'m"}]
             self.nlp.tokenizer.add_special_case("i'm", special_case)
@@ -77,6 +81,8 @@ class Processor:
         push docBin to disk (save docBin)
     """
     def process_file_and_create_nlp_objs(self):
+        Doc.set_extension("DOC_INDEX", default=None)
+        Doc.set_extension("SENT_INDEX", default=None)
         output_path = os.path.join(self.output_file_directory,
                                    self.output_file_name)
 
@@ -97,7 +103,9 @@ class Processor:
         as user data, and save to docbin 
     """
     def add_blogpost_to_docbin(self, index, row: pd.DataFrame):
-        blogpost_sents = self.nlp(row['text']).sents
+
+        blogpost_text = self.clean_text_data(row['text'])
+        blogpost_sents = self.nlp(blogpost_text).sents
 
         for sent_index, sent in enumerate(blogpost_sents):
             sentence = sent.text.strip()
@@ -129,6 +137,22 @@ class Processor:
 
         infix_re = compile_infix_regex(infixes)
         return infix_re.finditer
+
+    """
+    cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
+    these are all html remanants
+    """
+    def clean_text_data(self, blogpost:str)->str:
+        blogpost.replace("&nbsp;", " ")
+        blogpost.replace("nbsp;", " ")
+        blogpost.replace("&nbsp", " ")
+        blogpost.replace("&amp;", "&")
+        blogpost.replace("amp;", "&")
+        blogpost.replace("&amp", "&")
+        blogpost.strip()
+        return blogpost
+
+
 
 
 if __name__ == '__main__':

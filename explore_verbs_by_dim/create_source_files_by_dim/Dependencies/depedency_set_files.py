@@ -7,7 +7,7 @@ import csv
 import os
 
 from explore_verbs_by_dim.create_source_files_by_dim.\
-    Dependencies.DependencyDimensionFiles import \
+    Dependencies.abstract_dependency_files import \
     DependencyDimensionFiles
 
 import utils.path_configurations as paths

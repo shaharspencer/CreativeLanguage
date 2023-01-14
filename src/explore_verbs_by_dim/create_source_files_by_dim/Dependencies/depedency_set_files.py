@@ -1,4 +1,5 @@
 import spacy
+from docopt import docopt
 
 from spacy.tokens import DocBin
 
@@ -12,13 +13,20 @@ from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_d
 import utils.path_configurations as paths
 
 
+usage = '''
+dependency_set_files CLI.
+Usage:
+    dependency_set_files.py <spacy_file_name> <num_of_posts>
+'''
+
+
 
 
 class DependencySetFiles(DependencyDimensionFiles):
-    def __init__(self,
+    def __init__(self,spacy_file_path,
                  model="en_core_web_lg",
                  spacy_dir_path=r"withought_context_lg_model",
-                 spacy_file_path=r"data_from_first_50000_lg_model.spacy"):
+                 ):
 
         # TODO make sure these are correct deps
         # TODO make sure code is proper with proper tests etc
@@ -27,6 +35,8 @@ class DependencySetFiles(DependencyDimensionFiles):
                         "prt", "dobj", "prep", "dative"}
 
         self.ILLEGAL_HEADS = {"relcl", "advcl", "acl"}
+
+        self.irrelevant_parts_of_speech = {"punct", "SPACE"}
 
         # initialize super
         DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
@@ -41,7 +51,8 @@ class DependencySetFiles(DependencyDimensionFiles):
     def clean_token_children(self, token, clean_punct=True) -> list:
         token_children = [child for child in token.children]
         if clean_punct:
-            token_children = list(filter(lambda x: x.dep_ != "punct",
+            token_children = list(filter(lambda x: x.dep_ != "punct" and x.pos_ !=
+            "SPACE",
                                          token_children))
         return token_children
 
@@ -60,8 +71,10 @@ class DependencySetFiles(DependencyDimensionFiles):
         this type of verb
         @:param token: token to check
     """
-
+    # TODO: if father is relcl or acl, do we want to disregard it?
     def check_if_relcl(self, token: spacy.tokens) -> bool:
+        if token.head.pos_ in self.irrelevant_parts_of_speech:
+            return True
         for child in [child for child in token.head.children]:
             if child == token and child.dep_ in self.ILLEGAL_HEADS:
                 return False
@@ -200,15 +213,16 @@ if __name__ == '__main__':
     from datetime import datetime
 
     datetime = datetime.today().strftime('%Y_%m_%d')
+    args = docopt(usage)
 
     file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
-                                       "data_from_first_50_lg_model_no_nbsp.spacy")
+                                       args["<spacy_file_name>"])
 
-    csv_path = "{n}_dependency_set_from_first_50_posts_lg_sents.csv".format(
+    csv_path = "dependency_set_from_first_{t}_posts_lg_sents_{n}.csv".format(t=args["<num_of_posts>"],
         n=datetime)
     file_creator.write_dict_to_csv(csv_path)
 
-    counter_path = "{n}_dependency_set_from_first_25000_posts_lg_counter.csv".format(
+    counter_path = "dependency_set_from_first_{t}_posts_lg_counter_{n}.csv".format(t=args["<num_of_posts>"],
         n=datetime)
 
     file_creator.write_counter_csv(counter_path)

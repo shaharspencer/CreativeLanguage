@@ -64,9 +64,10 @@ class Renderer:
 
 
 if __name__ == '__main__':
-    sent = ""
-    renderer = Renderer()
-    renderer.output_sent_to_svg(sent)
+    sent = "that's not me... stop letting the little things annoy the %$#@ out of me?"
+    renderer = Renderer(model_to_use="en_core_web_lg")
+    renderer.output_sent_to_svg(sent,
+                                "sent.svg")
 
 
 

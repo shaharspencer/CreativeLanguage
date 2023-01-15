@@ -57,7 +57,6 @@ class GetRarestArgStructs:
             count_column.append(dep_row["count"])
         new_df["count of dep struct"] = count_column
         new_df["percent of dep struct"] = percent_column
-
         new_df.to_csv(self.output_path, index = False)
 
     def get_k_rarest_sents_from_rare_structs(self, k)-> set:

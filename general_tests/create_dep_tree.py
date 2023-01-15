@@ -9,7 +9,7 @@ from spacy import displacy
 import docopt
 import pandas as pd
 
-
+import utils.path_configurations
 
 
 class Renderer:
@@ -60,14 +60,17 @@ class Renderer:
         sents_df = pd.read_csv(csv_path, encoding='utf-8')
         for ind, r in sents_df.iterrows():
             self.output_sent_to_svg(r["Sentence"],
-                                    os.path.join(output_dir, r["Sentence"][:6]))
+                                    os.path.join(output_dir, str(ind) + ".svg"))
 
 
 if __name__ == '__main__':
-    sent = "that's not me... stop letting the little things annoy the %$#@ out of me?"
+    # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
     renderer = Renderer(model_to_use="en_core_web_lg")
-    renderer.output_sent_to_svg(sent,
-                                "sent.svg")
+    renderer.create_renderings_with_csv_file(os.path.join(utils.path_configurations.files_directory,
+                                             utils.path_configurations.rare_sents_directory,
+                                             r"dependency_set_sents_by_count_2023_01_15.csv"),
+                                             "dep_set_renderings")
+
 
 
 

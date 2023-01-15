@@ -36,7 +36,7 @@ class DependencySetFiles(DependencyDimensionFiles):
 
         self.ILLEGAL_HEADS = {"relcl", "advcl", "acl"}
 
-        self.irrelevant_parts_of_speech = {"punct", "SPACE"}
+        self.irrelevant_parts_of_speech = {"PUNCT", "SPACE"}
 
         # initialize super
         DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=

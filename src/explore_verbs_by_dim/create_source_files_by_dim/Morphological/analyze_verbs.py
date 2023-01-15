@@ -17,9 +17,6 @@ import utils.path_configurations as paths
 
 #TODO: general debug, see if there are issues
 
-#TODO: output files with 50000 posts
-
-#TODO nbsp&;
 
 
 
@@ -111,15 +108,15 @@ class AnalyzeVerbs:
     @:param doc_limit = doc index to stop at
     """
     def analyze_verbs(self):
-        with tqdm(desc = "creating dictionary for csv", colour="blue",
-                total= self.number_of_posts) \
-            as pbar:
-            for sentence in self.doc_bin.get_docs(self.nlp.vocab):
-                pbar.update(1)
+        # with tqdm(desc = "creating dictionary for csv", colour="blue",
+        #         total= self.number_of_posts) \
+        #     as pbar:
+        for sentence in self.doc_bin.get_docs(self.nlp.vocab):
+            # pbar.update(1)
 
-                for token in sentence:
-                    if (token.lemma_.lower() in self.words_classed_as_verb):
-                        self.add_token_to_dict(token)
+            for token in sentence:
+                if (token.lemma_.lower() in self.words_classed_as_verb):
+                    self.add_token_to_dict(token)
 
 
 
@@ -220,7 +217,8 @@ class AnalyzeVerbs:
         from datetime import datetime
         datetime = datetime.today().strftime('%Y_%m_%d')
         folder_name = r"first_{n}_posts_with_lg".format(n=self.number_of_posts) + datetime
-        zip_file_dir = os.path.join(paths.files_directory, paths.morphological_dimension_source_files,
+        zip_file_dir = os.path.join(paths.files_directory, paths.morphological_dimension_directory,
+                                    paths.morphological_dimension_source_files,
          folder_name + ".zip")
         with ZipFile(zip_file_dir, 'w') as file_dir:
             with tqdm(desc="creating text files per verb", colour="CYAN",

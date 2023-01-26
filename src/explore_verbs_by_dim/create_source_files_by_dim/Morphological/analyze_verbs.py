@@ -1,3 +1,5 @@
+from enum import Enum
+
 from docopt import docopt
 from spacy.tokens import DocBin
 import csv
@@ -9,14 +11,6 @@ from tqdm import tqdm
 
 import utils.path_configurations
 import utils.path_configurations as paths
-
-
-
-#TODO: are these the correct parts of speech?
-# nlp.get_pipe showed other parts of speech...
-
-#TODO: general debug, see if there are issues
-
 
 
 
@@ -42,7 +36,8 @@ parts_of_speech_to_ignore = ["X"]
 
 open_class_pos = ["VERB", "PROPN", "NOUN", "ADJ"]
 
-
+class EXTRA_COLS(Enum):
+    PERCENTAGE_AS_OPEN_CLASS_POS = "open class pos / total"
 
 
 """
@@ -132,9 +127,9 @@ class AnalyzeVerbs:
             return False
         self.add_token_template_to_dict(token)
         # convert all letters but first letter to lowercase
-        self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add(
-            (token.text, token.sent.text, token.doc.user_data["DOC_INDEX"],
-             token.doc.user_data["SENT_INDEX"]))
+        self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add\
+        ([token.text, token.sent.text, token.doc.user_data["DOC_INDEX"],
+             token.doc.user_data["SENT_INDEX"]])
         self.verb_dict[token.lemma_.lower()][token.pos_]["lemma"] = \
             token.lemma_
         self.verb_dict[token.lemma_.lower()][token.pos_]["Counter"] += 1
@@ -152,8 +147,8 @@ class AnalyzeVerbs:
     """
     create csv with all differnt count of parts of speech
     """
-    def write_dict_to_csv(self, pos_to_use, fields_to_write,
-                          output_file_name = r"general_parts_of_speech_distribution.csv"):
+    def write_dict_to_csv(self, pos_to_use, fields_to_write, additional_cols,
+                          output_file_name):
         output_file_name = "first_{n}_posts_".format(n=self.number_of_posts) + output_file_name
         output_path = os.path.join(utils.path_configurations.files_directory,
                                    utils.path_configurations.morphological_dimension_directory,
@@ -161,34 +156,31 @@ class AnalyzeVerbs:
                                    output_file_name)
         with open(output_path, 'w', encoding='utf-8', newline='') as f:
             fieldnames = ["word"]
-            fields, pos_dict = self.csv_pos_template(pos_to_use, fields_to_write)
+            pos_fields, pos_dict = self.csv_pos_template(pos_to_use, fields_to_write)
+            fieldnames += pos_fields
 
-            fieldnames += fields
+            additional_cols_as_strs = [field.value for field in additional_cols]
+            fieldnames += additional_cols_as_strs
+
+
+            # add to DictWriter dictionary
+            pos_dict.update(self.fieldnames_for_csv(additional_cols_as_strs))
+
 
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writerow(pos_dict)
-            self.writing_to_csv(writer, pos_to_use, fields_to_write)
-            # with tqdm(desc="writing to csv", colour="green",
-            #           total=len(self.verb_dict.keys())) as pbar:
-            #     pbar.update(1)
-            #     for word in self.verb_dict.keys():
-            #         n_dict = {'word': word}
-            #         total = sum(
-            #             [self.verb_dict[word][pos]["Counter"] for pos in self.spacy_part_of_speech])
-            #         for pos in self.spacy_part_of_speech:
-            #             n_dict[pos + "_count"] = self.verb_dict[word][pos]["Counter"]
-            #             n_dict[pos + "%"] = self.verb_dict[word][pos]["Counter"] / total
-            #             n_dict[pos + "_lemma"] = self.verb_dict[word][pos]["lemma"]
-            #
-            #         writer.writerow(n_dict)
+            self.writing_to_csv(writer, pos_to_use, fields_to_write, additional_cols)
+
 
     """
     does the actual writing to the csv
     @:param writer: file we are writing to, will be closed in another scope
     @:param pos_to_use: parts of speech we are regarding
     @:param fields_to_write: fields to use in csv, ex: count, %, lemma
+    @:param additional cols: extra columns that exist for each verb, for example
+    percent in specific types of speech
     """
-    def writing_to_csv(self, writer, pos_to_use, fields_to_write):
+    def writing_to_csv(self, writer, pos_to_use, fields_to_write, add_cols):
         with tqdm(desc="writing to csv", colour="green",
                   total=len(self.verb_dict.keys())) as pbar:
             pbar.update(1)
@@ -196,6 +188,11 @@ class AnalyzeVerbs:
                 n_dict = {'word': word}
                 total = sum(
                     [self.verb_dict[word][pos]["Counter"] for pos in
+                     pos_to_use])
+                if EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS in add_cols:
+                    n_dict[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS.value] = \
+                    total /  sum([self.verb_dict[word][pos]["Counter"]
+                                          for pos in
                      parts_of_speech])
                 for pos in pos_to_use:
                     # choose fields we want to write to (these should exist
@@ -245,7 +242,7 @@ class AnalyzeVerbs:
             fields = ["lemma", "word form", "sentence",
                       "doc index",
                       "sent index"]
-            d = self.fieldnames_for_csv_by_pos(fields)
+            d = self.fieldnames_for_csv(fields)
             writer = csv.DictWriter(f=f, fieldnames=fields)
             writer.writerow(d)
 
@@ -289,7 +286,7 @@ class AnalyzeVerbs:
     def dict_template(self):
         dict = {}
         for pos in self.spacy_part_of_speech:
-            dict[pos] = {"lemma": "", "Counter":0, "Instances":set()}
+            dict[pos] = {"lemma": "", "Counter":0, "Instances": set()}
         return dict
 
     """
@@ -316,11 +313,6 @@ class AnalyzeVerbs:
                     d[pos + extension] = pos + extension
 
 
-        # for pos in pos_to_use:
-        #     d[pos + "_lemma"] = pos + "_lemma"
-        #     d[pos + "_count"] = str(pos) + "_count"
-        #     d[pos + "%"] = pos + "%"
-
         return pos_template, d
 
 
@@ -328,7 +320,7 @@ class AnalyzeVerbs:
     get fieldnames for csv that represents all sentences with word in a 
     specific pos
     """
-    def fieldnames_for_csv_by_pos(self, given_lst: iter):
+    def fieldnames_for_csv(self, given_lst: iter):
         dic = {}
         for fieldname in given_lst:
             dic[fieldname] = fieldname
@@ -343,20 +335,21 @@ if __name__ == '__main__':
 
     verb_anazlyzer = AnalyzeVerbs(args["<spacy_file_name>"], args["<num_of_posts>"])
 
-    # write with only open clasue parts of speech and count, %
-    verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
-                                     fields_to_write=["%", "count"], output_file_name=
-                                     r"open_class_pos.csv"
-                                     )
+    # # write with only open clasue parts of speech and count, %
+    # verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
+    #                                  fields_to_write=["%", "count"], output_file_name=
+    #                                  r"open_class_pos.csv"
+    #                                  )
 
     # # write with only count and all parts of speech
-    verb_anazlyzer.write_dict_to_csv(pos_to_use=parts_of_speech,
+    verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
                                      fields_to_write=["count"],
-                                     output_file_name=r"all_pos_count.csv")
+                                     output_file_name=r"all_pos_count.csv",
+                                     additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS])
     #
     # write with only % and all parts of speech
-    verb_anazlyzer.write_dict_to_csv(pos_to_use=parts_of_speech,
-                                     fields_to_write=["%"],
-                                     output_file_name=r"all_pos_%.csv")
-
+    # verb_anazlyzer.write_dict_to_csv(pos_to_use=parts_of_speech,
+    #                                  fields_to_write=["%"],
+    #                                  output_file_name=r"all_pos_%.csv")
+    #
     verb_anazlyzer.create_text_files()

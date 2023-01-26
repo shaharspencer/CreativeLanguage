@@ -18,30 +18,30 @@ class Renderer:
 
     def initialize_nlp(self, model):
         nlp = spacy.load(model)
-        nlp.tokenizer.infix_finditer = self.recompile_hyphens()
-        special_case = [{ORTH: "I"}, {ORTH: "'m"}]
-        nlp.tokenizer.add_special_case("I'm", special_case)
-
-        return nlp
-
-    def recompile_hyphens(self):
-        infixes = (
-                          LIST_ELLIPSES
-                          + LIST_ICONS
-                          + [
-                              r"(?<=[0-9])[+\-\*^](?=[0-9-])",
-                              r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
-                                  al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
-                              ),
-                              r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
-
-                      r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
-        ]
-        )
-
-        infix_re = compile_infix_regex(infixes)
-
-        return infix_re.finditer
+    #     nlp.tokenizer.infix_finditer = self.recompile_hyphens()
+    #     special_case = [{ORTH: "I"}, {ORTH: "'m"}]
+    #     nlp.tokenizer.add_special_case("I'm", special_case)
+    #
+    #     return nlp
+    #
+    # def recompile_hyphens(self):
+    #     infixes = (
+    #                       LIST_ELLIPSES
+    #                       + LIST_ICONS
+    #                       + [
+    #                           r"(?<=[0-9])[+\-\*^](?=[0-9-])",
+    #                           r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
+    #                               al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
+    #                           ),
+    #                           r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
+    #
+    #                   r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
+    #     ]
+    #     )
+    #
+    #     infix_re = compile_infix_regex(infixes)
+    #
+    #     return infix_re.finditer
 
 
     def output_sent_to_svg(self, sent: str, output_path: str):
@@ -65,11 +65,11 @@ class Renderer:
 
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
+
+    sent = "Wake at 5:00 to be at work by 6:00 then get off at 3:30 and work on the house."
+
     renderer = Renderer(model_to_use="en_core_web_lg")
-    renderer.create_renderings_with_csv_file(os.path.join(utils.path_configurations.files_directory,
-                                             utils.path_configurations.rare_sents_directory,
-                                             r"dependency_set_sents_by_count_2023_01_15.csv"),
-                                             "dep_set_renderings")
+    renderer.output_sent_to_svg(sent, "sent.svg")
 
 
 

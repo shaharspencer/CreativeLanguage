@@ -1,3 +1,5 @@
+import enum
+
 import spacy
 from docopt import docopt
 
@@ -7,8 +9,9 @@ import csv
 
 import os
 
-from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files import \
-    DependencyDimensionFiles
+import src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files as abstract_dependency_files
+
+
 
 import utils.path_configurations as paths
 
@@ -22,26 +25,26 @@ Usage:
 
 
 
-class DependencySetFiles(DependencyDimensionFiles):
-    def __init__(self,spacy_file_path,
+
+
+class DependencySetFiles(abstract_dependency_files.DependencyDimensionFiles):
+    def __init__(self, spacy_file_path, group_mode: abstract_dependency_files.DEP_MODE,
+                 dep_set_type: abstract_dependency_files.DEP_SET_TYPE,
                  model="en_core_web_lg",
                  spacy_dir_path=r"withought_context_lg_model",
                  ):
 
-        # TODO make sure these are correct deps
-        # TODO make sure code is proper with proper tests etc
-        # TODO sanity checks with counter and sentences csv's
-        self.DEP_LIST = {"ccomp", "xcomp",
-                        "prt", "dobj", "prep", "dative"}
+
+        self.DEP_LIST = dep_set_type.value
 
         self.ILLEGAL_HEADS = {"relcl", "advcl", "acl"}
 
         self.irrelevant_parts_of_speech = {"PUNCT", "SPACE"}
 
         # initialize super
-        DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
+        abstract_dependency_files.DependencyDimensionFiles.__init__(self, model=model, spacy_dir_path=
         spacy_dir_path, spacy_file_path=
-                                          spacy_file_path)
+                                          spacy_file_path, mode=group_mode)
 
     """
     removes dependencies we don't want in dep list
@@ -112,7 +115,7 @@ class DependencySetFiles(DependencyDimensionFiles):
      different dependency sets across all verbs
      """
 
-    def write_counter_csv(self, counter_csv_name):
+    def write_counter_csv(self, counter_csv_name, column_set):
 
         output_path = os.path.join(paths.files_directory,
                                    paths.dependency_set_directory,
@@ -124,7 +127,7 @@ class DependencySetFiles(DependencyDimensionFiles):
             clean_possible_combs = copy.deepcopy(self.possible_combs)
             clean_possible_combs.remove("")
             clean_possible_combs.add("NO_DEPS")
-            fieldnames_for_combs = self.print_fieldnames(clean_possible_combs)
+            fieldnames_for_combs = self.print_fieldnames(clean_possible_combs, column_set)
             fieldnames = ["Lemma (V)"] + list(fieldnames_for_combs.keys())
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             d = {"Lemma (V)": "Lemma (V)"}
@@ -145,12 +148,16 @@ class DependencySetFiles(DependencyDimensionFiles):
                     try:
                         counter = len(
                             self.dict_for_csv[word][comb]["instances"])
-                        n_dict[comb_name + "_COUNT"] = counter
-                        n_dict[comb_name + "%"] = counter / sum_word
+                        if "COUNT" in column_set:
+                            n_dict[comb_name + "_COUNT"] = counter
+                        if "%" in column_set:
+                            n_dict[comb_name + "%"] = counter / sum_word
 
                     except KeyError:
-                        n_dict[comb_name + "_COUNT"] = 0
-                        n_dict[comb_name + "%"] = 0
+                        if "COUNT" in column_set:
+                            n_dict[comb_name + "_COUNT"] = 0
+                        if "%" in column_set:
+                            n_dict[comb_name + "%"] = 0
                 writer.writerow(n_dict)
 
     """
@@ -209,23 +216,24 @@ class DependencySetFiles(DependencyDimensionFiles):
 
 
 
-if __name__ == '__main__':
-    from datetime import datetime
-
-    datetime = datetime.today().strftime('%Y_%m_%d')
-    args = docopt(usage)
-
-    file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
-                                       args["<spacy_file_name>"])
-
-    csv_path = "dependency_set_from_first_{t}_posts_lg_sents_{n}.csv".format(t=args["<num_of_posts>"],
-        n=datetime)
-    file_creator.write_dict_to_csv(csv_path)
-
-    counter_path = "dependency_set_from_first_{t}_posts_lg_counter_{n}.csv".format(t=args["<num_of_posts>"],
-        n=datetime)
-
-    file_creator.write_counter_csv(counter_path)
+# if __name__ == '__main__':
+    # from datetime import datetime
+    #
+    # datetime = datetime.today().strftime('%Y_%m_%d')
+    # args = docopt(usage)
+    #
+    # file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
+    #                                    args["<spacy_file_name>"], ,
+    #                                  dep_set_type= DEP_SET_TYPE.NON_CLAUSAL_COMPELEMENTS)
+    #
+    # csv_path = "dependency_set_from_first_{t}_posts_lg_sents_{n}.csv".format(t=args["<num_of_posts>"],
+    #     n=datetime)
+    # file_creator.write_dict_to_csv(csv_path)
+    #
+    # counter_path = "dependency_set_from_first_{t}_posts_lg_counter_{n}.csv".format(t=args["<num_of_posts>"],
+    #     n=datetime)
+    #
+    # file_creator.write_counter_csv(counter_path, column_set=["%"])
 
 
 

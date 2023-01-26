@@ -1,0 +1,5 @@
+spacy==3.5.0
+en_core_web_lg==3.4.1
+docopt
+pandas
+os

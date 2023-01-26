@@ -1,4 +1,5 @@
 import copy
+import enum
 import os.path
 import spacy
 import csv
@@ -6,12 +7,31 @@ from spacy.tokens import DocBin
 from abc import ABC, abstractmethod
 from utils import path_configurations as paths
 
-# make sure changing the doc arrangment didnt change anything else
+import spacy
+
+from spacy.tokens import DocBin
+
+import csv
+
+import os
+
+
+class DEP_MODE(enum.Enum):
+    SINGLE_DEP = 1
+    DEP_GROUP = 2
+
+
+class DEP_SET_TYPE(enum.Enum):
+    COMPLETE_COMPELEMENTS = {"ccomp", "xcomp",
+                             "prt", "dobj", "prep", "dative"}
+    NON_CLAUSAL_COMPELEMENTS = {"prt", "dobj", "prep", "dative"}
+
 
 class DependencyDimensionFiles(ABC):
 
     def __init__(self, spacy_dir_path, spacy_file_path,
-                 model):
+                 model, mode:DEP_MODE):
+        self.mode = mode
         self.nlp = spacy.load(model)
 
         # get saved spacy file
@@ -53,8 +73,16 @@ class DependencyDimensionFiles(ABC):
     def add_doc_to_dict(self, doc):
         for sent in doc.sents:
             for token in sent:
-                self.add_token_to_dict(doc.user_data["DOC_INDEX"],
-                                       doc.user_data["SENT_INDEX"], token)
+                if self.mode == DEP_MODE.SINGLE_DEP:
+                    self.add_token_to_dict_by_single_dep(doc.user_data["DOC_INDEX"],
+                                                 doc.user_data["SENT_INDEX"], token)
+
+                elif self.mode == DEP_MODE.DEP_GROUP:
+                    self.add_token_to_dict_by_subset(doc.user_data["DOC_INDEX"],
+                                                 doc.user_data["SENT_INDEX"], token)
+
+                else:
+                    raise Exception("the mode in the abstract file was wrong")
 
     """
         adds a single token to dictionary
@@ -64,8 +92,8 @@ class DependencyDimensionFiles(ABC):
         then adds to dictionary
     """
 
-    def add_token_to_dict(self, doc_index: int, sent_indx: int,
-                          token: spacy.tokens) -> bool:
+    def add_token_to_dict_by_subset(self, doc_index: int, sent_indx: int,
+                                    token: spacy.tokens) -> bool:
 
         token_children = self.clean_token_children(token)
         # verify that we want to add this token
@@ -76,6 +104,26 @@ class DependencyDimensionFiles(ABC):
         # arrange dependencies
         token_dep_comb = self.arrange_deps(token, token_children )
 
+        self.add_entry_to_dict(token, doc_index, sent_indx, token_dep_comb, token_children)
+
+    def add_token_to_dict_by_single_dep(self, doc_index: int, sent_indx: int,
+                                    token: spacy.tokens) -> bool:
+
+        token_children = self.clean_token_children(token)
+        # verify that we want to add this token
+        if not self.check_if_add_token(token, token_children):
+            return False
+        # create key for token if not yet in dict keys
+        self.add_verb_template_to_dict(token, )
+        # arrange dependencies
+        # token_dep_comb = self.arrange_deps(token, token_children)
+        for dep in token_children:
+            self.add_entry_to_dict(token, doc_index, sent_indx, dep.dep_,
+                                   token_children)
+
+
+    def add_entry_to_dict(self, token, doc_index, sent_indx, token_dep_comb,
+                          token_children:list[spacy.tokens]):
         self.possible_combs.add(token_dep_comb)
         dict_tuple = (token.text, doc_index, sent_indx,
                       token.sent.text.strip())
@@ -91,8 +139,6 @@ class DependencyDimensionFiles(ABC):
                 [token_dep_comb] = {"instances": set(), "counter": 1}
             self.dict_for_csv[token.lemma_.lower()] \
                 [token_dep_comb]["instances"].add(dict_tuple)
-
-
 
     """
     this method checks if the token itself is of the type we want to use
@@ -174,7 +220,7 @@ class DependencyDimensionFiles(ABC):
     """
 
     @abstractmethod
-    def write_counter_csv(self, counter_csv_path: str):
+    def write_counter_csv(self, counter_csv_path: str, column_set: list[str]):
         pass
 
     """
@@ -182,18 +228,21 @@ class DependencyDimensionFiles(ABC):
     if the token.lemma_lower() is not yet a key, add as key
     """
 
-    def add_verb_template_to_dict(self, token: spacy.tokens):
+    def add_verb_template_to_dict(self, token: spacy.tokens,
+                                  dep_list:list[str]):
         if not token.lemma_.lower() in self.dict_for_csv.keys():
             self.dict_for_csv[token.lemma_.lower()] = {}
 
     """
     creates a dictionary for the .csv counter file fieldnames
     """
-    def print_fieldnames(self, given_lst: iter):
+    def print_fieldnames(self, comb: iter, column_set):
         dic = {}
-        for fieldname in given_lst:
-            dic[fieldname + "_COUNT"] = fieldname + "_COUNT"
-            dic[fieldname + "%"] = fieldname + "%"
+        for fieldname in comb:
+            if "COUNT" in column_set:
+                dic[fieldname + "_COUNT"] = fieldname + "_COUNT"
+            if "%" in column_set:
+                dic[fieldname + "%"] = fieldname + "%"
         return dic
 
 

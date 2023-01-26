@@ -127,9 +127,9 @@ class AnalyzeVerbs:
             return False
         self.add_token_template_to_dict(token)
         # convert all letters but first letter to lowercase
-        self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add\
-        ([token.text, token.sent.text, token.doc.user_data["DOC_INDEX"],
-             token.doc.user_data["SENT_INDEX"]])
+        self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add \
+            ( (token.text, token.sent.text, token.doc.user_data["DOC_INDEX"],
+             token.doc.user_data["SENT_INDEX"]))
         self.verb_dict[token.lemma_.lower()][token.pos_]["lemma"] = \
             token.lemma_
         self.verb_dict[token.lemma_.lower()][token.pos_]["Counter"] += 1

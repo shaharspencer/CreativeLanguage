@@ -6,9 +6,9 @@ import spacy
 import csv
 from spacy.tokens import DocBin
 
-import utils.path_configurations as paths
+import src.utils.path_configurations as paths
 
-from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files import \
+from src.source_files_by_dim.dependencies.abstract_dependency_files import \
     DependencyDimensionFiles
 
 usage = '''

@@ -1,14 +1,10 @@
-import logging
-import time
-
 import pandas as pd
 import spacy
 import pandas
 from spacy.tokens import Doc
 from spacy.tokens import DocBin
 from docopt import docopt
-from pathlib import Path
-from spacy.symbols import ORTH
+# from spacy.symbols import ORTH
 from spacy.lang.char_classes import ALPHA, ALPHA_LOWER, ALPHA_UPPER
 from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
@@ -20,7 +16,7 @@ import utils.path_configurations as paths
 usage = '''
 Processor CLI.
 Usage:
-    processor.py [<file_to_process>] [<number_of_blogposts>]
+    processor.py <file_to_process> <number_of_blogposts>
 '''
 
 """
@@ -43,71 +39,76 @@ class Processor:
                  model="en_core_web_lg", number_of_blogposts=40000,
 
                  ):
+        self.nlp = spacy.load(model)
         # get a .csv file that contains the unprocessed data
-        self.source_file_path = os.path.join(paths.files_directory,
-                                             paths.training_data_files_directory,
-                                             source_file)
-        # the name of the file we want to write to
-        output_file_name = "data_from_first_{n}_lg_model.spacy".format(
+        # self.source_file_path = os.path.join(files_directory,
+        #                                      training_data_files_directory,
+        #                                      source_file)
+        self.source_file_path = source_file
+    #     # the name of the file we want to write to
+        self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
             n=number_of_blogposts)
-        self.output_file_path = os.path.join(paths.files_directory,
-                                             paths.spacy_files_directory,
-                                             output_file_dir,
-                                             output_file_name)
-
+        # self.output_file_path = os.path.join(files_directory,
+        #                                      spacy_files_directory,
+        #                                      output_file_dir,
+        #                                      output_file_name)
+    #
         self.number_of_blogposts = number_of_blogposts
-
-        # create a dataframe from the .csv file
+    #
+    #     # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding ='utf-8'
-                                  ).head(self.number_of_blogposts)
-        # initialize a docBin object with the following attributes
+                                  )
+    #     # initialize a docBin object with the following attributes
         self.doc_bin = DocBin(
             attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE",
                    "ENT_KB_ID", "LEMMA", "MORPH", "POS"],
             store_user_data=True)
-        # initialize a spacy nlp object based on "model" type
-        self.nlp = spacy.load(model)
-        # add attributes to nlp object: ex. don't split hyphens
-        self.add_attrs_to_nlp()
+    #     # initialize a spacy nlp object based on "model" type
 
+    #     # add attributes to nlp object: ex. don't split hyphens
+        self.add_attrs_to_nlp()
+    #
     def add_attrs_to_nlp(self, no_split_hyphens = False,
                          add_i_m_case=True):
-        if add_i_m_case:
-            special_case = [{ORTH: "i"}, {ORTH: "'m"}]
-            self.nlp.tokenizer.add_special_case("i'm", special_case)
-            special_case = [{ORTH: "I"}, {ORTH: "'m"}]
-            self.nlp.tokenizer.add_special_case("I'm", special_case)
+        # if add_i_m_case:
+        #     special_case = [{spacyORTH: "i"}, {ORTH: "'m"}]
+        #     self.nlp.tokenizer.add_special_case("i'm", special_case)
+        #     special_case = [{ORTH: "I"}, {ORTH: "'m"}]
+        #     self.nlp.tokenizer.add_special_case("I'm", special_case)
 
         if no_split_hyphens:
             self.nlp.tokenizer.infix_finditer = self.recompile_hyphens
-
-
-    """
-        iterate over rows in dataframe and create nlp object from text.
-        can limit number of bloposts via number_of_blogposts argument
-        push docBin to disk (save docBin)
-    """
+    #
+    #
+    # """
+    #     iterate over rows in dataframe and create nlp object from text.
+    #     can limit number of bloposts via number_of_blogposts argument
+    #     push docBin to disk (save docBin)
+    # """
     def process_file_and_create_nlp_objs(self):
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
 
 
-        with tqdm(total=self.df.shape[0]) as pbar:
+        with tqdm(total=self.number_of_blogposts) as pbar:
             for index, row in self.df.iterrows():
                 pbar.update(1)
                 self.add_blogpost_to_docbin(index, row)
+                if index ==self.number_of_blogposts:
+                    self.doc_bin.to_disk(self.output_file_path)
+                    return
 
         self.doc_bin.to_disk(self.output_file_path)
-
-
-
-    """
-        adds each sentence in a single blogpost to the docBin. 
-        first creates a nlp object from the entire blogpost to get seperate
-        sentences.
-        then for each sentence create an nlp object, add the doc index etc
-        as user data, and save to docbin 
-    """
+    #
+    #
+    #
+    # """
+    #     adds each sentence in a single blogpost to the docBin.
+    #     first creates a nlp object from the entire blogpost to get seperate
+    #     sentences.
+    #     then for each sentence create an nlp object, add the doc index etc
+    #     as user data, and save to docbin
+    # """
     def add_blogpost_to_docbin(self, index, row: pd.DataFrame):
 
         blogpost_text = self.clean_text_data(row['text'])
@@ -118,11 +119,10 @@ class Processor:
             doc = self.nlp(sentence) # proccesed sentence
             doc.user_data = {"DOC_INDEX": index,
                              "SENT_INDEX": sent_index}
-            for col_name, col_val in row.iteritems():
+            for col_name, col_val in row.items():
                 doc.user_data[col_name] = col_val
             doc.retokenize()
             self.doc_bin.add(doc)
-
 
 
     def recompile_hyphens(self):
@@ -143,11 +143,11 @@ class Processor:
 
         infix_re = compile_infix_regex(infixes)
         return infix_re.finditer
-
-    """
-    cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
-    these are all html remanants
-    """
+    #
+    # """
+    # cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
+    # these are all html remanants
+    # """
     def clean_text_data(self, blogpost:str)->str:
         if "&nbsp;" in blogpost:
             x = 0
@@ -165,16 +165,12 @@ class Processor:
 
 if __name__ == '__main__':
     args = docopt(usage)
-    if args['<file_to_process>']:
-        source_file = args['<file_to_process>']
 
-        proccessor = Processor(source_file=source_file)
-    else:
-        processor = Processor()
+    source_file = args['<file_to_process>']
 
-    if args['<number_of_blogposts>']:
-        number_of_files = args['<number_of_blogposts>']
-        proccessor.number_of_blogposts = number_of_files
+    number_of_files = int(args['<number_of_blogposts>'])
 
-    processor.process_file_and_create_nlp_objs()
+    proccessor = Processor(source_file=source_file, number_of_blogposts=number_of_files)
+
+    proccessor.process_file_and_create_nlp_objs()
 

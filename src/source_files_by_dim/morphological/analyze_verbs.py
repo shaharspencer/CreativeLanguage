@@ -9,8 +9,8 @@ from spacy.tokens import DocBin
 from zipfile import ZipFile
 from tqdm import tqdm
 
-import utils.path_configurations
-import utils.path_configurations as paths
+import src.utils.path_configurations
+import src.utils.path_configurations as paths
 
 
 
@@ -147,13 +147,16 @@ class AnalyzeVerbs:
     """
     create csv with all differnt count of parts of speech
     """
+
+    # TODO add date
     def write_dict_to_csv(self, pos_to_use, fields_to_write, additional_cols,
                           output_file_name):
         output_file_name = "first_{n}_posts_".format(n=self.number_of_posts) + output_file_name
-        output_path = os.path.join(utils.path_configurations.files_directory,
-                                   utils.path_configurations.morphological_dimension_directory,
-                                   utils.path_configurations.morphological_dimension_source_files,
-                                   output_file_name)
+        output_path = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.morphological_dimension_directory,
+            src.utils.path_configurations.morphological_dimension_source_files,
+            output_file_name)
         with open(output_path, 'w', encoding='utf-8', newline='') as f:
             fieldnames = ["word"]
             pos_fields, pos_dict = self.csv_pos_template(pos_to_use, fields_to_write)
@@ -183,8 +186,9 @@ class AnalyzeVerbs:
     def writing_to_csv(self, writer, pos_to_use, fields_to_write, add_cols):
         with tqdm(desc="writing to csv", colour="green",
                   total=len(self.verb_dict.keys())) as pbar:
-            pbar.update(1)
+
             for word in self.verb_dict.keys():
+                pbar.update(1)
                 n_dict = {'word': word}
                 total = sum(
                     [self.verb_dict[word][pos]["Counter"] for pos in
@@ -220,8 +224,9 @@ class AnalyzeVerbs:
         with ZipFile(zip_file_dir, 'w') as file_dir:
             with tqdm(desc="creating text files per verb", colour="CYAN",
                 total=len(list(self.doc_bin.get_docs(self.nlp.vocab)))) as pbar:
-                pbar.update(1)
+
                 for word in self.verb_dict.keys():
+                    pbar.update(1)
                     for pos in self.spacy_part_of_speech:
                         file = self.create_csv_for_pos(word, pos)
                         if file != "":

@@ -1,13 +1,12 @@
-import enum
 import spacy
 from docopt import docopt
 
 from spacy.tokens import DocBin
-import csv
-
-import os
 
 DEP_PRT_SEPERATOR = "_"
+
+import sys
+sys.path.append('../')
 
 #TODO: 100 posts only outputted - {'', 'dative_dobj_prep', 'dative_dobj', 'dobj', 'prep', 'dobj_prep'}
 # sets maybe should be more. (8) make sure this isnt a bug
@@ -21,12 +20,11 @@ Usage:
     non_clausal_compelments_with_phrasal_verb.py <spacy_file_name> <num_of_posts>
 '''
 
-
-import utils.path_configurations as paths
-from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files import \
+from src.source_files_by_dim.dependencies.abstract_dependency_files import \
     DEP_SET_TYPE, DEP_MODE
 
-from src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.dependency_set.depedency_set_files import \
+
+from src.source_files_by_dim.dependencies.dependency_set.depedency_set_files import \
     DependencySetFiles
 
 

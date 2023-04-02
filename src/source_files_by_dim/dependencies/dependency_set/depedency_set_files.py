@@ -1,5 +1,3 @@
-import enum
-
 import spacy
 from docopt import docopt
 
@@ -9,11 +7,11 @@ import csv
 
 import os
 
-import src.explore_verbs_by_dim.create_source_files_by_dim.Dependencies.abstract_dependency_files as abstract_dependency_files
+import src.source_files_by_dim.dependencies.abstract_dependency_files as abstract_dependency_files
 
 
 
-import utils.path_configurations as paths
+import src.utils.path_configurations as paths
 
 
 usage = '''
@@ -216,24 +214,27 @@ class DependencySetFiles(abstract_dependency_files.DependencyDimensionFiles):
 
 
 
-# if __name__ == '__main__':
-    # from datetime import datetime
-    #
-    # datetime = datetime.today().strftime('%Y_%m_%d')
-    # args = docopt(usage)
-    #
-    # file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
-    #                                    args["<spacy_file_name>"], ,
-    #                                  dep_set_type= DEP_SET_TYPE.NON_CLAUSAL_COMPELEMENTS)
-    #
-    # csv_path = "dependency_set_from_first_{t}_posts_lg_sents_{n}.csv".format(t=args["<num_of_posts>"],
-    #     n=datetime)
-    # file_creator.write_dict_to_csv(csv_path)
-    #
-    # counter_path = "dependency_set_from_first_{t}_posts_lg_counter_{n}.csv".format(t=args["<num_of_posts>"],
-    #     n=datetime)
-    #
-    # file_creator.write_counter_csv(counter_path, column_set=["%"])
+if __name__ == '__main__':
+    from datetime import datetime
+
+    datetime = datetime.today().strftime('%Y_%m_%d')
+    args = docopt(usage)
+
+    file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
+                                       args["<spacy_file_name>"],
+                                      dep_set_type=
+                                      abstract_dependency_files.DEP_SET_TYPE.NON_CLAUSAL_COMPELEMENTS,
+                                      group_mode =
+                                      abstract_dependency_files.DEP_MODE.DEP_GROUP)
+
+    csv_path = "dependency_set_from_first_{t}_posts_lg_sents_{n}_non_clausal_compelemnts.csv".format(t=args["<num_of_posts>"],
+        n=datetime)
+    file_creator.write_dict_to_csv(csv_path)
+
+    counter_path = "dependency_set_from_first_{t}_posts_lg_counter_{n}_non_clausal_compelemnts.csv".format(t=args["<num_of_posts>"],
+        n=datetime)
+
+    file_creator.write_counter_csv(counter_path, column_set=["COUNT"])
 
 
 

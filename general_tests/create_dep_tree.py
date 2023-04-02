@@ -1,15 +1,8 @@
 import spacy
-from spacy.symbols import ORTH
-from spacy.lang.char_classes import ALPHA, ALPHA_LOWER, ALPHA_UPPER
-from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
-from spacy.util import compile_infix_regex
 import pathlib
 import os
 from spacy import displacy
-import docopt
 import pandas as pd
-
-import utils.path_configurations
 
 
 class Renderer:
@@ -17,7 +10,7 @@ class Renderer:
         self.nlp = self.initialize_nlp(model_to_use)
 
     def initialize_nlp(self, model):
-        nlp = spacy.load(model)
+        return spacy.load(model)
     #     nlp.tokenizer.infix_finditer = self.recompile_hyphens()
     #     special_case = [{ORTH: "I"}, {ORTH: "'m"}]
     #     nlp.tokenizer.add_special_case("I'm", special_case)
@@ -66,7 +59,7 @@ class Renderer:
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
 
-    sent = "Wake at 5:00 to be at work by 6:00 then get off at 3:30 and work on the house."
+    sent = "He had elections, in which everyone was 'encouraged' to vote, but he was still a dictator."
 
     renderer = Renderer(model_to_use="en_core_web_lg")
     renderer.output_sent_to_svg(sent, "sent.svg")

@@ -1,8 +1,7 @@
 import pandas as pd
 from docopt import docopt
 import csv
-from collections import OrderedDict
-import utils.path_configurations as paths
+import src.utils.path_configurations as paths
 import os
 
 usage = '''

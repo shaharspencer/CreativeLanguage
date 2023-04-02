@@ -3,7 +3,7 @@ import os
 
 from docopt import docopt
 
-import utils.path_configurations as paths
+import src.utils.path_configurations as paths
 
 usage = '''
 arg_struct_DIM CLI.

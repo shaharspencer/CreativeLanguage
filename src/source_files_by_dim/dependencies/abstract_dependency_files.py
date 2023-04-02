@@ -1,11 +1,8 @@
-import copy
 import enum
 import os.path
-import spacy
-import csv
 from spacy.tokens import DocBin
 from abc import ABC, abstractmethod
-from utils import path_configurations as paths
+from src.utils import path_configurations as paths
 
 import spacy
 
@@ -100,9 +97,9 @@ class DependencyDimensionFiles(ABC):
         if not self.check_if_add_token(token, token_children):
             return False
         # create key for token if not yet in dict keys
-        self.add_verb_template_to_dict(token)
+        self.add_verb_template_to_dict(token, dep_list=token_children)
         # arrange dependencies
-        token_dep_comb = self.arrange_deps(token, token_children )
+        token_dep_comb = self.arrange_deps(token, token_children)
 
         self.add_entry_to_dict(token, doc_index, sent_indx, token_dep_comb, token_children)
 

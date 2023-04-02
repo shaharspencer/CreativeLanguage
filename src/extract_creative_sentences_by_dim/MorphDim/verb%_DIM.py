@@ -6,7 +6,7 @@ from zipfile import ZipFile
 
 from docopt import docopt
 
-import utils.path_configurations
+import src.utils.path_configurations
 
 
 
@@ -21,14 +21,16 @@ class GetRarestVerbs:
     def __init__(self, sents_dir_path,
                  verb_csv
            ):
-        self.verb_csv = os.path.join(utils.path_configurations.files_directory,
-                                     utils.path_configurations.morphological_dimension_directory,
-                                     utils.path_configurations.morphological_dimension_source_files,
-                                     verb_csv)
-        self.sents_dir_path = os.path.join(utils.path_configurations.files_directory,
-                                     utils.path_configurations.morphological_dimension_directory,
-                                     utils.path_configurations.morphological_dimension_source_files,
-                                     sents_dir_path)
+        self.verb_csv = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.morphological_dimension_directory,
+            src.utils.path_configurations.morphological_dimension_source_files,
+            verb_csv)
+        self.sents_dir_path = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.morphological_dimension_directory,
+            src.utils.path_configurations.morphological_dimension_source_files,
+            sents_dir_path)
 
     def explore_simple_method_propn(self, output_file_name,
                                      top_and_lowest_k=20):
@@ -45,9 +47,10 @@ class GetRarestVerbs:
 
         sorted_lowest = sorted_dataframe.head(n=top_and_lowest_k)
         # sorted_top = sorted_dataframe.tail(n=top_and_lowest_k)
-        output_path = os.path.join(utils.path_configurations.files_directory,
-                                   utils.path_configurations.rare_sents_directory,
-                                   output_file_name)
+        output_path = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.rare_sents_directory,
+            output_file_name)
 
         self.write_csv_file_from_df(df=sorted_lowest,
                                     output_file_path=output_path)
@@ -60,9 +63,10 @@ class GetRarestVerbs:
 
         sorted_lowest = sorted_dataframe.head(n=top_and_lowest_k)
         # sorted_top = sorted_dataframe.tail(n=top_and_lowest_k)
-        output_path = os.path.join(utils.path_configurations.files_directory,
-                                   utils.path_configurations.rare_sents_directory,
-                                   output_file_name)
+        output_path = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.rare_sents_directory,
+            output_file_name)
 
         self.write_csv_file_from_df(df=sorted_lowest,
                                    output_file_path = output_path)

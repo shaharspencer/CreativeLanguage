@@ -20,6 +20,10 @@ Usage:
 
 
 class RandomizeSents:
+    """
+    k is the number of sentences
+
+    """
     def __init__(self, k: int, output_path,
                  model="en_core_web_lg",
                  spacy_directory=

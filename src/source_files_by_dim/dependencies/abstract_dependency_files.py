@@ -111,7 +111,7 @@ class DependencyDimensionFiles(ABC):
         if not self.check_if_add_token(token, token_children):
             return False
         # create key for token if not yet in dict keys
-        self.add_verb_template_to_dict(token, )
+        self.add_verb_template_to_dict(token, token_children)
         # arrange dependencies
         # token_dep_comb = self.arrange_deps(token, token_children)
         for dep in token_children:
@@ -119,7 +119,8 @@ class DependencyDimensionFiles(ABC):
                                    token_children)
 
 
-    def add_entry_to_dict(self, token, doc_index, sent_indx, token_dep_comb,
+    def add_entry_to_dict(self, token,
+                          doc_index, sent_indx, token_dep_comb,
                           token_children:list[spacy.tokens]):
         self.possible_combs.add(token_dep_comb)
         dict_tuple = (token.text, doc_index, sent_indx,
@@ -241,6 +242,8 @@ class DependencyDimensionFiles(ABC):
             if "%" in column_set:
                 dic[fieldname + "%"] = fieldname + "%"
         return dic
+
+
 
 
 

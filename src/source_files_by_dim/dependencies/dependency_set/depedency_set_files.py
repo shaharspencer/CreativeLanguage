@@ -17,10 +17,8 @@ import src.utils.path_configurations as paths
 usage = '''
 dependency_set_files CLI.
 Usage:
-    dependency_set_files.py <spacy_file_name> <num_of_posts>
+    dependency_set_files.py <spacy_file_name> <num_of_posts> <dep_set_type>
 '''
-
-
 
 
 
@@ -67,6 +65,18 @@ class DependencySetFiles(abstract_dependency_files.DependencyDimensionFiles):
         return True
 
     """
+        this token checks whether the verb is a child with dependency of type 
+        amod. 
+        if so returns false because we do not want to use
+        this type of verb
+        @:param token: token to check
+    """
+    def check_if_amod(self, token: spacy.tokens) -> bool:
+        if token.head.pos_ == "NOUN" and token.dep_ == "amod":
+            return False
+        return True
+
+    """
         this method checks whether the verb is a relcl or an acl.
         if so returns false because we do not want to use
         this type of verb
@@ -101,11 +111,16 @@ class DependencySetFiles(abstract_dependency_files.DependencyDimensionFiles):
                      token_children: list[spacy.tokens]) -> str:
         return "_".join(set(sorted([x.dep_ for x in token_children])))
 
-
+    """
+    check if the token has the allowed dependencies and if itself is a legal 
+    dependency type
+    @:return true if we want to use the token
+    false otherwise
+    """
     def check_legal_token_deps(self, token: spacy.tokens,
                                token_dep_list: list[spacy.tokens]) -> bool:
         return self.check_if_relcl(token) and self.check_token_dep_types(
-            token_dep_list)
+            token_dep_list) and self.check_if_amod(token)
 
     """
      this function is used when we are analyzing the dependency list
@@ -220,10 +235,18 @@ if __name__ == '__main__':
     datetime = datetime.today().strftime('%Y_%m_%d')
     args = docopt(usage)
 
+    if args["<dep_set_type>"] == "NON_CLAUSAL":
+        dep_set_type = abstract_dependency_files.DEP_SET_TYPE.NON_CLAUSAL_COMPELEMENTS
+
+    elif args["<dep_set_type>"] == "COMPLETE":
+        dep_set_type = abstract_dependency_files.DEP_SET_TYPE.COMPLETE_COMPELEMENTS
+    else:
+        raise Exception("dep set type is not legal")
+
     file_creator = DependencySetFiles(model="en_core_web_lg", spacy_file_path=
                                        args["<spacy_file_name>"],
                                       dep_set_type=
-                                      abstract_dependency_files.DEP_SET_TYPE.NON_CLAUSAL_COMPELEMENTS,
+                                      dep_set_type,
                                       group_mode =
                                       abstract_dependency_files.DEP_MODE.DEP_GROUP)
 

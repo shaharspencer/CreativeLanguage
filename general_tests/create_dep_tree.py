@@ -59,8 +59,7 @@ class Renderer:
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
 
-    sent = "He had elections, in which everyone was 'encouraged' to vote, but he was still a dictator."
-
+    sent = "First transform the gas into a liquid by subjecting it to pressure."
     renderer = Renderer(model_to_use="en_core_web_lg")
     renderer.output_sent_to_svg(sent, "sent.svg")
 

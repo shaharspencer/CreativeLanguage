@@ -93,7 +93,7 @@ class RandomizeSents:
     def __get_k_sents_csv(self):
 
         with open(self.output_path, 'w', encoding='utf-8', newline='') as f:
-            fieldnames = ["sentence", "verb", "dep set", "doc index", "sent index"]
+            fieldnames = ["sentence", "verb", "verb index", "dep set", "doc index", "sent index"]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
 
             writer.writerow(self.__fieldnames_for_csv(fieldnames))
@@ -104,7 +104,8 @@ class RandomizeSents:
                     dep_set.remove("punct")
                 dep_set = "_".join(dep_set)
                 n_dict = {"sentence": key.text,
-                          "verb": self.sents_mapped_to_verbs[key].text,
+                          "verb": self.sents_mapped_to_verbs[key].text, "verb index":
+                            self.sents_mapped_to_verbs[key].i,
                           "doc index": key.user_data["DOC_INDEX"],
                           "sent index":
                           key.user_data["SENT_INDEX"], "dep set": dep_set}

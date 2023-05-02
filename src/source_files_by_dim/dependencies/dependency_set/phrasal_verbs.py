@@ -105,13 +105,14 @@ class PhrasalVerbs(DependencySetFiles):
     def handle_prt_child_add_single_dep(self, doc_index: int, sent_indx: int,
                                     token: spacy.tokens, token_children):
         self.add_verb_template_to_dict(token, token_children)
-
-        if not token_children:
+        # if the dependency list has only "prt"
+        if (len(token_children) == 1
+                and token_children[0].dep_ == "prt"):
             self.add_entry_to_dict(token, doc_index, sent_indx,
                                    "",
                                    token_children)
             return True
-            # else if not empty dep list
+        # else if not empty dep list
         for dep in token_children:
             if dep.dep_ == "prep":
                 self.add_entry_to_dict(token, doc_index, sent_indx,
@@ -123,7 +124,7 @@ class PhrasalVerbs(DependencySetFiles):
 
             else:
                 self.add_entry_to_dict(token, doc_index, sent_indx,
-                                       dep.dep_,
+                                       dep.lemma_.lower(),
                                        token_children)
 
     """
@@ -131,9 +132,7 @@ class PhrasalVerbs(DependencySetFiles):
     the token children does NOT contain a prt dependency. we then want to 
     add entry to dictionary of word by itself and then
     add each dependency one by one. 
-
     """
-
     def handle_not_prt_child_add_single_dep(self, doc_index: int, sent_indx: int,
                                         token: spacy.tokens, token_children,
                                      ):
@@ -155,9 +154,6 @@ class PhrasalVerbs(DependencySetFiles):
                                           dep.dep_,
                                           token_children)
         return True
-
-
-
 
 
     #TODO: note - subset does not have the actual prep word like single does.
@@ -201,7 +197,7 @@ class PhrasalVerbs(DependencySetFiles):
     def add_verb_template_to_dict(self, token: spacy.tokens,
                                   dep_list:list[spacy.tokens]):
         prt_child = self.get_child_with_specific_dependency(dep_list, "prt")
-        token_lemma_with_prt = token.lemma_.lower() + DEP_PRT_SEPERATOR + prt_child.text
+        token_lemma_with_prt = token.lemma_.lower() + DEP_PRT_SEPERATOR + prt_child.text.lower()
         if not token_lemma_with_prt in self.dict_for_csv.keys():
             self.dict_for_csv[token_lemma_with_prt] = {}
 
@@ -230,8 +226,8 @@ class PhrasalVerbs(DependencySetFiles):
                                                             "prt")
         if not prt_child:
             raise Exception("do not have prt as child")
-        token_with_prt = token.text + DEP_PRT_SEPERATOR + prt_child.text
-        token_lemma_form_with_prt = token.lemma_.lower() +DEP_PRT_SEPERATOR+ prt_child.text
+        token_with_prt = token.text + DEP_PRT_SEPERATOR + prt_child.text.lower()
+        token_lemma_form_with_prt = token.lemma_.lower() +DEP_PRT_SEPERATOR+ prt_child.text.lower()
 
         dict_tuple = (token_with_prt, doc_index, sent_indx,
                       token.sent.text.strip())

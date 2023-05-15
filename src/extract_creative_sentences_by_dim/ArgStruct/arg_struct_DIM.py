@@ -75,6 +75,7 @@ class GetRarestArgStructs:
         sents_df = pd.read_csv(self.sents_csv)
         # screen out verbs with low set count
         verb_df = verb_df[verb_df["num_sets"] > 1]
+        verb_df = verb_df[verb_df["TOTAL"] > 50]
         sorted_dataframe = verb_df.sort_values(["entropy"],
                                           ascending=True)
         # open output csv
@@ -87,7 +88,7 @@ class GetRarestArgStructs:
                            "perc of dep set", "entropy",
                            "index of verb",
                            "Doc index",
-                            "Sent index"]
+                            "Sent index", "total count of verb"]
 
         writer = csv.DictWriter(f=output_csv, fieldnames=fields)
 
@@ -97,9 +98,9 @@ class GetRarestArgStructs:
         counter = 0
 
         for index, row in sorted_dataframe.iterrows():
-            if counter == 150:
+            if counter >= 300:
                 break
-            counter += 1
+
             # get rarest dependency set for current lemma
             rarest_dep_struct, min_count = None, 0
             for i_col, col in row.items():
@@ -114,6 +115,8 @@ class GetRarestArgStructs:
                                         row["Lemma (V)"]) &
                                         (sents_df["Dep struct"] == rarest_dep_struct)]
             for s_i, s_row in current_lemma_df.iterrows():
+                counter += 1
+
                 if rarest_dep_struct == "NO_DEPS":
                     dep_set = set()
                 else:
@@ -134,7 +137,7 @@ class GetRarestArgStructs:
                           "entropy": row["entropy"],
                            "Doc index": s_row["Doc index"],
                            "Sent index": s_row["Sent index"],
-                          "index of verb": index_of_verb
+                          "index of verb": index_of_verb, "total count of verb": row["TOTAL"]
                           }
 
                 writer.writerow(n_dict)
@@ -175,7 +178,7 @@ class GetRarestArgStructs:
                 if child.dep_ != "punct" and child.dep_ != "SPACE" and child.dep_ != "dep"])
             token_form = token.text
             token_lemma = token.lemma_
-            if token_lemma == "contain":
+            if token_lemma == "give" and doc == 'I have to keep giving it up to God over and over again.':
                 i=1
 
             if "_" in verb_form:
@@ -185,7 +188,11 @@ class GetRarestArgStructs:
                     continue
                 token_form += "_" + child.text
                 token_lemma += "_" + child.text
-                token_deps.remove(child)
+                new_set = set()
+                for child in token_deps:
+                    if child.dep_ != "prt":
+                        new_set.add(child)
+                token_deps = new_set
             token_deps = set([child.dep_ for child in token_deps])
 
             if token_form == verb_form and token_lemma == lemma \

@@ -59,7 +59,7 @@ class Renderer:
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
 
-    sent =  "Once inside the game, you can zoom right up to a single person, then zoom out to above the clouds, all in one swift seamless motion."
+    sent =  "I have to keep giving it up to God over and over again."
     renderer = Renderer(model_to_use="en_core_web_lg")
     renderer.output_sent_to_svg(sent, "sent.svg")
 

@@ -1,4 +1,3 @@
-blis @ file:///D:/bld/cython-blis_1668499257693/work
 brotlipy @ file:///D:/bld/brotlipy_1666764795627/work
 catalogue @ file:///D:/bld/catalogue_1666891955597/work
 certifi==2022.12.7

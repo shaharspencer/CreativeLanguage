@@ -69,8 +69,6 @@ class PhrasalVerbs(DependencySetFiles):
                                     token: spacy.tokens) -> bool:
         # get list of children w/o "punct" and such
         token_children = self.clean_token_children(token)
-        if token.sent == "Or I could just let you do the killing without killing you":
-            x = 0
 
         # verify that we want to add this token
         if not self.check_if_add_token(token, token_children):
@@ -233,8 +231,6 @@ class PhrasalVerbs(DependencySetFiles):
 
         dict_tuple = (token_with_prt, doc_index, sent_indx,
                       token.sent.text.strip())
-        if token.sent.text.strip() == "I have to keep giving it up to God over and over again.":
-            x = 0
 
         if token_dep_comb in self.dict_for_csv[token_lemma_form_with_prt]:
             self.dict_for_csv[token_lemma_form_with_prt] \

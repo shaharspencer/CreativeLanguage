@@ -1,0 +1,276 @@
+lemma,verb form,Sentence,dep set,count of dep set,perc of dep set,entropy,index of verb,Doc index,Sent index,verb count overall
+accord,according,I'm developing a habit of virtue according to which I do not feel sorry for myself and my situation and pursuing a vision in which I come out the stronger for it.,NO_DEPS,1,0%,0.04,7,26109,6,532
+be,aRe,"tHey aCtually aRe tO me, dEy hAve bEcOme nUtHiNg bUt",prep,1,1%,0.1,2,35754,6,78
+m,m,"And she was like, 'You know, l-m-a-o...",dobj,1,1%,0.11,11,20927,26,72
+re,re,or I know what you are youre a hustler!,dobj,1,1%,0.14,7,7770,7,115
+deal,dealing,"He's only played poker with us twice, but he's always shuffling a deck of cards in school and dealing himself poker hands, and he thinks he's really good.",dobj,1,1%,0.19,21,23908,78,119
+depend,depend,"Of course, in this odd post-modern era, there are those who would say there is no objective good and evil, and that what is good and what is evil are all subjective, and depend only one's own  personal preferences .",dobj,1,1%,0.23,39,16046,7,176
+lol,lol,lol only one person in this world besides me...knows what that stands for and well if your one of those people that get bugged by not knowing whatsomething means...well there ya go...,prep_dobj,1,0%,0.24,0,17473,0,287
+base,basing,"Knowing my luck and basing the possible outcomes on my BIO 103 class, which I took 3 times and still fought for a D+, I decided to drop those and take new classes from those sections.",dobj,2,1%,0.27,4,25784,9,178
+base,basing,"He's shown that in order to be taking seriously musically, I have to learn real musicianship instead of basing my practice and skills soley on little tricks I've picked up here and there.",dobj,2,1%,0.27,20,24409,28,178
+rid,rid,I do put time aside from my normal everyday life to help rid the society of those who plan to destroy it.,dobj,1,2%,0.35,12,31512,9,56
+come_on,Come_on,*pulls hand away rapidly*  Baka:  Come on you big tease.,dobj_dative,1,2%,0.63,10,35197,19,58
+come_up,coming_up,Personally i think that doctors should look into coming up w/ a cure for my unfortunate illness that i cannot cure.,prep_dobj,1,2%,0.68,8,17543,7,61
+worry,worrying,"its not that i dont feel there should be any repercussions for worrying my dad like that, but thats really harsh.",prep_dobj,2,3%,0.77,13,33006,13,75
+worry,worries,She is one who is obsessed about nitty-gritty issues and worries a lot about in life.,prep_dobj,2,3%,0.77,12,35392,7,75
+have,has,But what I do want to do is just understand myself a little more and live the life I want to be living and not live it on expectations I have for myself or anyone else has for me.,dative,2,0%,0.81,36,6148,1,2641
+have,Had,Had two cups a joe.,dative,2,0%,0.81,0,12779,3,2641
+put,put,I'm surprised he didn't take my money and put it in the machine for me.,prep_dobj_dative,5,1%,0.84,10,31500,55,398
+put,put,Writing it out helps put some things into perspective for me.,prep_dobj_dative,5,1%,0.84,4,23873,1,398
+put,put,i hesitated for a moment then grabbed him and put his bag underneat the chair in front of mine!,prep_dobj_dative,5,1%,0.84,9,37101,6,398
+put,put,He made no eye contact unless I cupped my hands around his big beautiful brown eyes and put him face to mine.,prep_dobj_dative,5,1%,0.84,17,508,124,398
+put,Put,"from Nietzsche's Daybreak,s. 147, R.J. Hollingdale transl  Me: Put this in plain English for me.",prep_dobj_dative,5,1%,0.84,14,26731,2,398
+stare,staring,"Waking, as if nothing, and 'staring' the rest of my day.",dobj,1,1%,0.89,8,34599,44,101
+head,headed,When the weather cleared a little we saddled up and headed SE into SC.,prep_dobj,4,4%,0.93,10,33242,52,109
+head,headed,"I then headed to my favourite temple in town at Luz, drove past the beach....amazing cool wind was blowing across, but the minute I had a look a the crowd, I just turned and headed ot the club.",prep_dobj,4,4%,0.93,39,8383,39,109
+head,headed,We bought the gas and headed down-river in a rented canoe.,prep_dobj,4,4%,0.93,5,12410,195,109
+head,headed,"After the boats were through, we crossed over the locks and headed down the path along the Ottawa River.",prep_dobj,4,4%,0.93,12,32792,9,109
+tune,Tuning,Tuning my bike's gears.,dobj,2,2%,0.93,0,16405,11,87
+tune,tuned,"So, stay tuned true believers - more will be forthcoming.",dobj,2,2%,0.93,3,22680,7,87
+compare,compared,"Or should I go with what I have , which now seems like crap compared.",NO_DEPS,1,0%,0.94,14,19877,2,216
+experience,experience,It's a cool thing to experience...and you get to meet people!,NO_DEPS,5,9%,0.95,6,13101,61,57
+experience,experience,There is so much I want to see and do and experience while I am here.,NO_DEPS,5,9%,0.95,11,17446,25,57
+experience,experience,14 years later as i continue to be with her and watch her and experience who she is and how she interacts with the world and with me and with our kids (etc.),NO_DEPS,5,9%,0.95,14,23099,11,57
+experience,experience,"I think my problem is that with every trip and experience abroad, I learn of new places I want to see and experience.",NO_DEPS,5,9%,0.95,23,22495,9,57
+experience,experience,I think I'm gonna start writing a real diary (journal) again to remember all the cool things that we are going to do and experience...,NO_DEPS,5,9%,0.95,28,23373,10,57
+fall,fall,"I don't know but, thanks to Linda Watkins, when I'm 85 and fall down my front stairs, I may not in fact break my hip.",prep_dobj,1,1%,0.96,16,480,25,188
+focus,focusing,"He'll give you many helps on focusing yourself, and will always be using his own word's to spark your heart on the eternal truths of the gospel.",dobj,3,3%,0.96,7,16487,5,88
+focus,focusing,"From a strategic point of view, this is interesting--basically a signal that the party thinks it has milked all the available support from Labour-leaning voters, and focusing their fire on the Tories.",dobj,3,3%,0.96,32,32406,1,88
+focus,focused,"All that said, to return to my original point -- it seems to me that so much more could be accomplished in this country if both Republicans and Democrats spent less time yammering on with all this ideological parlor talk and intellectual posturing, and focused all that mental energy on applying the broad range of available political philosophies to the immediate, tangible social, economic, and international issues that we as a society, a government, and a country would do well to confront.",dobj,3,3%,0.96,46,2057,36,88
+sit,sitting,"I proceeded to up my bankroll to $130, which I eventually started sitting on 2 .5/1 tables, and was raking in the dough.",prep_dobj,5,2%,0.99,14,23914,17,218
+sit,sat,In the top left corner of my refrigerator door sat the wedges of parmesan.,prep_dobj,5,2%,0.99,9,24659,24,218
+sit,sat,"Three of the beds on the far half of the room were occupied, but on her side of the room sat only one person: a human (she did not sense any naquada).",prep_dobj,5,2%,0.99,21,35049,14,218
+sit,sitting,Special thanks to my friends at Ca’Brea for sitting my lawyer/agent/advisor and myself at a better table that the movie stars.,prep_dobj,5,2%,0.99,8,8744,46,218
+sit,sitting,"Many athletes from NBA, and the Williams sisters declined invitations to participate sitting security concerns as the reason.",prep_dobj,5,2%,0.99,13,8090,11,218
+face,faced,You rode in the back of the station wagon and faced the cars behind you.,prep_dobj,1,1%,0.99,10,30887,12,72
+grab,grab,"yesterday the boy and i went to best buy to look for the new mates of state cd around 5:30 p.m., and the moment we walked into the store, the power went out and we got thrown out of the store (probably because i yelled 'grab whatever you can, loot, quick!').",NO_DEPS,2,3%,0.99,49,20529,10,65
+grab,grabbing,"I reached for him as he reached for me, both of us stripping our bathing suits off, reaching for one another embracing, touching, grabbing...I can still feel the taste of him on my lips, our tongues locking, and searching...Turning him around so that his back is to my chest grabbing his cock, and stroking it our feet skimming the bottom of the pool...Feeling the thrust of his dick in my hand, plunging deeper and deeper into my fist...Cupping one cheek of his ass in my other hand as I reach for his asshole...",NO_DEPS,2,3%,0.99,27,30277,14,65
+avoid,avoided,"I don't know what I have done to make me, so suddenly, abhorred and avoided.",NO_DEPS,4,7%,1,17,9772,0,55
+avoid,avoid,avoid?,NO_DEPS,4,7%,1,0,12524,20,55
+avoid,avoided,"I jumped puddles, avoided maniac",NO_DEPS,4,7%,1,4,21134,6,55
+avoid,avoid,Hit me Come on]  CHORUS Let's talk about sex baby Let's talk about you and me  Let's talk about all the good things And the bad things that may be  Let's talk about sex  Let's talk about sex  Let's talk about sex  Let's talk about sex  Let's talk about sex  for now to the people at home or in the crowd It keeps coming up anyhow Don't decoy avoid or make void the topic,NO_DEPS,4,7%,1,86,36131,1,55
+wear,Wear,Wear to work?,prep,4,2%,1.02,0,23025,9,182
+wear,worn,"Words inscribed in stone,  smooth and worn with age.",prep,4,2%,1.02,8,4042,5,182
+wear,worn,So without fanfare (and  only two pictures which have yet to be developed) the socks were mounted to my feet and worn from 1:30 PM until 3:00 AM.,prep,4,2%,1.02,24,19577,11,182
+wear,wearing,"(dress cuz i saw a really similar dress yesterday i was thinkin of wearing to our engagement party, and purple- hehe cuz i saw the purse i am obsessing over on ebay for 1/3 the price but instead of black it was purple- but you could barely tell by the main picture- but another picture had it like the EXACTSAME shade as the purple of the dress in my dreams).",prep,4,2%,1.02,14,37157,47,182
+ignore,ignored,"One hack effusively claimed: 'After five decades of being bullied or ignored in multilateral trading talks, the world's poorer nations ... enjoyed the first real confirmation that the balance of power has shifted a little in their direction.'",prep,2,3%,1.03,13,30542,70,63
+ignore,ignored,"One hack effusively claimed: 'After five decades of being bullied or ignored in multilateral trading talks, the world's poorer nations ... enjoyed the first real confirmation that the balance of power has shifted a little in their direction.'",prep,2,3%,1.03,13,30542,14,63
+hang_out,hang_out,I definitly have gotten to know and hang out more with a certain someone.,prep_dobj,3,1%,1.03,7,1110,5,231
+hang_out,hung_out,"so tht was a fun day, then on wednesday i went and hung out w/ Nicole @ my house and we talked for hours and my sis drove her home (yes she passed her road test) and then the next day i wanted to tt Dani b/c",prep_dobj,3,1%,1.03,13,17553,15,231
+hang_out,Hanging_out,Hanging out in a computer lab....story of my life.,prep_dobj,3,1%,1.03,0,23492,0,231
+pick_up,picked_up,then we headed home on the bart and andy picked us all up at the ashby bart station.,prep_dative,1,1%,1.06,9,36934,12,193
+go_on,going_on,"I couldn't stand the thought of going on that long of a trip without music, I'd go nuts.",dobj,1,2%,1.07,7,38497,16,52
+check_out,check_out,"In the meantime, check out:  urlLink Pats blog   urlLink Dons blog   urlLink Nealz blog   urlLink Phisters funnel race   urlLink Howards blog   urlLink the Puppy blender",prep,4,1%,1.07,4,5623,1,338
+check_out,checking_out,"Svala is gorgeous by the way, so if her brother is anything near as hot, the band will be at least worth checking out (especially for Lee and Rodney).",prep,4,1%,1.07,24,10634,12,338
+check_out,checking_out,"Following The Mission was L’Ame Immortelle – a band enjoyed by the Jax and a band I was interested in checking out because of the hype surrounding them and boy was I not disappointed – they sucked even worse than I had anticipated, though the crowd seemed to enjoy them greatly – see where I’m going here?",prep,4,1%,1.07,20,8788,41,338
+check_out,checked_out,"And then, because I could, I got some fresh produce and checked out at 1am.",prep,4,1%,1.07,13,527,39,338
+grant,granted,"Although I may have taken it for granted at the time, I definitely value the education that I received in religion during my elementary and secondary education.",prep,1,2%,1.08,7,13290,13,53
+remind,reminding,thank-you for reminding me the importance of fellowship.,dobj_dative,5,8%,1.08,4,8462,4,60
+remind,reminding,When I finish a book I liked I let it live longer by prolonging the characters life and reminding me passages from the book.,dobj_dative,5,8%,1.08,18,19902,14,60
+remind,reminds,and it has pretty ballerinas and reminds me a bit of pretear.,dobj_dative,5,8%,1.08,6,14549,19,60
+remind,reminds,reminds me a little of the 'shadow war' in  urlLink babylon 5  - you become totally invested in the realization of this great conflict that never happens.,dobj_dative,5,8%,1.08,0,21834,8,60
+remind,reminds,"Also included in the collection is a story called 'Offloading for Mrs. Schwartz,' which revolves around a mind-erasing machine and reminds me a lot of  Eternal Sunshine of the Spotless Mind  (Oooh!",dobj_dative,5,8%,1.08,25,12291,12,60
+find,found,"In other news, I came home today and found a letter to me from UPJ.",prep_dobj_dative,1,0%,1.12,9,11618,27,533
+act,act,"But I wouldn't want to be in public, or have to sing any of my crappy songs or be in any of my crappy videos, or act in my crappy movies, anything like that.",prep_dobj,1,1%,1.12,29,6989,5,111
+order,ordered,"New furnishings, toys, decor, and equipment all selected and/or ordered for new facilities...",prep,1,2%,1.13,12,10934,3,60
+remember,remembered,"But a methodical working through of any ‘remembered’ story will uncover many forgotten details, which can then be recorded and remembered for posterity.",prep,2,1%,1.13,23,30638,141,200
+remember,remember,So guys and gals enjoy yr rank but remember of consqeuences.,prep,2,1%,1.13,8,34733,9,200
+screw,screwed,"This year, I have been fucked with, rejected with, screwed with, played with and almost any other adjective you can think of.",prep,2,4%,1.13,12,8845,6,55
+screw,screw,"Standing alone, hearing hundreds of voices but not a single word and watching this mass of humanity that takes 'let's get drunk and screw' as a life motto, the thinker cringes.",prep,2,4%,1.13,26,22810,42,55
+guess,guessing,Sign: Libra  Appearance: Tsuyu's most noticable quality would have to be the navy eyes he has that leave all guessing at what his true nature is.,prep,1,1%,1.15,23,19087,1,87
+cry,Cry,"It will resemble Justin Timberlakes song, Cry Me a River.",dobj_dative,1,0%,1.16,7,37329,46,294
+care,cared,"The you that we loved and we know, who smiled and cared Illness creates geodes out of perfectly beautiful people But what illness is it if you chose it of yourself So much is said of cures, healing, treatment When the real disease is still what it has always been Disease of the heart At this point, I cannot tell if you are A victim or a burden or a coward or pathetic Even accepting pain as part of life, Of believing in positive reframing, courage And the development of pearls Uncertainty is certain and the gray times of life Are what get me brooding   I never asked for much  Of what I’ve been given Rarely complained about my cheese being moved Except once or twice All my unworthy tears for minor frustration and Self-created problems Dried up the wells That are so inaccessible now When I feel like I should need them most   Ripple effect of tears and frustration Shattered dreams gathered and reglued Old pains and mistakes Brooded over like a cycling record Shame and guilt and pain Needing resolution, with roadblocks In ever foolproof plan Only a fool could block them anyhow",dobj,2,2%,1.16,12,33739,16,88
+care,caring,What the fuck is wrong with caring too much?,dobj,2,2%,1.16,6,17093,15,88
+touch,touching,"Apparently, this movie addresses some of those themes, and is pretty funny and touching in the process.",prep,2,4%,1.16,15,27507,4,53
+touch,touching,i hope my wedding will be that touching to the guests!!,prep,2,4%,1.16,7,36960,27,53
+destroy,destroy,"In other words, destroy.",prep,1,2%,1.16,4,22738,93,61
+support,supporting,"Option 4 strikes me as unlikely in most cases (except Al Sharpton), and even if it were partially true for most people (I suspect it is) it strikes me as a acceptable price to pay if the platform of that politician is something worth supporting (like Al Sharpton).",prep,1,1%,1.16,49,29146,51,89
+sound,sounds,"but I call him Ed because he looks and sounds EXACTLY like Edward Norton), Kyle, Ian, and two other people that I can't think of...)",prep_dobj,2,2%,1.16,9,20920,29,83
+sound,sound,"Sure, we have music in America - all kinds - but have you ever noticed how the singers and bands start to all look and sound the same after a while?",prep_dobj,2,2%,1.16,26,10111,6,83
+happen,happen,cos of wat happen this weekk... begin to qn God of His promises...,dobj,3,5%,1.16,3,39949,5,62
+happen,happened,"I was happened to like an abandond building by a bull- dozer, like the van that missed my skull happened a two-inch gash across my chin.",dobj,3,5%,1.16,20,29349,1,62
+happen,happening,if you didn't know about this water fight happening change right before it actually starts... therefore everyone wont be looking at your ass and your thong.,dobj,3,5%,1.16,9,6127,12,62
+come,come,I open the sliding glass door and in come about 30 cats.,prep_dobj,5,1%,1.17,8,17619,8,336
+come,comes,"With each year, comes less guilt about not meeting my parents expectations of me.",prep_dobj,5,1%,1.17,4,7127,13,336
+come,comes,And as quickly you are gone When my sky turns pale and light We are never the same at dawn As we were that very night  With night time comes my dreams,prep_dobj,5,1%,1.17,30,13661,3,336
+come,coming,"Here it is: I become an arms supplier, selling my supplies to foreign up & coming political leaders in bulk [ an un-bias political trend spotter if you will ],  making a nice profit for myself.",prep_dobj,5,1%,1.17,17,38751,1,336
+come,came,"'Dreaming Up Reality'  I was browsing through my friends' blogs and came across  urlLink an entry  that echoed what I have been going through in my life, and so here are my two cents.",prep_dobj,5,1%,1.17,15,24729,0,336
+create,created,"They view this generation as bratty, because all these protests and opinions are biting the hands that fed them and created their free world for them in the first place.",prep_dobj_dative,2,1%,1.17,21,24857,5,191
+create,create,"I am not to sure where and if anyone will go with me, but I need some place exciting to go, so PLEASE send me some ideas and create wonderful adventures for me to expereince.",prep_dobj_dative,2,1%,1.17,30,34410,11,191
+damn,Damned,(this is the  Fantasia Down  chapter)  'Damned in Any Language (A Plague on Words)' opens the theme of temptation of sin upon humans.,prep,1,2%,1.17,12,33856,24,63
+need,need,"It fades, and you better make sure that person is your best friend in the end, because thats all you're going to ever get or need in the long run.",prep,2,1%,1.18,29,7169,17,136
+need,needs,"I could stay where I am now and provide for my familys needs for the next 30 years,  But, will I be happy?",prep,2,1%,1.18,12,1525,7,136
+swim,swim,I'm gonna:   Read 3 books  Drink 100 jack and cokes  run 50 miles  swim 10 miles  kickbox for 10 hours  hang out with jim at least 5 times  spend at least $300 at boswells  goto LA at least 1 time to see my lil brother  watch no less then 3 movies  hang out with pants so much that she wishes i worked more  take at least 1 dare  sustain at least 1 injury  forget at least 2 days,prep_dobj,2,2%,1.18,20,10895,2,110
+swim,swimming,"Anyway I am rather excited and I am looking very forward to a swim in the ocean, I love swimming in the ocean ( very fond memories from my childhood) and I am hoping that this end of the pacific will not be as bloody cold as it is at home!",prep_dobj,2,2%,1.18,20,20135,13,110
+shop,shopping,"The customers were beginning to build, everyone looking excited at the prospect of shopping beautiful produce for an equally beautiful 3 day holiday weekend.",prep_dobj,1,0%,1.18,14,20148,5,202
+shit,shit,"'So what i'm going to do is go downstairs, and shit myself, then I'm going to vomit, and then I figure I'm going to be ok.'      -Greg",dobj,4,7%,1.19,13,36040,0,59
+shit,Shit,Shit him n HER!,dobj,4,7%,1.19,0,27102,19,59
+shit,shit,I love you girl~!~      Brittany~ Alwayz been tight and shit blue balls.,dobj,4,7%,1.19,10,18516,15,59
+shit,shit,"I swear, if he had known I was sixteen, he would have shit a brick!!!!",dobj,4,7%,1.19,14,9983,390,59
+produce,produce,"When he catches you, you can protest your innocence and produce the receipt for it.",dobj_dative,1,2%,1.19,11,20882,4,52
+spend,spending,"At my current rate I will end up spending like $100 bucks a month on MP3's, which is coming a long way from the good 'ol college network days.",prep,4,2%,1.2,8,36170,4,247
+spend,spending,It's so cheap to drink at home instead of spending like 3 dollars on an espresso drink at a coffee place.,prep,4,2%,1.2,10,12211,8,247
+spend,spend,I think I'll take Friday off to recoup and spend with the kids.,prep,4,2%,1.2,10,17299,19,247
+spend,spending,"Far from what I expected, I ended up losing weight and spending about the same amount of money, go figure.",prep,4,2%,1.2,12,32,4,247
+fuck,Fuck,"blah blah blah)   “Fuck for forest” are concerned youngsters, fighting to preserve the environment.",prep,5,3%,1.2,6,18950,2,200
+fuck,fucking,Some people have no interest in fucking with their mind and body and that's a great thing.,prep,5,3%,1.2,6,27301,1,200
+fuck,fucking,You can understand then why their sound engineer beat the hell out of someone who tried fucking with the main board.,prep,5,3%,1.2,16,24153,18,200
+fuck,fucked,"Although credit has to go to  Victor  who, while everyone else took about 5 minutes to decide on their luggage nomination, took about 0.005 seconds to proclaim  Kitten  as the most undeserving and fucked in the head!",prep,5,3%,1.2,39,38128,8,200
+fuck,fuck,"'people say cherish the school life for you'll only realize how good it is when it is gone but i dont care fuck off you stupid stinky school, with your restrictions and gay uniforms and gay rules and gay culture and gay girls who don't wanna fuck, just fuck off.'",prep,5,3%,1.2,25,22993,0,200
+smile,smiling,"I said smiling, 'Glen, plack please' as a joke and he smiled",prep_dobj,1,1%,1.2,2,8087,24,105
+wait,waited,"Got to his appointment on time, waited a half hour for a ten minute appointment.",prep_dobj,5,1%,1.22,7,23861,9,422
+wait,waited,"We waited, and waited, sat down on a couch and waited in total maybe 25 minutes?",prep_dobj,5,1%,1.22,12,30050,15,422
+wait,wait,wait hmg nag nag like old woman...,prep_dobj,5,1%,1.22,0,38372,26,422
+wait,waiting,We flirted with the idea of waiting a few hours for the chance to scream at Nick and his party people as they arrived to celebrate his fantastic new release.,prep_dobj,5,1%,1.22,6,6441,5,422
+wait,waiting,"After waiting days for the response to my note to Biscomerica, I got a flat reply.",prep_dobj,5,1%,1.22,1,6842,1,422
+travel,traveling,"When I got back, Bir Krsna Maharaj arrived (New Goloka is his home, and he was back from traveling himself) and spent a few minutes with Gurudeva.",dobj,3,5%,1.23,21,32051,36,61
+travel,travel,"Am planning to visit her in Bristol one day, so we can get a Euro Rail pass and travel round Europle.",dobj,3,5%,1.23,19,308,15,61
+travel,travelling,"I have to learn how to sit down, think out my visions and ideals, and realize that travelling the road to their actualization takes hope, perserverance, and patience.",dobj,3,5%,1.23,19,24842,3,61
+complain,complain,"so i said YES unwillingly.sigh.helped him with his laptop n all tht.then went for lunch with him,his gf,n phoebe.luckily phoebe went with me,if not i die on the spot of boredom.hehe.makan lunch d,then went back to skool to study.till around 4 sumthin,all also gotta go home d,so ok ler,all belah liao,left me n pin jack....then we went to gurney drive there...sit down by the seaside n chit chat a bit ler...it's a long time since the last time we sat by the sea n talk.sat there till 7 sumthin,sky also turned dark d,then went to my mom's shop d ler.went there,do my work,study,then my mom come n talk to me n complain this n tht,then i was like listenin then after tht",dobj,5,7%,1.24,146,36689,5,70
+complain,complain,"On the whole, typical Virgos pursue the following leisure interests:  * theater, concerts, plays, pageants  * books, magazines, dictionaries, encyclopedias  * detailed crafts, especially weaving  * alternative medicines, psychology  * gardening, health foods, flowers  * computers with all the paraphernalia    Virgoan Likes and Dislikes    Likes  * making lists * a well-stocked medicine cabinet * self-improvement courses * punctuality * mimicking others * grooming self, taking showers,using nice soaps * dealing with details * tiny animals * helping others * wearing well-tailored clothes in muted colors and textures   Dislikes  * crowds and noise; brash people * slang, vulgarity, slovenliness,and dirt * people who whine and complain a lot * sitting still for a long time * disrupted schedules * lids left off boxes, or tops off toothpaste * being obligated to others * people who move Virgo's personal things * hypocrisy and deceit * any admission of weakness or failure * bright, bold, primary colors",dobj,5,7%,1.24,141,18350,98,70
+complain,complaining,After hanging around wasting away and hearing complaining the entire time we play more volleyball and I own it up again.,dobj,5,7%,1.24,7,31585,30,70
+complain,complaining,Here is the Hypnotizing   formula that brings the nothing that is its self and flows a way with infer and smother these singular phrasings under wilt it branches towards the widening of stream aloft goes bracing and here is the equation of clarity and bring about until parcels hold against the marble of solid trees over an ocean swinging current and starch button and breaking bridges the double plastic reduction that only places of stop not force will refer here in the remainder of the middle passages like moonshot again plastic dirt much like so very drip spout with doughnut box and slippers inside complaining case of pillows with interrupt and the letter pause,dobj,5,7%,1.24,105,13507,0,70
+complain,complained,She was only moderately depressed and complained only half of the time I was there.,dobj,5,7%,1.24,6,15447,43,70
+thank,thank,wanna thank like tons of ppl larh!!!,prep,2,0%,1.24,1,19084,2,546
+thank,Thank,Thank for looking out Ernie!,prep,2,0%,1.24,0,36642,1,546
+dress,Dress,"Yes, David Sedaris is back to his old tricks in his new book 'Dress Your Family in Corduroy and Denim'.",prep_dobj,2,2%,1.24,15,12245,0,85
+dress,dressing,"dressing herself in clothes soaked in the screams of her gaping chest cavity  a dull, rusted knife stabbing her   between the ribs but he feels nothing his knife is sharp and new 'such a quick stab, you won't feel it'  not knowing, in his own bliss,  She's stabbed him and  filled him with poisonous oxygen  that soaks his lungs, provides life only to kill later she sleeps in lakes and awakes in deserts with skeletons surrounding her  they recite her sin over and over with murder in mind, they never stop.",prep_dobj,2,2%,1.24,0,18499,0,85
+watch,watched,"I went up to the doors and watched them handcuff the culprit, and a woman standing next to me was almost in tears because she thought the police were going to break his arm.",dobj_dative,1,0%,1.26,7,14501,2,1011
+receive,received,"However, they seem to have a different idea of the word 'hearsay' than the dictionary:  1: Unverified information heard or received from another; rumor.",prep,3,3%,1.26,26,32962,5,97
+receive,received,"Mr. Wilmont's comments were well expressed and received (unlike some public hearings I have attended where people were ranting and raving), and his comments are acurately and fully presented in the article.",prep,3,3%,1.26,8,3327,7,97
+receive,received,A satirist's monologue may be most potent when delivered to a live audience; yet the choice whether this will in fact be the manner in which the message is delivered and received is one the First Amendment prohibits the government from making.,prep,3,3%,1.26,33,16759,934,97
+sleep,Sleeping,"Sleeping Awake By Max Willson  The following story is mostly true, but the title was blatantly plagiarized from a P.O.D. song and the story itself has been heavily dramatized, exaggerated, and generally jazzed up because I think it sounds better this way.",prep_dobj,4,1%,1.27,0,33714,0,341
+sleep,slept,"I also saw a decent movie, turned down some drugs, saw one of the funniest episodes of South Park that I've ever seen and slept like a baby.",prep_dobj,4,1%,1.27,27,29451,40,341
+sleep,sleeping,I love sleep; I love my bed; I love sleeping lots in my bed.,prep_dobj,4,1%,1.27,11,25206,1,341
+sleep,sleeping,"But again we are fooled, as we find sleeping more than 30 minutes at a time, nearly impossible.",prep_dobj,4,1%,1.27,9,21144,29,341
+think,thinking,"It is tragic that Fitzgerald died thinking himself a failure considering how many admire his work and have emulated his style, and most of all that high fashion will forever refer to flowing, glamourous, beautiful costumes as Fitzgeraldian.",dobj_dative,1,0%,1.27,6,27322,28,814
+stand,stood,Not this one he bounced himself back on his legs and walked back over to where he was and stood his place.,dobj,4,4%,1.27,19,39404,14,105
+stand,standing,"So here I am, 2 months later, keeping with the 'principle' spirit and standing my ground!",dobj,4,4%,1.27,17,34451,11,105
+stand,stand,the feedback i get is that i look too proud and stand offish...!,dobj,4,4%,1.27,11,21993,39,105
+stand,stand,"So if you didn't have a VIP pass, it was a typical stand-all-night-in-line Hollywood evening.",dobj,4,4%,1.27,14,8582,9,105
+relax,relaxing,To see my mom and friends and family...its going to be great and of course relaxing I hope.,prep_dobj,3,4%,1.28,17,39380,1,83
+relax,relaxed,"Got a haircut, did a little shopping, and relaxed a little with a Sunday afternoon nap.",prep_dobj,3,4%,1.28,10,4528,10,83
+relax,relax,"When bedtime came around my head was still pounding, so I decided to do a bit of yoga to get centered and relax it into submission.",prep_dobj,3,4%,1.28,23,6289,4,83
+chat,chatted,"Such as with the Cathedral, I'd seen it before, so rather than go inside again (there was not much to see anyway, most of the inside had collapsed), we found a nice spot facing the river Medway, sat down, and chatted about 'this', 'that' and 'the other' until we got hungry.",prep_dobj,5,5%,1.28,49,11822,17,107
+chat,chatting,"Out of habit, I wake up and go online because the good feelings from chatting with people and reading journal entries make me forget my anger.",prep_dobj,5,5%,1.28,15,24954,20,107
+chat,chatting,den started chatting wit him..,prep_dobj,5,5%,1.28,2,17761,25,107
+chat,chatted,"So we chatted a bit then went back down to the bar and got some drinks and chatted some more, about our backgrounds and sex and fetishes.",prep_dobj,5,5%,1.28,17,37639,50,107
+chat,chatted,Other than that I've played go-fer for Gary and chatted with several people abount random things.,prep_dobj,5,5%,1.28,12,23501,5,107
+laugh,Laughing,Laughing my ass off HUGS DAN,prep_dobj,5,2%,1.29,0,38870,32,275
+laugh,laugh,"My name also changed several times through out the night  i started out rae rae, but then I was Poke (seriously, this 'let's watch Rachel cringe and laugh at her hysterically' thing is REALLY not funny.)",prep_dobj,5,2%,1.29,33,4917,5,275
+laugh,laughing,really  brilliantpoppy : a looked over at him..stopped my discussion  brilliantpoppy : and said to him stop laughing at me LwStud: good for you  brilliantpoppy : and hes all like,prep_dobj,5,2%,1.29,21,25762,10,275
+laugh,laughed,"So I got home yesterday and then called Fifer and after dropping off my brother at the Summit football game, I went to her house and we ate dinner and talked/laughed our asses off a lot.",prep_dobj,5,2%,1.29,33,20885,9,275
+laugh,laughed,"Yes, now I am posting this info in my blog under full awareness that I am probably going to be slaughtered by all the people whom which I have ridiculed and laughed at, while they have defended themselves, about going to see Harry Potter.",prep_dobj,5,2%,1.29,32,37675,14,275
+dance,dance,"He taught me how to swing dance, and I gotta admit, when a man knows how to treat a lady as a lady, and dance with her as a lady... dude thats impressive.",prep_dobj,2,2%,1.3,28,33742,66,128
+dance,danced,"I have slipped the surly bonds of earth And danced the skies on laughter-silvered wings; Sunward I've climbed, and joined the tumbling mirth Of sun-split clouds - and done a hundred things You have not dreamed of - wheeled and soared and swung High in the sunlit silence.",prep_dobj,2,2%,1.3,9,33633,18,128
+catch_up,catch_up,The phones are silent on this Thursday (shhhh..knock wood on that one) so I am going to try to take this opportunity to write and catch my character up in the current BlackHawke storyline.,prep_dobj,1,2%,1.3,29,23843,3,54
+cause,cause,"Now, he reminded me of one of my cousin Steve's friends cause of his personality, but he has the hairstyle where you shave the sides of your head and leve the hair one inch on each side of your hairline, including the back, and he has a mustach and goutee sort of thing, and he's about 5'8', or 9', whatever.",prep,3,2%,1.3,13,22562,10,167
+cause,cause,"I want to be able to think without you coming to my mind, cause to you our love was blind, you couldnt tell how much i really loved you.",prep,3,2%,1.3,14,18510,139,167
+cause,cause,"I felt bad for him after that though, cause after that, he just kind of sat there fiddling with his computer screens, not saying much.",prep,3,2%,1.3,9,9983,394,167
+jump,jumping,"We ran freely around the neighborhood, playing in the creek, sledding down the hills, jumping rope in the park,  biking around the town…  Wish somehow we could find that sort of freedom again.",prep_dobj,1,1%,1.3,17,10113,15,75
+blogge,blogging,Just felt like blogging a bit about what is going on at my job.,prep_dobj,1,1%,1.3,3,17258,0,129
+make,made,"and she told me that this chick that I used to be friends with in elementary school (until she turned on me and spread ugly rumours about me to the rest of the school, rumours which followed me for years and made elementary school a living  hell",dative,1,0%,1.31,43,34262,11,1074
+piss,pissing,"the class responded 'yes' and he continued 'Good, I sometimes don't know if it's hot or if I'm just fat.'  pissing yourself in class is embarrassing, so I tried really hard to hold the urine in after that statement.",prep_dobj,2,3%,1.32,30,34579,7,69
+piss,pissing,"Scary like when you ride a rollercoaster, it's just going to be fast, fun, and will leave me pissing myself with excitement.",prep_dobj,2,3%,1.32,22,34546,31,69
+express,express,"Seems to me that the food was overhyped and overpriced to begin with, but now add the word 'express' to it, and it's the most expensive, bland, slowest fast food with a lot of attitude behind the cash register.",NO_DEPS,4,6%,1.32,20,12038,23,62
+express,express,i bought a top from express too.,NO_DEPS,4,6%,1.32,5,36940,101,62
+express,express,............ express ............,NO_DEPS,4,6%,1.32,1,12699,0,62
+express,Express,'Express Yourself' - N.W.A.,NO_DEPS,4,6%,1.32,1,19457,0,62
+throw,thrown,"I had a dream that I was arrested for some reason and thrown into jail, this was a lucid dream, however it's hard to take control when you don't realize that you have any; I thought it was real.",prep,3,2%,1.34,12,270,2,126
+throw,threw,"I guess you would still have to think of threw with he, she, we or they.)",prep,3,2%,1.34,9,17929,27,126
+throw,throw,we always rite things on paper then throw to each other,prep,3,2%,1.34,7,33891,17,126
+praise,Praise,Praise God for you!,dobj_dative,2,3%,1.34,0,33152,13,64
+praise,Praise,Praise God for me!!,dobj_dative,2,3%,1.34,0,33084,56,64
+kill,killing,Or I could just let you do the killing without killing you,dative,1,0%,1.34,-1,28183,41,265
+enjoy,enjoy,The downstairs shitter is the designated: Have a seat and enjoy yourself theme.,dobj_dative,1,0%,1.34,11,6868,27,326
+understand,understand,"But I know that I just have to try and understand with him moving and all, that he's not gonna be able to do something for a while until he's all unpacked.",prep,4,4%,1.34,10,29875,4,106
+understand,understand,"If you are confused by American English and would like to speak and understand like a native, you need to read this book!'               American Accent Training.",prep,4,4%,1.34,13,17919,162,106
+understand,understand,"It is true that man and wife are one person, but understand in what manner.",prep,4,4%,1.34,12,11712,2,106
+understand,understood,"Epistemology is the study of knowledge considered as a real physical phenomenon, and understood in terms of the isomorphic relationship between the knowledge structure itself and the 'world' a part of which it represents.",prep,4,4%,1.34,14,18826,7,106
+protect,protected,Could the rows and rows of fences simply be a silent scream to all who will take noticed - 'We need to feel safe and protected!',NO_DEPS,3,6%,1.35,26,10109,17,53
+protect,protected,"Although the First Amendment may require unwilling adults to absorb the first blow of offensive but protected speech when they are in public before they turn away, see, e. g., Erznoznik, supra, at 210-211, but cf.",NO_DEPS,3,6%,1.35,16,16759,748,53
+protect,Protected,Protected?:,NO_DEPS,3,6%,1.35,0,30194,26,53
+waste,wasted,"and, when i'm completely off-my-ass wasted at the reception, i will slur to my disapproving relatives, 'fuck you.",prep,1,2%,1.36,11,20458,7,59
+do,do,"I want to send you this little gift, and do something nice for yourselves with it.",prep_dobj_dative,1,0%,1.36,10,9607,11,1919
+fix,fix,"anyways, i'm gonna go and fix me some hot pockets (yes i'm lazy) and go to bed soon.",dobj_dative,1,1%,1.36,8,39989,12,75
+lie,lying,i saw myself sitting in my bed at home and lying my back against the wall.,dobj,2,2%,1.36,10,37499,13,99
+lie,lay,"Hey you always on the run Gotta slow it down baby, gotta have some fun  Gotta keep it down honey, lay your back on the line",dobj,2,2%,1.36,26,6153,23,99
+download,Download,Download like hell.,prep,2,3%,1.38,0,16288,34,70
+download,downloading,"But I guess its worth it, provided my videos finish downloading by tmr that is.",prep,2,3%,1.38,11,22000,15,70
+carry,carry,Apparently our conceal and carry statute has been ruled unconstitutional by a district court judge.,NO_DEPS,1,2%,1.39,4,7890,0,55
+consider,Considering,"Considering except for the reality television which I am addicted to, I am beginning to loathe the channel.",prep,3,3%,1.39,0,36645,6,91
+consider,considered,"He is high profile, and everything he does will get attention, so all of his actions will seem self-serving to an extent, but considered against the alternative - doing nothing - I hope he continues to speak out even though it means he will be criticized.",prep,3,3%,1.39,28,6715,17,91
+consider,considering,"After considering among various hot-topics that I am interested very much to make some annotates, I'd like to start maintaining a long awaited  #direktif .",prep,3,3%,1.39,1,39873,0,91
+date,dating,"i'd had an aversion to dating my friends since high school, because i once had a passing fancy for a girl i'd been best friends with.",prep_dobj,3,3%,1.4,6,27589,8,112
+date,dating,I spose dating her sister for the last 2.5 years has something to do with that one.,prep_dobj,3,3%,1.4,2,23462,33,112
+date,dating,"He's not on the show anymore.'  mr. hooper and i were best friends in the fullest highschool sense of the word, so i didn't have realistic intention of dating her per se, but then she got wind of my passing fancy because i'd mentioned it in passing to a passing friend, so quite naturally she reacted by never speaking to me again.",prep_dobj,3,3%,1.4,35,27589,12,112
+remove,removing,Bake 35 minutes at 350° F. Let stand 10 minutes before removing from pan.,prep,3,4%,1.41,12,10427,7,76
+remove,Removing,"Your golden glow filled my being Imparting a peace Of light and love Removing in it’s wake Tears, Confusion,  Hopelessness.",prep,3,4%,1.41,13,22403,1,76
+remove,Remove,Remove to a bowl.,prep,3,4%,1.41,0,32129,22,76
+mean,means,In this ever more cashless society spending our hard-earned money means credit and debit cards.,prep_dobj,2,3%,1.41,12,38020,0,79
+mean,means,"I wanna get hurt  I have the rights of being angry, but it doesn't mean that I do something cruel  sweet words without doing means goodbye with the one I love  I'll loose the one I love faster and often   ~~~Love doesn't make the worl go around~~~ ~~Love is what makes the ride worth while~~",prep_dobj,2,3%,1.41,28,17640,4,79
+win,winning,"He had no chance of winning in 2000, and he has even less of a chance now.",prep,3,2%,1.41,5,7679,10,162
+win,Winning,Winning of the bid is a very important and not so easy task and having your own site is a great advantage (as I found to my expense).,prep,3,2%,1.41,0,36365,13,162
+win,winning,Back then I was even leaning to voting for Bush if the Democratic National Party allowed the early primaries to elect a candidate who may have been winning the party faithful but had no chance of winning over the Democratic population at large.,prep,3,2%,1.41,36,1291,10,162
+choose,Choose,"Choose from gangsta, biker, tribal, and Japanese.",prep,2,3%,1.42,0,30582,9,69
+choose,choosing,"I stated that it was like choosing between two children, it was like Sophie's Choice, the Apple Macintosh version.",prep,2,3%,1.42,6,492,21,69
+hate,hate,There are many things I have come to love and hate over the past 9 months.,prep,5,5%,1.42,10,22470,8,108
+hate,hate,i think so (53) Is there anything you fear or hate about yourself?,prep,5,5%,1.42,12,6148,73,108
+hate,hating,"Man united are worth hating because  1) they rejected the FA cup to play in a more financially rewarding competition, only to go out first round, come back and claim that that years FA cup was pointless cos they werent in it  2) peter kenyon is trying to get the FA to allow them to play on Saturdays at 3pm to allow for more televised games.",prep,5,5%,1.42,4,33500,0,108
+hate,hate,Now I dont feel love or hate  For the boy who broke my heart in two....:(,prep,5,5%,1.42,7,39298,9,108
+hate,Hated,"Check out 'Hated because of Good Qualities', 'Mama Cita', 'Futurism vs Passeism' and Equally Damaged'.",prep,5,5%,1.42,3,17726,65,108
+catch,Caught,"And we know that you could go and find some other Take or leave it or just don't even bother Caught in a craze, it's just a faze Or will this be around forever  Don't you know it's going too fast Racing so hard you know it won't last Don't you know, what can't you see Slow it down, read the sign, so you know just where you are going  Stop",prep,4,4%,1.44,21,6153,13,101
+catch,catching,So i decided to play catching with her in the house today.,prep,4,4%,1.44,5,20700,3,101
+catch,Caught,"I'm tired of being what you want me to be Feeling so faithless, lost under the surface I don't know what you're expecting of me Put under the pressure, of walking in your shoes (Caught in the undertow, just caught in the undertow)",prep,4,4%,1.44,40,22866,0,101
+catch,caught,"I hope that if you're like me, caught in the whirl of obligations to everyone but myself, caught in more than a few issues you can't seem to find resolutions for, you'll find a day like I did to rediscover the peace we always seem to be looking for.",prep,4,4%,1.44,20,15655,32,101
+wash,washing,"I finished washing at about 8.30 pm and now I am here, writing this blog!",prep,1,2%,1.44,2,22331,13,56
+grow,grow,"I have to try to save them all now, and probably re-grow some from seed.",prep_dobj,1,2%,1.44,14,19699,16,65
+set_up,setting_up,i was starting to seriously consider setting up a second 'buffy blog' for you guys -,dobj_dative,1,1%,1.45,6,2610,0,81
+marry,marry,I used to believe that I'm suppose to find true love the year I turn twenty five and marry that person at thirty.,prep_dobj,5,4%,1.48,19,12904,2,134
+marry,marrying,Roman monk was arrested and charged for marrying couples against the wishes of the Emperor Claudius.,prep_dobj,5,4%,1.48,7,22253,4,134
+marry,married,"We ended up giving each other evil eyes, while Kiera said things to me such as - 'One day you're gonna meet some hobo on the street and get married 2 him in one of those Las Vegas wedding chapels' and my retort was that she was 'Going to end up as an old loveless lady, and all she had were her cats!'",prep_dobj,5,4%,1.48,33,37672,23,134
+marry,marry,"everything possible, i've done to cure you, a cry, a cut, a flower in the dark, an orchid black, pink, blue.   to tame you, i keep you in my dream, marry you to your sister living on the outside planet of jupiter.",prep_dobj,5,4%,1.48,42,9067,1,134
+marry,marrying,"Rumor has it that since Edwards is worth only 60 million dollars, he may back out from marrying him in Massachusetts.",prep_dobj,5,4%,1.48,18,38971,6,134
+imagine,imagined,"urlLink Recovery  was certainly a product of its time, which is why it wouldn't be the same now if it was to be resurrected or re-imagined in whatever form.",prep,2,3%,1.49,30,15770,4,76
+imagine,imagining,"It is only at this hour that I keep imagining of rushing countrysides, lazy afternoons, or reading a book, or travelling for that matter.",prep,2,3%,1.49,9,33810,1,76
+see,see,Go see the movie for yourself.,dobj_dative,1,0%,1.5,1,34531,44,1488
+yell,yells,"The taxi seizes the chance to pull into a farther lane and go around the delivery guy, and yells something out the window at him.",prep_dobj,4,5%,1.51,19,25320,7,88
+yell,yelling,He continued kicking things and yelling stuff at us and when I looked up to my left a young Japanese girl gave me a smile as if she understood our situation completely.,prep_dobj,4,5%,1.51,5,22474,13,88
+yell,yells,"As all of these thoughts race through my head, he squeezes in next to me, stops, and yells in broken English, 'Vat ahr yoo doing, clazy lady?!!!'",prep_dobj,4,5%,1.51,20,12170,34,88
+yell,yelling,I was making dinner and he was playing Mario party and literally reciting every sound the game made and yelling 'OH BABY' at the screen when he would win a mini-game.,prep_dobj,4,5%,1.51,19,29248,12,88
+join,Join,Join me my friend into elimating these critters.,prep_dobj_dative,1,1%,1.52,0,694,12,93
+cross,crossed,"He's got to pop and see this guy at three o'clock, so everyone keep everything crossed for him!!!!!!!!!!!!",prep,2,4%,1.52,17,22573,1,55
+cross,crossed,i'll keep my fingers crossed till friday!,prep,2,4%,1.52,5,36909,27,55
+let,let,"Then someone said let's print magazines with pictures of nude women and call it wholesome, down-to-earth appreciation for the beauty of the female body.",dative,1,1%,1.52,3,23517,66,115
+edit,editing,"Woke up at 7:15 am to finish editing a final presentation for my Revelation to John class, a New Testament course that pairs more typical textual analysis with artistic interpretation.",dobj_dative,1,2%,1.53,7,8484,0,51
+sit_down,sat_down,"Ohh yes, aparently, it's ok for people to sleep upstairs, but when they go downstairs they are way out of line!they took us upstairs and sat us down on the couches at the main counter place, and James was looking like a crack addict",prep_dobj,1,2%,1.53,29,29486,34,52
+miss,Missed,Missed him lots.,dobj_dative,3,1%,1.53,0,13491,4,207
+miss,miss,"For my folks and sisters....love and miss you guys, and Suzanne ,I'll see you in 2 months for part 2 of the Choi kids in Korea.",dobj_dative,3,1%,1.53,8,15935,1,207
+miss,missed,missed me rite?,dobj_dative,3,1%,1.53,0,19058,1,207
+like,liked,"Basically, if there was something you remembered or liked as a kid, I'd have it in stock.",prep,5,5%,1.53,9,7730,16,105
+like,like,Or even in bed with a set you like,prep,5,5%,1.53,8,28967,40,105
+like,like,and i continued walking up the stairs..and he's STILL looking at me..like up and down..he was like checking me out!,prep,5,5%,1.53,16,3752,17,105
+like,liked,"I had said a couple of days ago that for a goal I was going to write 3 things that I did well or liked about myself, so I guess now would be a good time to do that.",prep,5,5%,1.53,24,22598,8,105
+like,Like,Loner      Your Favorite Band/Song    Evanescence - My Immortal      You Like To Read:    The backs of cereal boxes      You Firmly Believe In:    Nose-picking      Everyone Thinks You Are:    A complete loser      You Were Conceived:,prep,5,5%,1.53,14,20272,3,105
+hope,hope,hope tt in d end..,prep_dobj,4,7%,1.54,0,26795,71,59
+hope,Hope,Hope you like the new Blog look.,prep_dobj,4,7%,1.54,0,8773,33,59
+hope,Hope,Hope you like it.,prep_dobj,4,7%,1.54,0,24324,19,59
+hope,Hope,Hope you like traffic!,prep_dobj,4,7%,1.54,0,7751,15,59
+shut,shut,Mood: very focused  What i should put in mind: I better keep my mouth shut during st. john ambulance 1st aid class.,prep,3,6%,1.54,17,21232,0,53
+shut,shut,"I did think to ask which drugs the test looked for, but I decided to keep my mouth shut for that.",prep,3,6%,1.54,19,25905,4,53
+shut,shut,"Needless to say, I kept my mouth shut during this whole episode.",prep,3,6%,1.54,8,7763,16,53
+get_up,get_up,Big ups to the  urlLink SOE  cartel for helping get my music collection up over 120 gigabytes.  Check out the updated playlist... urlLink audio-inventory-kk.txt,prep_dobj,3,5%,1.54,11,30564,0,63
+get_up,getting_up,"Is it actually capeable that the kid I like, likes me just the same, but also has the same mentality as i do when it comes to getting up the guts to making the first step?",prep_dobj,3,5%,1.54,29,1137,2,63
+get_up,get_up,"What's important is that this job is going to give me the time to preach and be in the community doing devotional service, and that the income generated by this job is going to pay off our bills and get us up to Hillsborough.",prep_dobj,3,5%,1.54,41,31857,3,63
+vote,voting,i think i will end up voting republican for governor and democrat for president.,prep_dobj,2,4%,1.55,6,23978,7,53
+vote,vote,"let's all stand up together and vote the idiot and his crew of scum and villainy out of office, ok?",prep_dobj,2,4%,1.55,7,34132,5,53
+read,read,"Sit down and read them a book, for Christmas sake.",prep_dobj_dative,1,0%,1.55,3,32000,31,1064
+forget,forget,"I actually feel the bunch of guys I've met in the last couple of years while working where I am, are the best I have ever made, they are not like some of the friends I had in high school who seem to use when appropriate and forget you at other times and I honestly don't think they ever thought about it, or the friends they are unwilling or just unable to share any emotions deeper than a bottle of beer with you..",prep_dobj,3,2%,1.56,50,1215,10,153
+forget,forget,"During these times those handful I call truly friends have been there for me to lean on, to draw strength from, to make me laugh and forget my worries at least for a moment or two.",prep_dobj,3,2%,1.56,28,23874,19,153
+forget,forget,"Do NOT, like me, ignore your husband's encouragements to write up that list and as a result forget things.",prep_dobj,3,2%,1.56,20,22190,4,153
+answer,answer,"I would love to hear the answers to these questions from you, so feel free to put them on your website and leave me a link OR answer them in my comments!",prep_dobj,5,7%,1.57,28,18397,29,72
+answer,answering,"That and I started answering the phone by saying 'Go ahead caller, you're on the air.'  Also, and this is the best one.",prep_dobj,5,7%,1.57,4,656,50,72
+answer,answering,"I didn't mind ringing them up, or answering questions for the hour previous.",prep_dobj,5,7%,1.57,9,38778,24,72
+answer,answering,"Our efficient security heroes jumped in and solved the matters by answering swears with swears, pushes with pushes and glares with bigger glares!",prep_dobj,5,7%,1.57,11,16187,29,72
+answer,answering,"I realize; what a dumbass, like answering the phone at that moment was so important that it superseded the mouth full of water and paste.",prep_dobj,5,7%,1.57,8,523,14,72
+name,name,"Some will laugh and name them fools, but I know better, for I have heard their tales before, and know their skill quite well...",dobj_dative,1,1%,1.57,4,17100,3,74

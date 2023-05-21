@@ -5,6 +5,7 @@ import spacy
 from zipfile import ZipFile
 
 from docopt import docopt
+from numpy import int32
 
 import src.utils.path_configurations
 
@@ -36,7 +37,7 @@ class GetRarestVerbs:
         # proper nouns used as verbs
 
         df = pd.read_csv(self.verb_csv)
-        illegal = {':', '*', "?", "<", ">", "|", '"', chr(92), chr(47)}
+        # illegal = {':', '*', "?", "<", ">", "|", '"', chr(92), chr(47)}
 
         sorted_dataframe = df[df['PROPN%'] > 0.8]
 
@@ -84,11 +85,34 @@ class GetRarestVerbs:
     #TODO add index of verb
     def explore_entropy_measures(self, output_file_name,
                                  top_and_lowest_k):
-        df = pd.read_csv(self.verb_csv, encoding="ISO-8859-1",
-                         on_bad_lines='skip')
+        dtype_dict = {
+            'num_POSs': 'float',
+            'VERB_count': 'float',
+            'PROPN_count': 'float',
+            'NOUN_count': 'float',
+            'ADJ_count': 'float',
+            'total open class': 'float',
+            'percent_VERB': 'float',
+            'percent_PROPN': 'float',
+            'percent_NOUN': 'float',
+            'percent_ADJ': 'float',
+            'entropy': 'float',
+            'open class pos / total': 'float'
+        }
+
+        df = pd.read_csv(self.verb_csv, on_bad_lines="skip", encoding="ISO-8859-1",
+                         dtype = dtype_dict)
         # filter values by percentage consitions
-        df = df[(df["%VERB"] < 0.5) & (df["%VERB"] > 0) & (df[
-            "open class pos / total"] >= 0.95)]
+        df = df[(df["%VERB"] < 0.5)
+                &
+                (df["%VERB"] > 0)
+                &
+                (df["open class pos / total"] >= 0.95)
+                &
+                (df["VERB_count"] <= 5)
+                &
+                (df["total open class"] > 50)
+                ]
         # sort by entropy
         df_sortedby_entropy = df.sort_values(["entropy"], ascending=True)
         self.__write_csv_file_from_df(output_file_name, df_sortedby_entropy)
@@ -104,7 +128,7 @@ class GetRarestVerbs:
         file = open(output_path, "w", encoding='utf-8', newline='')
         fields = ["lemma", "verb form", "percent as verb", "percent as propn",
                   "Count as verb",
-                  "Sentence", "Doc index", "Sent index", "index of verb"]
+                  "Sentence", "Doc index", "Sent index", "index of verb", "total open class"]
         # if we can add the entropy
         if "entropy" in df.columns:
             fields.append("entropy")
@@ -146,6 +170,7 @@ class GetRarestVerbs:
                         n_dict['Doc index'] = doc_index
                         n_dict['Sent index'] = sent_index
                         n_dict['Count as verb'] = row["VERB_count"]
+                        n_dict["total open class"] = row["total open class"]
                         n_dict["index of verb"] = \
                             self.__get_index_of_verb(lemma=row['word'],
                                                      verb_form=r['word form'],
@@ -159,10 +184,12 @@ class GetRarestVerbs:
 
 
                         writer.writerow(n_dict)
+                    os.remove(sents_path)
 
                 except KeyError:
                     pass
             file.close()
+
     """
       given parameters describing the verb, we find the index spacy gives 
       to the verb within the sentence.
@@ -170,7 +197,7 @@ class GetRarestVerbs:
     def __get_index_of_verb(self, lemma: str, verb_form: str, sent: str):
         doc = self.nlp(sent)
         for token in doc:
-            if token.text == verb_form and token.lemma_ == lemma:
+            if token.text == verb_form and token.lemma_.lower() == lemma:
                 return token.i
         return -1
 

@@ -60,12 +60,12 @@ class GetRarestArgStructs:
     """
     get creative setences by entropy measures.
     we want sentences that:
-    1. appear in at least 2 different complement sets
+    1. appear in at least 2 different complement sets and atleast 50 times in all different sets
     we want to:
     1. measure the entropy of each verb across the different complement sets
     2. for the verbs with the lowest entropy, take the least 
     common complement set
-    3. print verbs' sentences with the least common complement set
+    3. print verbs' sentences with the least common complement set with frequency no more than 5
     """
 
     def explore_by_entropy(self, output_path, k:int):
@@ -74,7 +74,9 @@ class GetRarestArgStructs:
         # open sentences df
         sents_df = pd.read_csv(self.sents_csv)
         # screen out verbs with low set count
-        verb_df = verb_df[verb_df["num_sets"] > 1]
+        verb_df = verb_df[(verb_df["num_sets"] > 1) &
+                          (verb_df["TOTAL"] > 50)
+                          ]
         sorted_dataframe = verb_df.sort_values(["entropy"],
                                           ascending=True)
         # open output csv
@@ -87,7 +89,7 @@ class GetRarestArgStructs:
                            "perc of dep set", "entropy",
                            "index of verb",
                            "Doc index",
-                            "Sent index"]
+                            "Sent index", "verb count overall"]
 
         writer = csv.DictWriter(f=output_csv, fieldnames=fields)
 
@@ -101,7 +103,7 @@ class GetRarestArgStructs:
                 break
             counter += 1
             # get rarest dependency set for current lemma
-            #TODO^^
+
             rarest_dep_struct, min_count = None, 0
 
             for i_col, col in row.items():
@@ -109,6 +111,8 @@ class GetRarestArgStructs:
                     (not rarest_dep_struct or col < min_count) and col > 0:
                     rarest_dep_struct = i_col[:len(i_col)-len("_COUNT")]
                     min_count = col
+            if min_count > 5:
+                continue
 
             # get subset of dataframe that represents current lemma
             # with rarest dep struct
@@ -136,7 +140,8 @@ class GetRarestArgStructs:
                           "entropy": row["entropy"],
                            "Doc index": s_row["Doc index"],
                            "Sent index": s_row["Sent index"],
-                          "index of verb": index_of_verb
+                          "index of verb": index_of_verb, "verb count overall":
+                          row["TOTAL"]
                           }
 
                 writer.writerow(n_dict)

@@ -1,17 +1,23 @@
 import pandas as pd
 import spacy
 import pandas
+from spacy import Language
 from spacy.tokens import Doc
 from spacy.tokens import DocBin
 from docopt import docopt
-# from spacy.symbols import ORTH
 from spacy.lang.char_classes import ALPHA, ALPHA_LOWER, ALPHA_UPPER
 from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
-import utils.path_configurations as paths
+
+"""
+    if we want to use external models in our docs objects, we should
+    import them here
+"""
+
+# import utils.path_configurations as paths
 
 usage = '''
 Processor CLI.
@@ -41,33 +47,38 @@ class Processor:
                  ):
         self.nlp = spacy.load(model)
         # get a .csv file that contains the unprocessed data
-        # self.source_file_path = os.path.join(files_directory,
-        #                                      training_data_files_directory,
-        #                                      source_file)
+        self.source_file_path = os.path.join(files_directory,
+                                             training_data_files_directory,
+                                             source_file)
         self.source_file_path = source_file
-    #     # the name of the file we want to write to
+        # the name of the file we want to write to
         self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
             n=number_of_blogposts)
-        # self.output_file_path = os.path.join(files_directory,
-        #                                      spacy_files_directory,
-        #                                      output_file_dir,
-        #                                      output_file_name)
-    #
+        self.output_file_path = os.path.join(files_directory,
+                                             spacy_files_directory,
+                                             output_file_dir,
+                                             output_file_name)
+
         self.number_of_blogposts = number_of_blogposts
-    #
-    #     # create a dataframe from the .csv file
+
+        # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding ='utf-8'
                                   )
-    #     # initialize a docBin object with the following attributes
+        # initialize a docBin object with the following attributes
         self.doc_bin = DocBin(
             attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE",
                    "ENT_KB_ID", "LEMMA", "MORPH", "POS"],
             store_user_data=True)
-    #     # initialize a spacy nlp object based on "model" type
+        # initialize a spacy nlp object based on "model" type
 
-    #     # add attributes to nlp object: ex. don't split hyphens
+        # add attributes to nlp object: ex. don't split hyphens
         self.add_attrs_to_nlp()
-    #
+    """
+    use this method to load our custom pos taggers. 
+    we then use them as the "tagger" factory in 
+    """
+
+
     def add_attrs_to_nlp(self, no_split_hyphens = False,
                          add_i_m_case=True):
         # if add_i_m_case:
@@ -78,13 +89,12 @@ class Processor:
 
         if no_split_hyphens:
             self.nlp.tokenizer.infix_finditer = self.recompile_hyphens
-    #
-    #
-    # """
-    #     iterate over rows in dataframe and create nlp object from text.
-    #     can limit number of bloposts via number_of_blogposts argument
-    #     push docBin to disk (save docBin)
-    # """
+
+    """
+        iterate over rows in dataframe and create nlp object from text.
+        can limit number of bloposts via number_of_blogposts argument
+        push docBin to disk (save docBin)
+    """
     def process_file_and_create_nlp_objs(self):
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
@@ -99,16 +109,15 @@ class Processor:
                     return
 
         self.doc_bin.to_disk(self.output_file_path)
-    #
-    #
-    #
-    # """
-    #     adds each sentence in a single blogpost to the docBin.
-    #     first creates a nlp object from the entire blogpost to get seperate
-    #     sentences.
-    #     then for each sentence create an nlp object, add the doc index etc
-    #     as user data, and save to docbin
-    # """
+
+
+    """
+        adds each sentence in a single blogpost to the docBin.
+        first creates a nlp object from the entire blogpost to get seperate
+        sentences.
+        then for each sentence create an nlp object, add the doc index etc
+        as user data, and save to docbin
+    """
     def add_blogpost_to_docbin(self, index, row: pd.DataFrame):
 
         blogpost_text = self.clean_text_data(row['text'])
@@ -169,6 +178,8 @@ if __name__ == '__main__':
     source_file = args['<file_to_process>']
 
     number_of_files = int(args['<number_of_blogposts>'])
+
+
 
     proccessor = Processor(source_file=source_file, number_of_blogposts=number_of_files)
 

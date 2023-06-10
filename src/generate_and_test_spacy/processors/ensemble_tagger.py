@@ -16,6 +16,7 @@ import nltk
 import flair
 from flair.data import Sentence
 from flair.models import SequenceTagger
+from nltk.stem import WordNetLemmatizer
 
 
 #TODO exchange to universal dependencies
@@ -28,17 +29,39 @@ from flair.models import SequenceTagger
 #         token.tag_ = tag
 #     return doc
 
-
+pos_tags = [
+    'ADJ',
+    'ADP',
+    'ADV',
+    'AUX',
+    'CCONJ',
+    'DET',
+    'INTJ',
+    'NOUN',
+    'NUM',
+    'PART',
+    'PRON',
+    'PROPN',
+    'PUNCT',
+    'SCONJ',
+    'SYM',
+    'VERB',
+    'X'
+]
 class EnsembleTagger():
     def __init__(self):
-        # bert dependencies
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.model = BertForTokenClassification.from_pretrained(
-            'bert-base-uncased')
+        # # bert dependencies
+        # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        # self.model = BertForTokenClassification.from_pretrained(
+        #     'bert-base-uncased')
 
         # nltk dependencies
+        # for tokenizer
         nltk.download('averaged_perceptron_tagger')
         nltk.download('universal_tagset')
+        # # for lemmatizer
+        # nltk.download('wordnet')
+
 
         # stanza dependencies TODO confirm these are UD
         stanza.download('en')
@@ -48,7 +71,7 @@ class EnsembleTagger():
         self.flair_pipeline = SequenceTagger.load("flair/upos-english")
 
         self.tagger_funcs = [self.flair_tokenizer, self.nltk_tagger,self.stanza_tagger]
-
+        # self.tagger_funcs = [self.nltk_tagger]
 
 
     """
@@ -58,13 +81,12 @@ class EnsembleTagger():
     """
     def get_tags_list(self, doc):
         votes =  self.get_all_votes(doc)
-
-        tags = self.calculate_votes(votes) #TODO make this a doc object
+        tags = self.calculate_votes(votes, doc)
         return tags
 
 
-    def calculate_votes(self, votes: [list[list]]):
-        votes = self.create_lists_from_elements(votes)
+    def calculate_votes(self, votes: [list[list]], tokens: list[spacy.tokens]):
+
         polled_results = {}
         with ThreadPoolExecutor() as executor:
             tagging_tasks = [executor.submit(self.majority_vote, [vote, index]) for index,
@@ -76,9 +98,9 @@ class EnsembleTagger():
         return polled_results
 
 
-    def get_all_votes(self, doc):
+    def get_all_votes(self, spacy_tokens):
         tagged_tokens_lst = []
-        spacy_tokens = [token.text for token in doc]
+
         with ThreadPoolExecutor() as executor:
             tagging_tasks = [executor.submit(tagger_func, spacy_tokens) for
                              tagger_func
@@ -89,7 +111,8 @@ class EnsembleTagger():
             result = task.result()
             tagged_tokens_lst.append(result)
 
-        return tagged_tokens_lst
+        ordered_lst = self.create_lists_from_elements(tagged_tokens_lst)
+        return ordered_lst
 
 
     def create_lists_from_elements(self,list_of_lists):
@@ -113,17 +136,22 @@ class EnsembleTagger():
     @:param tags potentials tags for some token
     @:return tag the tag that received the majority vote
     """
-    def majority_vote(self, tags_and_index):
+    def majority_vote(self, tags_and_token):
         tag_counts = {}
-        tags = tags_and_index[0]
-        index = tags_and_index[1]
+
+        tags = tags_and_token[0]
+        index = tags_and_token[1]
         for vote in tags:
             tag = vote[1]
+            # if not tag in pos_tags:
+            #     continue #TODO what if none fit?
             if tag in tag_counts:
                 tag_counts[tag] += 1
             else:
                 tag_counts[tag] = 1
         majority_tag = max(tag_counts, key=tag_counts.get)
+
+
         return [index, [tags[0][0], majority_tag]]
 
     # """
@@ -151,7 +179,7 @@ class EnsembleTagger():
         # doc = [token.text for token in doc]
 
         taggings = self.stanza_pipeline([doc])
-        tags = [[word.text, word.upos] for word in taggings.sentences[0].words]
+        tags = [word for word in taggings.sentences[0].words]
 
         return tags
 
@@ -163,7 +191,6 @@ class EnsembleTagger():
     """
     def nltk_tagger(self, tokens):
          tagged_tokens = nltk.pos_tag(tokens, tagset='universal')
-
          return tagged_tokens
 
 

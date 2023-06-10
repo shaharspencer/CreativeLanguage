@@ -10,3 +10,10 @@ spacy==3.5.0
 spacy-legacy @ file:///home/conda/feedstock_root/build_artifacts/spacy-legacy_1674550301837/work
 spacy-loggers @ file:///home/conda/feedstock_root/build_artifacts/spacy-loggers_1672303484730/work
 zipfile2==0.0.12
+nltk~=3.8.1
+
+tqdm~=4.64.1
+torch~=2.0.1
+transformers~=4.30.1
+numpy~=1.24.1
+streamlit~=1.23.1

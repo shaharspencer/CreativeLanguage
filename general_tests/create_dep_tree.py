@@ -38,7 +38,6 @@ class Renderer:
 
 
     def output_sent_to_svg(self, sent: str, output_path: str):
-
         sent = self.nlp(sent)
 
         svg = spacy.displacy.render(sent, style="dep")

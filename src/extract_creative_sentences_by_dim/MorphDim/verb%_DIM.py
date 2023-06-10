@@ -37,7 +37,6 @@ class GetRarestVerbs:
         # proper nouns used as verbs
 
         df = pd.read_csv(self.verb_csv)
-        # illegal = {':', '*', "?", "<", ">", "|", '"', chr(92), chr(47)}
 
         sorted_dataframe = df[df['PROPN%'] > 0.8]
 

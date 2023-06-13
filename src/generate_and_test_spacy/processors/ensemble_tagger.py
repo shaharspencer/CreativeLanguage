@@ -1,6 +1,7 @@
 # for BERT tokenizer
 import concurrent
 import stanza
+from nltk import map_tag
 
 from spacy import Language
 from transformers import BertTokenizer, BertForTokenClassification
@@ -48,6 +49,22 @@ pos_tags = [
     'VERB',
     'X'
 ]
+
+nltk_to_spacy_pos_mapping = {
+    'VERB': 'VERB',
+    'NOUN': 'NOUN',
+    'PRON': 'PRON',
+    'ADJ': 'ADJ',
+    'ADV': 'ADV',
+    'ADP': 'ADP',
+    'CONJ': 'CCONJ',
+    'DET': 'DET',
+    'NUM': 'NUM',
+    'PRT': 'PART',
+    'X': 'X',
+    '.': 'PUNCT'
+}
+
 class EnsembleTagger():
     def __init__(self):
         # # bert dependencies
@@ -80,12 +97,13 @@ class EnsembleTagger():
         @:param doc 
     """
     def get_tags_list(self, doc):
-        votes =  self.get_all_votes(doc)
-        tags = self.calculate_votes(votes, doc)
+        word_lst = [token.text for token in doc]
+        votes = self.get_all_votes(word_lst)
+        tags = self.calculate_votes(votes)
         return tags
 
 
-    def calculate_votes(self, votes: [list[list]], tokens: list[spacy.tokens]):
+    def calculate_votes(self, votes: [list[list]]):
 
         polled_results = {}
         with ThreadPoolExecutor() as executor:
@@ -141,10 +159,11 @@ class EnsembleTagger():
 
         tags = tags_and_token[0]
         index = tags_and_token[1]
+        items = [item[0] for item in tags]
+        if not len(set(items)) <= 1:
+            raise Exception("for some reason the words are not all the same")
         for vote in tags:
             tag = vote[1]
-            # if not tag in pos_tags:
-            #     continue #TODO what if none fit?
             if tag in tag_counts:
                 tag_counts[tag] += 1
             else:
@@ -176,10 +195,8 @@ class EnsembleTagger():
           @:param doc to tag tokens in 
       """
     def stanza_tagger(self, doc): #TODO represents PUNCT as "."
-        # doc = [token.text for token in doc]
-
         taggings = self.stanza_pipeline([doc])
-        tags = [word for word in taggings.sentences[0].words]
+        tags = [[word.text, word.upos] for word in taggings.sentences[0].words]
 
         return tags
 
@@ -191,7 +208,10 @@ class EnsembleTagger():
     """
     def nltk_tagger(self, tokens):
          tagged_tokens = nltk.pos_tag(tokens, tagset='universal')
-         return tagged_tokens
+         mapped = [(word, nltk_to_spacy_pos_mapping[map_tag('en-ptb', 'universal',
+                                                            tag)]) for word, tag in
+          tagged_tokens]
+         return mapped
 
 
     def flair_tokenizer(self, token_list:list[str]):

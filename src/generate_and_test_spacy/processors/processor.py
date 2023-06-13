@@ -1,3 +1,11 @@
+import sys
+print(sys.path)
+
+# Add missing paths
+sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
+sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
+
 import pandas as pd
 import spacy
 import pandas
@@ -11,13 +19,16 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
+from src.generate_and_test_spacy.processors import ensemble_tagger
+from src.utils.path_configurations import files_directory, \
+    training_data_files_directory, spacy_files_directory
+
+
 
 """
     if we want to use external models in our docs objects, we should
     import them here
 """
-
-# import utils.path_configurations as paths
 
 usage = '''
 Processor CLI.
@@ -36,6 +47,19 @@ Creates a .spacy doc_bin of given csv file.
         None
 """
 
+"""
+  use this method to apply our custom pos tagger
+"""
+@Language.component("custom_tagger")
+def multi_tagger(doc):
+    tags = tagger.get_tags_list(doc)
+    sorted_values = [tags[key] for key in sorted(tags.keys())]
+
+    for token, (text, tag) in zip(doc, sorted_values):
+        # if tag == ".":
+        #     tag = "PUNCT"
+        token.pos_ = tag
+    return doc
 
 class Processor:
     def __init__(self,
@@ -46,18 +70,20 @@ class Processor:
 
                  ):
         self.nlp = spacy.load(model)
+
+        self.nlp.add_pipe("custom_tagger", last=True)
         # get a .csv file that contains the unprocessed data
         self.source_file_path = os.path.join(files_directory,
                                              training_data_files_directory,
                                              source_file)
-        self.source_file_path = source_file
+        self.source_file_path = self.source_file_path
         # the name of the file we want to write to
-        self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
+        self.output_file_name = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
             n=number_of_blogposts)
         self.output_file_path = os.path.join(files_directory,
                                              spacy_files_directory,
                                              output_file_dir,
-                                             output_file_name)
+                                             self.output_file_name)
 
         self.number_of_blogposts = number_of_blogposts
 
@@ -73,10 +99,6 @@ class Processor:
 
         # add attributes to nlp object: ex. don't split hyphens
         self.add_attrs_to_nlp()
-    """
-    use this method to load our custom pos taggers. 
-    we then use them as the "tagger" factory in 
-    """
 
 
     def add_attrs_to_nlp(self, no_split_hyphens = False,
@@ -173,6 +195,7 @@ class Processor:
 
 
 if __name__ == '__main__':
+    tagger = ensemble_tagger.EnsembleTagger()
     args = docopt(usage)
 
     source_file = args['<file_to_process>']

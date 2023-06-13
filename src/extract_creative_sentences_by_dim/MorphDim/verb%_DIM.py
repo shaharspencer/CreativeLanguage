@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import os
 import csv
@@ -8,12 +9,14 @@ from docopt import docopt
 from numpy import int32
 
 import src.utils.path_configurations
+from scipy.stats import entropy
 
 usage = '''
 verb%_DIM CLI.
 Usage:
     verb%_DIM.py <sents_dir_path> <verb_csv>
 '''
+
 
 
 class GetRarestVerbs:
@@ -72,6 +75,33 @@ class GetRarestVerbs:
                                     output_file_path=output_path)
 
         # sorted_lowest.to_csv("sorted_by_then_verb_proportion.csv")
+    """
+        this method adds an "Entropy" column to each row in a dataframe
+        representing the
+    """
+    def add_entropy_column(self):
+        data = pd.read_csv(self.verb_csv, encoding="ISO-8859-1")
+
+        counts = data[
+            ['VERB_count', 'PROPN_count', 'NOUN_count', 'ADJ_count']].to_numpy(
+            dtype=np.float64)
+
+        # Calculate the entropy for each row
+        entropies = []
+        for i in range(counts.shape[0]):
+            row_entropy = entropy(counts[i], base=2)
+            entropies.append(row_entropy)
+
+        # Open the file in write mode
+        with open(self.verb_csv, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+
+            # Write the headers
+            writer.writerow(data.columns.tolist() + ['Entropy'])
+
+            # Write the rows with entropy values
+            for index, row in data.iterrows():
+                writer.writerow(row.tolist() + [entropies[index]])
 
     """
     a specific measure that uses entropy to find creative sentences.
@@ -102,18 +132,19 @@ class GetRarestVerbs:
         df = pd.read_csv(self.verb_csv, on_bad_lines="skip", encoding="ISO-8859-1",
                          dtype = dtype_dict)
         # filter values by percentage consitions
-        df = df[(df["%VERB"] < 0.5)
-                &
-                (df["%VERB"] > 0)
-                &
+      #  (df["%VERB"] < 0.5)
+      #  &
+       # (df["%VERB"] > 0)
+        df = df[
+
                 (df["open class pos / total"] >= 0.95)
                 &
                 (df["VERB_count"] <= 5)
-                &
-                (df["total open class"] > 50)
+                # &
+                # (df["total open class"] > 50)
                 ]
         # sort by entropy
-        df_sortedby_entropy = df.sort_values(["entropy"], ascending=True)
+        df_sortedby_entropy = df.sort_values(["Entropy"], ascending=True)
         self.__write_csv_file_from_df(output_file_name, df_sortedby_entropy)
 
     """
@@ -163,20 +194,20 @@ class GetRarestVerbs:
                         sent_index = r["sent index"]
                         #TODO issue with my style vs their style - %verb vs verb%
                         #TODO improve this method it looks messy
-                        n_dict["percent as verb"] = row['%VERB']
-                        n_dict["percent as propn"] = row['%PROPN']
+                        # n_dict["percent as verb"] = row['%VERB']
+                        # n_dict["percent as propn"] = row['%PROPN']
                         n_dict["Sentence"] = r['sentence'].strip()
                         n_dict['Doc index'] = doc_index
                         n_dict['Sent index'] = sent_index
                         n_dict['Count as verb'] = row["VERB_count"]
-                        n_dict["total open class"] = row["total open class"]
+                        # n_dict["total open class"] = row["total open class"]
                         n_dict["index of verb"] = \
                             self.__get_index_of_verb(lemma=row['word'],
                                                      verb_form=r['word form'],
                                                      sent=
                                                      r['sentence'].strip())
-                        if "entropy" in fields:
-                            n_dict["entropy"] = row["entropy"]
+                        if "Entropy" in fields:
+                            n_dict["entropy"] = row["Entropy"]
                         if "%OPENCLASS" in fields:
                             n_dict["%OPENCLASS"] = row[
                                 "open class pos / total"]
@@ -225,6 +256,7 @@ if __name__ == '__main__':
     #                                 )
     # obj.explore_simple_method_by_count(
     #     output_file_name=output_path_morph)
+    # obj.add_entropy_column()
     output_path_entropy = "morph_order_by_entropy_and_verb_perc" + datetime + ".csv"
     obj.explore_entropy_measures(output_file_name=output_path_entropy,
                                  top_and_lowest_k=20)

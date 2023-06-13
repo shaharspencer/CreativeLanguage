@@ -23,7 +23,7 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
-from src.generate_and_test_spacy.processors import ensemble_tagger
+import ensemble_tagger
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory
 

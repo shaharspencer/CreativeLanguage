@@ -4,7 +4,6 @@ import stanza
 from nltk import map_tag
 
 from spacy import Language
-from transformers import BertTokenizer, BertForTokenClassification
 import torch
 import spacy
 from spacy.tokens import Doc
@@ -14,21 +13,14 @@ from concurrent.futures import ThreadPoolExecutor
 
 # for NLTK tokenizer
 import nltk
+
+# for flair tokenizer
 import flair
 from flair.data import Sentence
 from flair.models import SequenceTagger
-from nltk.stem import WordNetLemmatizer
 
 
 #TODO exchange to universal dependencies
-
-
-# @Language.component("custom_tagger")
-# def custom_tagger(doc):
-#     tagged_tokens = nltk.pos_tag([token.text for token in doc])
-#     for token, (text, tag) in zip(doc, tagged_tokens):
-#         token.tag_ = tag
-#     return doc
 
 pos_tags = [
     'ADJ',
@@ -67,27 +59,23 @@ nltk_to_spacy_pos_mapping = {
 
 class EnsembleTagger():
     def __init__(self):
-        # # bert dependencies
-        # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        # self.model = BertForTokenClassification.from_pretrained(
-        #     'bert-base-uncased')
 
         # nltk dependencies
         # for tokenizer
         nltk.download('averaged_perceptron_tagger')
         nltk.download('universal_tagset')
-        # # for lemmatizer
-        # nltk.download('wordnet')
 
 
         # stanza dependencies TODO confirm these are UD
         stanza.download('en')
-        self.stanza_pipeline = stanza.Pipeline('en', processors='tokenize,mwt,pos',
+        self.stanza_pipeline = stanza.Pipeline('en',
+                                               processors='tokenize,mwt,pos',
                                                tokenize_pretokenized=True)
-        # flair dependency (UD pipeline)
+        # flair dependencies (UD pipeline)
         self.flair_pipeline = SequenceTagger.load("flair/upos-english")
 
-        self.tagger_funcs = [self.flair_tokenizer, self.nltk_tagger,self.stanza_tagger]
+        self.tagger_funcs = [self.flair_tokenizer, self.nltk_tagger,
+                             self.stanza_tagger]
 
 
 
@@ -102,12 +90,17 @@ class EnsembleTagger():
         tags = self.calculate_votes(votes)
         return tags
 
-
-    def calculate_votes(self, votes: [list[list]]):
-
+    """
+        returns dictionary of  majority votes for each token's pos
+        dict is of form token_index: majority_tag
+        @:param votes list of votes from each tagger 
+        @:return dictionary of majority votes
+    """
+    def calculate_votes(self, votes: [list[list]])-> dict:
         polled_results = {}
         with ThreadPoolExecutor() as executor:
-            tagging_tasks = [executor.submit(self.majority_vote, [vote, index]) for index,
+            tagging_tasks = [executor.submit(self.majority_vote, [vote,
+                                                index]) for index,
                              vote in enumerate(votes)]
         # Retrieve results from completed tasks
         for task in concurrent.futures.as_completed(tagging_tasks):
@@ -115,8 +108,14 @@ class EnsembleTagger():
             polled_results[result[0]] = result[1]
         return polled_results
 
-
-    def get_all_votes(self, spacy_tokens):
+    """
+        this method gets all the votes from the different tokenizers
+        for each tagger, we send a list of strings and recieve a list of
+        type (token_text, predicted_token_tag)
+        @:param spacy_tokens list of strings from spacy's tokenizer
+        @:return list of lists returned by each tagger
+    """
+    def get_all_votes(self, spacy_tokens: list[str])-> list[list[(str, str)]]:
         tagged_tokens_lst = []
 
         with ThreadPoolExecutor() as executor:
@@ -124,7 +123,7 @@ class EnsembleTagger():
                              tagger_func
                              in self.tagger_funcs]
 
-        # Retrieve results from completed tasks
+        # retrieve results from completed tasks
         for task in concurrent.futures.as_completed(tagging_tasks):
             result = task.result()
             tagged_tokens_lst.append(result)
@@ -132,7 +131,14 @@ class EnsembleTagger():
         ordered_lst = self.create_lists_from_elements(tagged_tokens_lst)
         return ordered_lst
 
-
+    """
+        this method recieves a list of lists, each one is a list returned 
+        by a pos tagger
+        it returns one list for each token, which consists of tuples of
+        type (token_text, predicted_token_tag)
+        @:param list_of_lists list from each pos tagger
+        @:return list of one list for each token
+    """
     def create_lists_from_elements(self,list_of_lists):
         result_lists = []
         transposed = zip(*list_of_lists)
@@ -143,16 +149,10 @@ class EnsembleTagger():
         return result_lists
 
 
-        # for token, (text, tag) in zip(doc, tagged_tokens):
-        #         token.tag_ = tag
-        #     return doc
-        #
-
-
     """
-    finds the tag with maximum votes for some token
-    @:param tags potentials tags for some token
-    @:return tag the tag that received the majority vote
+        finds the tag with maximum votes for some token
+        @:param tags potentials tags for some token
+        @:return tag the tag that received the majority vote
     """
     def majority_vote(self, tags_and_token):
         tag_counts = {}
@@ -161,7 +161,7 @@ class EnsembleTagger():
         index = tags_and_token[1]
         items = [item[0] for item in tags]
         if not len(set(items)) <= 1:
-            raise Exception("for some reason the words are not all the same")
+            raise Exception("For some reason the words are not all the same")
         for vote in tags:
             tag = vote[1]
             if tag in tag_counts:
@@ -173,27 +173,11 @@ class EnsembleTagger():
 
         return [index, [tags[0][0], majority_tag]]
 
-    # """
-    #     predicts the labels for the tokens according to BERT model
-    #     @:param doc to tag tokens in
-    #     @:param tagged_tokens_list list to add our predictions to
-    #     @:return tags for tokens
-    # """
-    # def bert_tagger(self, doc: Doc):
-    #     text = [token.text for token in doc]
-    #     tokens = self.tokenizer.encode(text, add_special_tokens=True)
-    #     input_ids = torch.tensor([tokens])
-    #     with torch.no_grad():
-    #         outputs = self.model(input_ids)
-    #         predictions = outputs[0].argmax(dim=2).squeeze().tolist()
-    #     tags = [self.tokenizer.convert_ids_to_tokens(pred) for pred in predictions][
-    #            1:-1]
-    #     return tags
 
     """
           predicts the labels for the tokens based on stanza model
           @:param doc to tag tokens in 
-      """
+    """
     def stanza_tagger(self, doc):
         taggings = self.stanza_pipeline([doc])
         tags = [[word.text, word.upos] for word in taggings.sentences[0].words]
@@ -208,8 +192,10 @@ class EnsembleTagger():
     """
     def nltk_tagger(self, tokens):
          tagged_tokens = nltk.pos_tag(tokens, tagset='universal')
-         mapped = [(word, nltk_to_spacy_pos_mapping[map_tag('en-ptb', 'universal',
-                                                            tag)]) for word, tag in
+         mapped = [(word, nltk_to_spacy_pos_mapping[map_tag('en-ptb',
+                                                            'universal',
+                                                            tag)]) for word,
+                                                                       tag in
           tagged_tokens]
          return mapped
 

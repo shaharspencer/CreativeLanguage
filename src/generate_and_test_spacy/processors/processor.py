@@ -6,7 +6,9 @@ print(sys.path)
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+# sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+
+sys.path.append('/cs/snapless/gabis/shaharspencer')
 
 import pandas as pd
 import spacy

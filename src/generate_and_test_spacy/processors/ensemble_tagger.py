@@ -88,7 +88,7 @@ class EnsembleTagger():
         self.flair_pipeline = SequenceTagger.load("flair/upos-english")
 
         self.tagger_funcs = [self.flair_tokenizer, self.nltk_tagger,self.stanza_tagger]
-        # self.tagger_funcs = [self.nltk_tagger]
+
 
 
     """
@@ -194,7 +194,7 @@ class EnsembleTagger():
           predicts the labels for the tokens based on stanza model
           @:param doc to tag tokens in 
       """
-    def stanza_tagger(self, doc): #TODO represents PUNCT as "."
+    def stanza_tagger(self, doc):
         taggings = self.stanza_pipeline([doc])
         tags = [[word.text, word.upos] for word in taggings.sentences[0].words]
 

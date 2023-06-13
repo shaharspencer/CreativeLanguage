@@ -2,9 +2,9 @@ import sys
 print(sys.path)
 
 # Add missing paths
-sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
-sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
-sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
+# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
 import pandas as pd
 import spacy
@@ -20,15 +20,13 @@ import os
 from tqdm import tqdm
 
 from src.generate_and_test_spacy.processors import ensemble_tagger
-from src.utils.path_configurations import files_directory, \
-    training_data_files_directory, spacy_files_directory
+# from src.utils.path_configurations import files_directory, \
+#     training_data_files_directory, spacy_files_directory
 
 
 
-"""
-    if we want to use external models in our docs objects, we should
-    import them here
-"""
+
+
 
 usage = '''
 Processor CLI.
@@ -69,27 +67,28 @@ class Processor:
                  model="en_core_web_lg", number_of_blogposts=40000,
 
                  ):
+        self.source_file = source_file
         self.nlp = spacy.load(model)
 
         self.nlp.add_pipe("custom_tagger", last=True)
         # get a .csv file that contains the unprocessed data
-        self.source_file_path = os.path.join(files_directory,
-                                             training_data_files_directory,
-                                             source_file)
-        self.source_file_path = self.source_file_path
+        # self.source_file_path = os.path.join(files_directory,
+        #                                      training_data_files_directory,
+        #                                      source_file)
+        self.source_file_path = self.source_file
         # the name of the file we want to write to
-        self.output_file_name = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
+        self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(
             n=number_of_blogposts)
-        self.output_file_path = os.path.join(files_directory,
-                                             spacy_files_directory,
-                                             output_file_dir,
-                                             self.output_file_name)
+        # self.output_file_path = os.path.join(files_directory,
+        #                                      spacy_files_directory,
+        #                                      output_file_dir,
+        #                                      self.output_file_name)
 
         self.number_of_blogposts = number_of_blogposts
 
         # create a dataframe from the .csv file
-        self.df = pandas.read_csv(self.source_file_path, encoding ='utf-8'
-                                  )
+
+        self.df = pandas.read_csv(self.source_file_path, encoding='utf-8')
         # initialize a docBin object with the following attributes
         self.doc_bin = DocBin(
             attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE",

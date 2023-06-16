@@ -1,5 +1,6 @@
 import sys
-# print(sys.path)
+print(sys.path)
+#hi
 
 # Add missing paths
 sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')

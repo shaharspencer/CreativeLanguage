@@ -39,16 +39,7 @@ Usage:
     processor.py <file_to_process> <number_of_blogposts>
 '''
 
-"""
-Creates a .spacy doc_bin of given csv file.
 
-    Paremeters:
-        file(string): file from which to create .spacy file
-        number_of_blogposts(int): limit on how many blogposts to process
-
-    Returns: 
-        None
-"""
 
 """
   use this method to apply our custom pos tagger
@@ -64,6 +55,14 @@ def multi_tagger(doc):
         token.pos_ = tag
     return doc
 
+"""
+Creates a .spacy doc_bin of given csv file.
+
+    Paremeters:
+        source_file(string): csv file from which to create .spacy file
+        model(str) : model for spaCy to utilize, defaults to en_core_web_lg
+        number_of_blogposts(int): limit on how many blogposts to process
+"""
 class Processor:
     def __init__(self,
                  source_file =
@@ -71,33 +70,35 @@ class Processor:
                  model="en_core_web_lg", number_of_blogposts=40000,
                  ):
 
-        self.load_nlp_objects(model)
-        self.add_attrs_to_nlp()
-        self.load_docbin()
-        self.load_attributes(source_file, number_of_blogposts)
+        self.__load_nlp_objects(model)
+        self.__add_attrs_to_nlp()
+        self.__load_docbin()
+        self.__load_attributes(source_file, number_of_blogposts)
 
     """
         loads nlp object with requested model
-        adds pipelines if relevant
+        adds extra pipelines if relevant
+        @:param model(str): model to load for spaCy
     """
-    def load_nlp_objects(self, model):
+    def __load_nlp_objects(self, model):
         self.nlp = spacy.load(model)
         # add custom tagger to end of pipeline
         self.nlp.add_pipe("custom_tagger", last=True)
 
     """
-        load docbin object
+        load docBin object to store serialized data
     """
-    def load_docbin(self):
+    def __load_docbin(self):
         self.doc_bin = DocBin(
             attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE",
                    "ENT_KB_ID", "LEMMA", "MORPH", "POS"],
             store_user_data=True)
+
     """
         load relevant attributes such as source file paths
         and output file paths
     """
-    def load_attributes(self, source_file, number_of_blogposts):
+    def __load_attributes(self, source_file, number_of_blogposts):
 
         # get a .csv file that contains the unprocessed data
         # self.source_file_path = os.path.join(files_directory,
@@ -118,13 +119,13 @@ class Processor:
         # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding='utf-8')
 
-    def add_attrs_to_nlp(self, no_split_hyphens=False):
+    def __add_attrs_to_nlp(self, no_split_hyphens=False):
         if no_split_hyphens:
             self.nlp.tokenizer.infix_finditer = self.recompile_hyphens
 
     """
         iterate over rows in dataframe and create nlp object from text.
-        can limit number of blogposts via number_of_blogposts argument
+        can limit number of blogposts via number_of_blogposts attribute
         push docBin to disk (save docBin)
     """
     def process_file(self)-> None:
@@ -135,9 +136,9 @@ class Processor:
         with tqdm(total=self.blogpost_limit) as pbar:
             for index in range(self.blogpost_limit):
                 pbar.update(1)
-                print(index)
+                print(index, flush=True)
                 row = self.df.loc[index]
-                self.proccess_blogpost(index, row)
+                self.__proccess_blogpost(index, row)
             self.doc_bin.to_disk(self.output_file_path)
 
 
@@ -156,16 +157,16 @@ class Processor:
         sentences.
         then for each sentence create an nlp object, add the doc index etc
         as user data, and save to docbin
-        @:param index #TODO explain
-        @ row #TODO explain
+        @:param index(int): index of row to save to doc
+        @ row(pd.dataFrame): row #index from main dataframe
     """
-    def proccess_blogpost(self, index, row: pd.DataFrame):
-        blogpost_text = self.clean_text_data(row['text'])
+    def __proccess_blogpost(self, index, row: pd.DataFrame)->None:
+        blogpost_text = self.__clean_text_data(row['text'])
         blogpost_sents = self.nlp(blogpost_text).sents
 
         for sent_index, sent in enumerate(blogpost_sents):
             original_sentence = sent.text
-            sentence = self.normalize_sent(sent.text)
+            sentence = self.__normalize_sent(sent.text)
             doc = self.nlp(sentence)
             doc.user_data = {"DOC_INDEX": index,
                              "SENT_INDEX": sent_index,
@@ -174,7 +175,7 @@ class Processor:
                 doc.user_data[col_name] = col_val
             doc.retokenize()
             self.doc_bin.add(doc)
-            print(f"doc index: {index}, sent index: {sent_index}\n")
+            print(f"doc index: {index}, sent index: {sent_index}\n", flush=True)
 
     """
         recompile hyphens for tokenizer so that words with hyphens between
@@ -202,10 +203,10 @@ class Processor:
     """
         cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
         these are all html remanants
-        @:param blogpost string of the blogpost text
-        @:return blogpost text cleaned of nbsp and amp etc
+        @:param blogpost(str): blogpost text
+        @:return blogpost(str): cleaned blogpost text
     """
-    def clean_text_data(self, blogpost:str)->str:
+    def __clean_text_data(self, blogpost:str)->str:
         # clean html expressions
         blogpost = blogpost.replace("&nbsp;", " ")
         blogpost = blogpost.replace("nbsp;", " ")
@@ -214,14 +215,14 @@ class Processor:
         blogpost = blogpost.replace("amp;", "&")
         blogpost = blogpost.replace("&amp", "&")
         blogpost = blogpost.strip()
-        # lowercase all letters except first to improve model performance
 
         return blogpost
     """
         normalize sentence data for spacy pipeline
-        @:param sentence sentence to process
+        @:param sentence(str): sentence to process
+        @:return sentence(str): normalized sentence
     """
-    def normalize_sent(self, sentence: str) -> str:
+    def __normalize_sent(self, sentence: str) -> str:
         sentence = sentence[0] + sentence[1:].lower()
         sentence = sentence.strip()
         return sentence

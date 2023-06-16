@@ -67,7 +67,7 @@ class ClusterSentences:
 
         return furthest_distance, furthest_vector
 
-    def __normalize_embeddings(self, embeddings, normalize_factor):
+    def __normalize_embeddings(self, embeddings, normalize_factor:int)->list[np.ndarray]:
         # convert the list of tensors to a single tensor
         # tensor_array = torch.stack(embeddings)
 

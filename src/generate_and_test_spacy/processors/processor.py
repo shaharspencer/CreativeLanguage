@@ -135,6 +135,7 @@ class Processor:
         with tqdm(total=self.blogpost_limit) as pbar:
             for index in range(self.blogpost_limit):
                 pbar.update(1)
+                print(index)
                 row = self.df.loc[index]
                 self.proccess_blogpost(index, row)
             self.doc_bin.to_disk(self.output_file_path)

@@ -175,7 +175,7 @@ class EnsembleTagger():
 
 
     """
-          predicts the labels for the tokens based on stanza model
+          predicts the labels for the tokens based on stanza tokenizer
           @:param doc to tag tokens in 
     """
     def stanza_tagger(self, doc):
@@ -187,7 +187,7 @@ class EnsembleTagger():
 
 
     """
-        predicts the labels for the tokens based on NLTK model
+        predicts the labels for the tokens based on NLTK tokenizer
         @:param doc to tag tokens in 
     """
     def nltk_tagger(self, tokens):
@@ -199,7 +199,10 @@ class EnsembleTagger():
           tagged_tokens]
          return mapped
 
-
+    """
+          predicts the labels for the tokens based on flair tokenizer
+          @:param doc to tag tokens in 
+    """
     def flair_tokenizer(self, token_list:list[str]):
         # since the text is pretokenized, create a sentence object out of it
         sentence = Sentence(token_list)

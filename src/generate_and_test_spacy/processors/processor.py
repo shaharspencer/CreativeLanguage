@@ -1,14 +1,14 @@
 import sys
-print(sys.path)
+# print(sys.path)
 
 # Add missing paths
-# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-# sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+# sys.path.append('CreativeLanguage/src')
 
-sys.path.append('/cs/snapless/gabis/shaharspencer')
+# sys.path.append('/cs/snapless/gabis/shaharspencer')
 
 import pandas as pd
 import spacy
@@ -22,10 +22,11 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
+# sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
 import ensemble_tagger
-# from src.utils.path_configurations import files_directory, \
-#     training_data_files_directory, spacy_files_directory
+
+from src.utils.path_configurations import files_directory, \
+    training_data_files_directory, spacy_files_directory
 #h
 
 usage = '''
@@ -95,12 +96,12 @@ class Processor:
     def load_attributes(self, source_file, number_of_blogposts):
 
         # get a .csv file that contains the unprocessed data
-        # self.source_file_path = os.path.join(files_directory,
-        #                                      training_data_files_directory,
-        #                                      source_file)
+        self.source_file_path = os.path.join(files_directory,
+                                             training_data_files_directory,
+                                             source_file)
 
-        self.source_file = source_file
-        self.source_file_path = self.source_file
+        # self.source_file = source_file
+        # self.source_file_path = source_file
         # the name of the file we want to write to
         self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5." \
                                 "spacy".format(
@@ -110,7 +111,7 @@ class Processor:
         #                                      output_file_dir,
         #                                      self.output_file_name)
 
-        self.number_of_blogposts = number_of_blogposts
+        self.blogpost_limit = number_of_blogposts
         # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding='utf-8')
 
@@ -120,24 +121,32 @@ class Processor:
 
     """
         iterate over rows in dataframe and create nlp object from text.
-        can limit number of bloposts via number_of_blogposts argument
+        can limit number of blogposts via number_of_blogposts argument
         push docBin to disk (save docBin)
     """
-    def process_file_and_create_nlp_objs(self):
+    def process_file(self)-> None:
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
+        Doc.set_extension("ORIGINAL_SENTENCE", default=None)
 
-
-        with tqdm(total=self.number_of_blogposts) as pbar:
+        with tqdm(total=self.blogpost_limit) as pbar:
             for index, row in self.df.iterrows():
                 pbar.update(1)
-                self.add_blogpost_to_docbin(index, row)
-                if index ==self.number_of_blogposts:
+                self.proccess_blogpost(index, row)
+                if index == self.blogpost_limit:
                     self.doc_bin.to_disk(self.output_file_path)
                     return
 
         self.doc_bin.to_disk(self.output_file_path)
 
+    # """
+    #     close relevant objects:
+    #     doc_bin
+    #     json file
+    #     conllu file
+    # """
+    # def close_objects(self):
+    #
 
     """
         adds each sentence in a single blogpost to the docBin.
@@ -145,23 +154,30 @@ class Processor:
         sentences.
         then for each sentence create an nlp object, add the doc index etc
         as user data, and save to docbin
+        @:param index #TODO explain
+        @ row #TODO explain
     """
-    def add_blogpost_to_docbin(self, index, row: pd.DataFrame):
-
+    def proccess_blogpost(self, index, row: pd.DataFrame):
         blogpost_text = self.clean_text_data(row['text'])
         blogpost_sents = self.nlp(blogpost_text).sents
 
         for sent_index, sent in enumerate(blogpost_sents):
-            sentence = sent.text.strip()
-            doc = self.nlp(sentence) # proccesed sentence
+            original_sentence = sent.text
+            sentence = self.normalize_sent(sent.text)
+            doc = self.nlp(sentence)
             doc.user_data = {"DOC_INDEX": index,
-                             "SENT_INDEX": sent_index}
+                             "SENT_INDEX": sent_index,
+                             "ORIGINAL_SENTENCE": original_sentence}
             for col_name, col_val in row.items():
                 doc.user_data[col_name] = col_val
             doc.retokenize()
             self.doc_bin.add(doc)
+            print(f"doc index: {index}, sent index: {sent_index}\n")
 
-
+    """
+        recompile hyphens for tokenizer so that words with hyphens between
+        them are not split while tokenizing text
+    """
     def recompile_hyphens(self):
         infixes = (
                           LIST_ELLIPSES
@@ -188,6 +204,7 @@ class Processor:
         @:return blogpost text cleaned of nbsp and amp etc
     """
     def clean_text_data(self, blogpost:str)->str:
+        # clean html expressions
         blogpost = blogpost.replace("&nbsp;", " ")
         blogpost = blogpost.replace("nbsp;", " ")
         blogpost = blogpost.replace("&nbsp", " ")
@@ -195,7 +212,17 @@ class Processor:
         blogpost = blogpost.replace("amp;", "&")
         blogpost = blogpost.replace("&amp", "&")
         blogpost = blogpost.strip()
+        # lowercase all letters except first to improve model performance
+
         return blogpost
+    """
+        normalize sentence data for spacy pipeline
+        @:param sentence sentence to process
+    """
+    def normalize_sent(self, sentence: str) -> str:
+        sentence = sentence[0] + sentence[1:].lower()
+        sentence = sentence.strip()
+        return sentence
 
 
 
@@ -211,5 +238,6 @@ if __name__ == '__main__':
     proccessor = Processor(source_file=source_file,
                            number_of_blogposts=number_of_files)
 
-    proccessor.process_file_and_create_nlp_objs()
+    proccessor.process_file()
+
 

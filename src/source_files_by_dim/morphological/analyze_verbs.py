@@ -12,7 +12,7 @@ from tqdm import tqdm
 import src.utils.path_configurations
 import src.utils.path_configurations as paths
 
-
+#TODO save indexes!!!!!!!!!!
 
 usage = '''
 analyze_verbs CLI.

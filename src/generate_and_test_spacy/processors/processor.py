@@ -1,6 +1,6 @@
 import sys
 print(sys.path)
-#hi
+#TODO utilize GPU?
 
 # Add missing paths
 sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
@@ -13,6 +13,9 @@ sys.path.append('CreativeLanguage\\src')
 
 import pandas as pd
 import spacy
+activated = spacy.prefer_gpu()
+print(f"activated gpu: {activated}\n")
+print(f"spacy version: {spacy.__version__}\n")
 import pandas
 from spacy import Language
 from spacy.tokens import Doc
@@ -28,7 +31,7 @@ import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory
-#h
+
 
 usage = '''
 Processor CLI.
@@ -128,7 +131,7 @@ class Processor:
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
         Doc.set_extension("ORIGINAL_SENTENCE", default=None)
-
+        print(f"processing file!\n")
         with tqdm(total=self.blogpost_limit) as pbar:
             for index in range(self.blogpost_limit):
                 pbar.update(1)

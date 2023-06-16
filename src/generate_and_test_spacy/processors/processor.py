@@ -115,7 +115,7 @@ class Processor:
         # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding='utf-8')
 
-    def add_attrs_to_nlp(self, no_split_hyphens = False,):
+    def add_attrs_to_nlp(self, no_split_hyphens=False):
         if no_split_hyphens:
             self.nlp.tokenizer.infix_finditer = self.recompile_hyphens
 
@@ -130,14 +130,12 @@ class Processor:
         Doc.set_extension("ORIGINAL_SENTENCE", default=None)
 
         with tqdm(total=self.blogpost_limit) as pbar:
-            for index, row in self.df.iterrows():
+            for index in range(self.blogpost_limit):
                 pbar.update(1)
+                row = self.df.loc[index]
                 self.proccess_blogpost(index, row)
-                if index == self.blogpost_limit:
-                    self.doc_bin.to_disk(self.output_file_path)
-                    return
+            self.doc_bin.to_disk(self.output_file_path)
 
-        self.doc_bin.to_disk(self.output_file_path)
 
     # """
     #     close relevant objects:

@@ -6,7 +6,7 @@ sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-# sys.path.append('CreativeLanguage/src')
+sys.path.append('CreativeLanguage\\src')
 
 # sys.path.append('/cs/snapless/gabis/shaharspencer')
 
@@ -22,11 +22,11 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
-# sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
 import ensemble_tagger
 
-from src.utils.path_configurations import files_directory, \
-    training_data_files_directory, spacy_files_directory
+# from src.utils.path_configurations import files_directory, \
+#     training_data_files_directory, spacy_files_directory
 #h
 
 usage = '''
@@ -96,12 +96,11 @@ class Processor:
     def load_attributes(self, source_file, number_of_blogposts):
 
         # get a .csv file that contains the unprocessed data
-        self.source_file_path = os.path.join(files_directory,
-                                             training_data_files_directory,
-                                             source_file)
+        # self.source_file_path = os.path.join(files_directory,
+        #                                      training_data_files_directory,
+        #                                      source_file)
 
-        # self.source_file = source_file
-        # self.source_file_path = source_file
+        self.source_file_path = source_file
         # the name of the file we want to write to
         self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5." \
                                 "spacy".format(

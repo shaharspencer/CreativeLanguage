@@ -13,8 +13,8 @@ sys.path.append('CreativeLanguage\\src')
 
 import pandas as pd
 import spacy
-activated = spacy.prefer_gpu()
-print(f"activated gpu: {activated}\n")
+# activated = spacy.prefer_gpu()
+# print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
 import pandas
 from spacy import Language

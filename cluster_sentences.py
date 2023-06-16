@@ -21,7 +21,7 @@ class ClusterSentences:
             'sentence-transformers/all-roberta-large-v1')
 
     def process_csv(self, csv_name): #NOT ENOUGH MEMORY
-        csv = pd.read_csv(csv_name, encoding='utf-8').head(1000)
+        csv = pd.read_csv(csv_name, encoding='utf-8')
         embeddings = self.__embedd(csv["sentence"])
         equilblirum = self.__find_equiblirum(embeddings)
         print(f"equiblirum is {equilblirum}\n")

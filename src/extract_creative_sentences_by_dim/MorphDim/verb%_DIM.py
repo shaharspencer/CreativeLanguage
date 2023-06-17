@@ -6,7 +6,6 @@ import spacy
 from zipfile import ZipFile
 
 from docopt import docopt
-from numpy import int32
 
 import src.utils.path_configurations
 from scipy.stats import entropy
@@ -21,7 +20,7 @@ Usage:
 
 class GetRarestVerbs:
     def __init__(self, sents_dir_path,
-                 verb_csv, model = "en_core_web_lg"
+                 verb_csv, model="en_core_web_lg"
                  ):
         self.verb_csv = os.path.join(
             src.utils.path_configurations.files_directory,
@@ -33,7 +32,6 @@ class GetRarestVerbs:
             src.utils.path_configurations.morphological_dimension_directory,
             src.utils.path_configurations.morphological_dimension_source_files,
             sents_dir_path)
-        self.nlp = spacy.load(model)
 
     def explore_simple_method_propn(self, output_file_name,
                                     top_and_lowest_k=20):
@@ -132,16 +130,16 @@ class GetRarestVerbs:
         df = pd.read_csv(self.verb_csv, on_bad_lines="skip", encoding="ISO-8859-1",
                          dtype = dtype_dict)
         # filter values by percentage consitions
-      #  (df["%VERB"] < 0.5)
-      #  &
-       # (df["%VERB"] > 0)
-        df = df[
 
+        df = df[
+                 (df["VERB%"] < 0.5)
+                 &
+                (df["VERB%"] > 0) &
                 (df["open class pos / total"] >= 0.95)
                 &
                 (df["VERB_count"] <= 5)
-                # &
-                # (df["total open class"] > 50)
+                &
+                (df["total open class"] > 50)
                 ]
         # sort by entropy
         df_sortedby_entropy = df.sort_values(["Entropy"], ascending=True)
@@ -158,9 +156,10 @@ class GetRarestVerbs:
         file = open(output_path, "w", encoding='utf-8', newline='')
         fields = ["lemma", "verb form", "percent as verb", "percent as propn",
                   "Count as verb",
-                  "Sentence", "Doc index", "Sent index", "index of verb", "total open class"]
+                  "Sentence", "Doc index", "Sent index", "index of verb",
+                  "tokenized sentence", "total open class"]
         # if we can add the entropy
-        if "entropy" in df.columns:
+        if "Entropy" in df.columns:
             fields.append("entropy")
         if "open class pos / total" in df.columns:
             fields.append("%OPENCLASS")
@@ -180,56 +179,50 @@ class GetRarestVerbs:
                     counter += 1
                     if counter == 100:
                         break
-                    c = 0
                     for ind, r in sents_df.iterrows():
 
-                        # if c == row["VERB_count"]:
-                        #     break
-                        n_dict = {"lemma": row['word'],
-                                  'verb form': r['word form']}
-                        if row["word"] == "omg":
-                            t = 0
-                        c += 1
-                        doc_index = r["doc index"]
-                        sent_index = r["sent index"]
-                        #TODO issue with my style vs their style - %verb vs verb%
-                        #TODO improve this method it looks messy
-                        # n_dict["percent as verb"] = row['%VERB']
-                        # n_dict["percent as propn"] = row['%PROPN']
-                        n_dict["Sentence"] = r['sentence'].strip()
-                        n_dict['Doc index'] = doc_index
-                        n_dict['Sent index'] = sent_index
-                        n_dict['Count as verb'] = row["VERB_count"]
-                        # n_dict["total open class"] = row["total open class"]
-                        n_dict["index of verb"] = \
-                            self.__get_index_of_verb(lemma=row['word'],
-                                                     verb_form=r['word form'],
-                                                     sent=
-                                                     r['sentence'].strip())
-                        if "Entropy" in fields:
-                            n_dict["entropy"] = row["Entropy"]
-                        if "%OPENCLASS" in fields:
-                            n_dict["%OPENCLASS"] = row[
-                                "open class pos / total"]
-
+                        n_dict = self.__define_ndict(r=r, row=row,
+                                                     fields=fields)
 
                         writer.writerow(n_dict)
                     os.remove(sents_path)
 
                 except KeyError:
-                    pass
+                    print("key error!\n")
             file.close()
+    """
+        for an instance of a verb, defines a dictionary to write to
+        the creative sentence file
+        @:param r
+        @:param row
+        @:param fields TODO define these
+    """
+    def __define_ndict(self, r, row, fields):
+        n_dict = {"lemma": row['word'],
+                  'verb form': r['word form']}
+        # extract info about lemma
+        n_dict["percent as verb"] = row['VERB%']
+        n_dict["percent as propn"] = row['PROPN%']
+        n_dict['Count as verb'] = row["VERB_count"]
+        n_dict["total open class"] = row["total open class"]
+        if "entropy" in fields:
+            n_dict["entropy"] = row["Entropy"]
+        if "%OPENCLASS" in fields:
+            n_dict["%OPENCLASS"] = row[
+                "open class pos / total"]
 
-    """
-      given parameters describing the verb, we find the index spacy gives 
-      to the verb within the sentence.
-    """
-    def __get_index_of_verb(self, lemma: str, verb_form: str, sent: str):
-        doc = self.nlp(sent)
-        for token in doc:
-            if token.text == verb_form and token.lemma_.lower() == lemma:
-                return token.i
-        return -1
+        # extract info about specific instance
+        n_dict["Sentence"] = r['sentence'].strip()
+        doc_index = r["doc index"]
+        sent_index = r["sent index"]
+        n_dict['Doc index'] = doc_index
+        n_dict['Sent index'] = sent_index
+
+        n_dict["index of verb"] = r["token index"]
+        n_dict["tokenized sentence"] = r["tokenized sentence"]
+
+
+        return n_dict
 
 
 def print_fieldnames(given_lst: iter):
@@ -256,7 +249,7 @@ if __name__ == '__main__':
     #                                 )
     # obj.explore_simple_method_by_count(
     #     output_file_name=output_path_morph)
-    # obj.add_entropy_column()
+    obj.add_entropy_column()
     output_path_entropy = "morph_order_by_entropy_and_verb_perc" + datetime + ".csv"
     obj.explore_entropy_measures(output_file_name=output_path_entropy,
                                  top_and_lowest_k=20)

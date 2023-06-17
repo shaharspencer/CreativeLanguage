@@ -1,3 +1,4 @@
+from collections import namedtuple
 from enum import Enum
 
 from docopt import docopt
@@ -12,7 +13,11 @@ from tqdm import tqdm
 import src.utils.path_configurations
 import src.utils.path_configurations as paths
 
-#TODO save indexes!!!!!!!!!!
+
+
+DictEntry = namedtuple('DictEntry', ['token_text', 'token_sent_text', 'doc_index', 'sent_index',
+                                      'token_index', 'tokenized_sentence'])
+
 
 usage = '''
 analyze_verbs CLI.
@@ -20,12 +25,6 @@ Usage:
     analyze_verbs.py <spacy_file_name> <num_of_posts>
 '''
 
-# parts_of_speech = ["VERB", "PROPN", "PART", "NUM", "X", "PUNCT",
-#                         "ADJ",
-#                         "ADP", "ADV",
-#                         "AUX", "CCONJ", "DET", "INTJ", "NOUN", "PRON",
-#                         "SCONJ", "CONJ",
-#                         "SYM"]
 parts_of_speech = ["VERB", "PROPN", "PART", "NUM", "PUNCT",
                         "ADJ",
                         "ADP", "ADV",
@@ -38,6 +37,8 @@ open_class_pos = ["VERB", "PROPN", "NOUN", "ADJ"]
 
 class EXTRA_COLS(Enum):
     PERCENTAGE_AS_OPEN_CLASS_POS = "open class pos / total"
+    TOTAL_OPEN_CLASS = "total open class"
+
 
 #TODO: add % columns
 
@@ -59,35 +60,43 @@ And save occurences of that word in the part of speech
 
 class AnalyzeVerbs:
     def __init__(self, spacy_file_path, num_of_posts, model="en_core_web_lg",
-                 spacy_directory=
-                 r"withought_context_lg_model",
                  ):
-
+        # define how many blogposts we want to analyze
         self.number_of_posts = num_of_posts
-        self.spacy_path = os.path.join(paths.files_directory,
-                                       paths.spacy_files_directory,
-                                       spacy_directory,
-                                       spacy_file_path)
-
-
+        # define where the spacy path we want to use is located
+        self.spacy_path = self.__define_spacy_path(spacy_file_path=
+                                                   spacy_file_path)
+        # load file from docBin
         self.doc_bin = DocBin().from_disk(self.spacy_path)
 
-
+        # define nlp model to use vocab
         self.nlp = spacy.load(model)
 
+        # define which pos we want to collecy
         self.spacy_part_of_speech = parts_of_speech
 
         # find all words which at some point are classified as verbs
         self.words_classed_as_verb = self.find_all_verbs_in_file()
+
         #initialize dictionary
         self.verb_dict = {}
+
         #fill dictionary
         self.analyze_verbs()
+    """
+        define where the spacy file we want to use is
+    """
+    def __define_spacy_path(self, spacy_file_path):
+        spacy_path = os.path.join(paths.files_directory,
+                                       paths.spacy_files_directory,
+                                       spacy_file_path)
+
+        return spacy_path
+
 
     """
     creates a set of all verbs that were at some point in the files
     classified as verbs
-    @:doc_limit: doc to stop processing at
     """
     def find_all_verbs_in_file(self)->set:
         verbs = set()
@@ -99,39 +108,40 @@ class AnalyzeVerbs:
         return verbs
 
     """
-    create dictionary with all words that are at some point classified as verbs
-    we know they were classified as verbs using the set words_classed_as_verbs
-    save all instances in different parts of speech, lemmas and more info
-    @:param doc_limit = doc index to stop at
+        create dictionary with all words that are at some point classified as verbs
+        we know they were classified as verbs using the set words_classed_as_verbs
+        save all instances in different parts of speech, lemmas and more info
+        @:param doc_limit = doc index to stop at
     """
     def analyze_verbs(self):
-        # with tqdm(desc = "creating dictionary for csv", colour="blue",
-        #         total= self.number_of_posts) \
-        #     as pbar:
-        for sentence in self.doc_bin.get_docs(self.nlp.vocab):
-            # pbar.update(1)
+        for i, sentence in enumerate(self.doc_bin.get_docs(self.nlp.vocab)):
+            print(f"processing sentence number {i}\n")
 
             for token in sentence:
                 if (token.lemma_.lower() in self.words_classed_as_verb):
                     self.add_token_to_dict(token)
 
 
-
     """
-    adds current instance of word to dictionary
-    adds template for word if not already in the dictionary
-    :return bool True if added
-                 False else
+        adds current instance of word to dictionary
+        adds template for word if not already in the dictionary
+        :return bool True if added
+                     False else
     """
-
     def add_token_to_dict(self, token)->bool:
         if token.pos_ in parts_of_speech_to_ignore:
             return False
         self.add_token_template_to_dict(token)
         # convert all letters but first letter to lowercase
+        dict_entry = DictEntry(token_text=token.text,
+                               token_sent_text=token.sent.text,
+                               doc_index=token.doc.user_data["DOC_INDEX"],
+                               sent_index=token.doc.user_data["SENT_INDEX"],
+                               token_index=token.i,
+                               tokenized_sentence=
+                               tuple([token.text for token in token.sent]))
         self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add \
-            ( (token.text, token.sent.text, token.doc.user_data["DOC_INDEX"],
-             token.doc.user_data["SENT_INDEX"]))
+            (dict_entry)
         self.verb_dict[token.lemma_.lower()][token.pos_]["lemma"] = \
             token.lemma_
         self.verb_dict[token.lemma_.lower()][token.pos_]["Counter"] += 1
@@ -147,43 +157,57 @@ class AnalyzeVerbs:
 
 
     """
-    create csv with all differnt count of parts of speech
+    create csv with all different count of parts of speech
     """
 
-    # TODO add date
     def write_dict_to_csv(self, pos_to_use, fields_to_write, additional_cols,
                           output_file_name):
-        output_file_name = "first_{n}_posts_".format(n=self.number_of_posts) + output_file_name
-        output_path = os.path.join(
-            src.utils.path_configurations.files_directory,
-            src.utils.path_configurations.morphological_dimension_directory,
-            src.utils.path_configurations.morphological_dimension_source_files,
-            output_file_name)
+        output_path = self.__define_output_path(output_file_name)
         with open(output_path, 'w', encoding='utf-8', newline='') as f:
-            fieldnames = ["word"]
-            pos_fields, pos_dict = self.csv_pos_template(pos_to_use, fields_to_write)
-            fieldnames += pos_fields
-
-            additional_cols_as_strs = [field.value for field in additional_cols]
-            fieldnames += additional_cols_as_strs
-
-
-            # add to DictWriter dictionary
-            pos_dict.update(self.fieldnames_for_csv(additional_cols_as_strs))
-
+            fieldnames, pos_dict = self.__define_fieldnames_and_pos_dict(
+                additional_cols=additional_cols,
+                                                  pos_to_use=pos_to_use,
+                                                  fields_to_write=fields_to_write)
 
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writerow(pos_dict)
             self.writing_to_csv(writer, pos_to_use, fields_to_write, additional_cols)
 
+    def __define_fieldnames_and_pos_dict(self, additional_cols, pos_to_use, fields_to_write):
+        fieldnames = ["word"]
+        pos_fields, pos_dict = self.csv_pos_template(pos_to_use,
+                                                     fields_to_write)
+        fieldnames += pos_fields
+
+        additional_cols_as_strs = [field.value for field in additional_cols]
+        fieldnames += additional_cols_as_strs
+
+        # add to DictWriter dictionary
+        pos_dict.update(self.fieldnames_for_csv(additional_cols_as_strs))
+        return fieldnames, pos_dict
 
     """
-    does the actual writing to the csv
-    @:param writer: file we are writing to, will be closed in another scope
-    @:param pos_to_use: parts of speech we are regarding
-    @:param fields_to_write: fields to use in csv, ex: count, %, lemma
-    @:param additional cols: extra columns that exist for each verb, for example
-    percent in specific types of speech
+        define csv final path according to output_file_name given to object
+    """
+    def __define_output_path(self, output_file_name):
+        output_file_name = "first_{n}_posts_".format(
+            n=self.number_of_posts) + output_file_name
+        output_path = os.path.join(
+            src.utils.path_configurations.files_directory,
+            src.utils.path_configurations.morphological_dimension_directory,
+            src.utils.path_configurations.morphological_dimension_source_files,
+            output_file_name)
+        return output_path
+
+
+
+    """
+        does the actual writing to the csv
+        @:param writer: file we are writing to, will be closed in another scope
+        @:param pos_to_use: parts of speech we are regarding
+        @:param fields_to_write: fields to use in csv, ex: count, %, lemma
+        @:param additional cols: extra columns that exist for each verb, for example
+        percent in specific types of speech
     """
     def writing_to_csv(self, writer, pos_to_use, fields_to_write, add_cols):
         with tqdm(desc="writing to csv", colour="green",
@@ -197,9 +221,12 @@ class AnalyzeVerbs:
                      pos_to_use])
                 if EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS in add_cols:
                     n_dict[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS.value] = \
-                    total /  sum([self.verb_dict[word][pos]["Counter"]
+                    total / sum([self.verb_dict[word][pos]["Counter"]
                                           for pos in
                      parts_of_speech])
+                if EXTRA_COLS.TOTAL_OPEN_CLASS in add_cols:
+                    n_dict[EXTRA_COLS.TOTAL_OPEN_CLASS.value] = \
+                        total
                 for pos in pos_to_use:
                     # choose fields we want to write to (these should exist
                     # in dictionary)
@@ -227,8 +254,9 @@ class AnalyzeVerbs:
             with tqdm(desc="creating text files per verb", colour="CYAN",
                 total=len(list(self.doc_bin.get_docs(self.nlp.vocab)))) as pbar:
 
-                for word in self.verb_dict.keys():
+                for i, word in enumerate(self.verb_dict.keys()):
                     pbar.update(1)
+                    print(f"processing text file number {i}\n")
                     for pos in self.spacy_part_of_speech:
                         file = self.create_csv_for_pos(word, pos)
                         if file != "":
@@ -248,7 +276,7 @@ class AnalyzeVerbs:
                   mode="w", encoding='utf-8', newline="") as f:
             fields = ["lemma", "word form", "sentence",
                       "doc index",
-                      "sent index"]
+                      "sent index",'token index', 'tokenized sentence']
             d = self.fieldnames_for_csv(fields)
             writer = csv.DictWriter(f=f, fieldnames=fields)
             writer.writerow(d)
@@ -258,20 +286,22 @@ class AnalyzeVerbs:
                 writer.writerow(n_dict)
         return p
 
-    def create_instance_row(self, word, sent)->dict:
-        verb_form, sentence, doc_index, sent_index = sent[
-                                                         0], \
-                                                     sent[
-                                                         1], \
-                                                     sent[
-                                                         2], \
-                                                     sent[
-                                                         3]
+    """
+        create row for zip file for an instance of a word. 
+        @:param word(str): lemma of word form
+        @:param sent(DictEntry): a DictEntry named tuple representing info
+        about the instance
+        @:return n_dict(dict): dictionary with all the info
+    """
+    def create_instance_row(self, word, sent: DictEntry)->dict:
+        verb_form, sentence, doc_index, sent_index, token_index, tokenized_sentence = sent
         n_dict = {"lemma": word,
                   "word form": verb_form,
                   "sentence": sentence,
                   "doc index": doc_index,
-                  "sent index": sent_index}
+                  "sent index": sent_index,
+                  "token index": token_index,
+                  "tokenized sentence": tokenized_sentence}
         return n_dict
 
     def verify_word(self, word: str)->bool:
@@ -352,11 +382,7 @@ if __name__ == '__main__':
     verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
                                      fields_to_write=["count", "%"],
                                      output_file_name=r"all_pos_count.csv",
-                                     additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS])
-    #
-    # write with only % and all parts of speech
-    # verb_anazlyzer.write_dict_to_csv(pos_to_use=parts_of_speech,
-    #                                  fields_to_write=["%"],
-    #                                  output_file_name=r"all_pos_%.csv")
-    #
+                                     additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
+                                                      EXTRA_COLS.TOTAL_OPEN_CLASS])
+
     verb_anazlyzer.create_text_files()

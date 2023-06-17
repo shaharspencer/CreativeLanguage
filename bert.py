@@ -11,8 +11,8 @@ class BertConverter: # TODO smarter name :)
         initialize tokenizer and model instances
     """
     def __init__(self):
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-        self.model = TFBertForMaskedLM.from_pretrained('bert-base-cased')
+        self.mask_pipeline = pipeline("fill-mask", model="roberta-base",
+                             tokenizer="roberta-base")
 
     """
         returns top k predictions to replace [MASK] token
@@ -35,6 +35,11 @@ class BertConverter: # TODO smarter name :)
 
         decoded_output_words = decoded_output[mask_index]
         return decoded_output_words
+    """
+        this method replaces the 
+    """
+    def replace_token_with_mask(self, input_str, ):
+
 
 
 if __name__ == '__main__':

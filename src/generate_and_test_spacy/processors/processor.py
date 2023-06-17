@@ -1,6 +1,9 @@
 import sys
 print(sys.path)
 #TODO utilize GPU?
+#TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
+#TODO save tokenized list??? for prections of pos
+#TODO check if the pos are correct
 
 # Add missing paths
 sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
@@ -136,7 +139,7 @@ class Processor:
         with tqdm(total=self.blogpost_limit) as pbar:
             for index in range(self.blogpost_limit):
                 pbar.update(1)
-                print(index, flush=True)
+                print(str(index) + "\n", flush=True)
                 row = self.df.loc[index]
                 self.__proccess_blogpost(index, row)
             self.doc_bin.to_disk(self.output_file_path)

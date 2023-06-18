@@ -14,6 +14,7 @@ print(sys.path)
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
 sys.path.append('CreativeLanguage\\src')
+sys.path.append('\\cs\\snapless\\gabis\\shaharspencer\\CreativeLanguage\\src')
 
 # sys.path.append('/cs/snapless/gabis/shaharspencer')
 

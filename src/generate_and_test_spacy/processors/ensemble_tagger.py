@@ -164,11 +164,16 @@ class EnsembleTagger():
             raise Exception("For some reason the words are not all the same")
         for vote in tags:
             tag = vote[1]
+            if "tag" == 'X':
+                continue
             if tag in tag_counts:
                 tag_counts[tag] += 1
             else:
                 tag_counts[tag] = 1
-        majority_tag = max(tag_counts, key=tag_counts.get)
+        if not tag_counts:
+            majority_tag = "X"
+        else:
+            majority_tag = max(tag_counts, key=tag_counts.get)
 
 
         return [index, [tags[0][0], majority_tag]]

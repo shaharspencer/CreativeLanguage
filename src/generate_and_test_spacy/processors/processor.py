@@ -1,4 +1,7 @@
 import sys
+
+from src.generate_and_test_spacy.processors import ensemble_tagger
+
 print(sys.path)
 #TODO utilize GPU?
 #TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
@@ -30,10 +33,10 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
-import ensemble_tagger
+import src.generate_and_test_spacy.processors.ensemble_tagger
 
-# from src.utils.path_configurations import files_directory, \
-#     training_data_files_directory, spacy_files_directory
+from src.utils.path_configurations import files_directory, \
+    training_data_files_directory, spacy_files_directory
 
 
 usage = '''
@@ -51,11 +54,15 @@ Usage:
 """
 @Language.component("custom_tagger")
 def multi_tagger(doc):
+    if not doc:
+        return doc
     tags = tagger.get_tags_list(doc)
     sorted_values = [tags[key] for key in sorted(tags.keys())]
 
     for token, (text, tag) in zip(doc, sorted_values):
-        token.pos_ = tag
+        # prob = token.prob
+        if tag != "X":
+            token.pos_ = tag
     return doc
 
 """
@@ -153,6 +160,15 @@ class Processor:
     # """
     # def close_objects(self):
     #
+    """
+        processes a sentence into a Doc object.
+        @:param sentence(str): string to process
+        @:return doc(Doc): spacy doc object
+    """
+    def process_text(self, sentence: str)-> Doc:
+        doc = self.nlp(sentence)
+        doc.retokenize()
+        return doc
 
     """
         adds each sentence in a single blogpost to the docBin.
@@ -170,7 +186,7 @@ class Processor:
         for sent_index, sent in enumerate(blogpost_sents):
             original_sentence = sent.text
             sentence = self.__normalize_sent(sent.text)
-            doc = self.nlp(sentence)
+            doc = self.process_text(sentence)
             doc.user_data = {"DOC_INDEX": index,
                              "SENT_INDEX": sent_index,
                              "ORIGINAL_SENTENCE": original_sentence}
@@ -178,7 +194,8 @@ class Processor:
                 doc.user_data[col_name] = col_val
             doc.retokenize()
             self.doc_bin.add(doc)
-            print(f"doc index: {index}, sent index: {sent_index}\n", flush=True)
+            print(f"doc index: {index}, sent index: {sent_index}\n",
+                  flush=True)
 
     """
         recompile hyphens for tokenizer so that words with hyphens between

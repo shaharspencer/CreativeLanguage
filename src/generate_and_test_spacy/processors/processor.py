@@ -40,7 +40,7 @@ sys.path.append(parent_dir)
 print(sys.path)
 
 
-from src.generate_and_test_spacy.processors import ensemble_tagger
+import ensemble_tagger
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory

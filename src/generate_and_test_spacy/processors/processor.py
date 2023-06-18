@@ -37,6 +37,7 @@ parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/
 
 # Append the parent directory to sys.path
 sys.path.append(parent_dir)
+print(sys.path)
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory

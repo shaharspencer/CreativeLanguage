@@ -1,8 +1,8 @@
 import sys
 
-from src.generate_and_test_spacy.processors import ensemble_tagger
 
-print(sys.path)
+
+
 #TODO utilize GPU?
 #TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
 #TODO save tokenized list??? for prections of pos
@@ -38,6 +38,9 @@ parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/
 # Append the parent directory to sys.path
 sys.path.append(parent_dir)
 print(sys.path)
+
+
+from src.generate_and_test_spacy.processors import ensemble_tagger
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory

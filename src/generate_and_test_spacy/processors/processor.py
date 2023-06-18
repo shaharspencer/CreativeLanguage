@@ -13,7 +13,7 @@ import sys
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-# sys.path.append('CreativeLanguage\\src')
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
 
 #h
 # sys.path.append('/cs/snapless/gabis/shaharspencer')
@@ -33,7 +33,7 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
-parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/processors/ensemble_tagger')
+parent_dir = os.path.abspath('CreativeLanguage/src')
 
 # Append the parent directory to sys.path
 sys.path.append(parent_dir)
@@ -52,7 +52,7 @@ Usage:
     processor.py <file_to_process> <number_of_blogposts>
 '''
 
-
+tagger = ensemble_tagger.EnsembleTagger()
 
 """
   use this method to apply our custom pos tagger
@@ -259,7 +259,7 @@ class Processor:
 
 
 if __name__ == '__main__':
-    tagger = ensemble_tagger.EnsembleTagger()
+
     args = docopt(usage)
 
     source_file = args['<file_to_process>']

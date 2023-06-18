@@ -10,6 +10,8 @@ from docopt import docopt
 import src.utils.path_configurations
 from scipy.stats import entropy
 
+from bert import BertConverter
+
 usage = '''
 verb%_DIM CLI.
 Usage:
@@ -73,13 +75,29 @@ class GetRarestVerbs:
                                     output_file_path=output_path)
 
         # sorted_lowest.to_csv("sorted_by_then_verb_proportion.csv")
+
     """
         this method adds an "Entropy" column to each row in a dataframe
         representing the
     """
     def add_entropy_column(self):
-        data = pd.read_csv(self.verb_csv, encoding="ISO-8859-1")
-
+        column_dtype = {
+                'VERB_count': float,
+                'VERB%': float,
+                'PROPN_count': int,
+                'PROPN%': float,
+                'NOUN_count': int,
+                'NOUN%': float,
+                'ADJ_count': int,
+                'ADJ%': float,
+                'open class pos / total': float,
+                'total open class': int,
+                'Entropy': float
+        }
+        data = pd.read_csv(self.verb_csv, encoding="ISO-8859-1", on_bad_lines='skip',
+                          dtype= column_dtype)
+        if "Entropy" in data.columns:
+            return
         counts = data[
             ['VERB_count', 'PROPN_count', 'NOUN_count', 'ADJ_count']].to_numpy(
             dtype=np.float64)
@@ -113,18 +131,19 @@ class GetRarestVerbs:
     def explore_entropy_measures(self, output_file_name,
                                  top_and_lowest_k):
         dtype_dict = {
-            'num_POSs': 'float',
-            'VERB_count': 'float',
-            'PROPN_count': 'float',
-            'NOUN_count': 'float',
-            'ADJ_count': 'float',
-            'total open class': 'float',
-            'percent_VERB': 'float',
-            'percent_PROPN': 'float',
-            'percent_NOUN': 'float',
-            'percent_ADJ': 'float',
-            'entropy': 'float',
-            'open class pos / total': 'float'
+
+            'num_POSs': float,
+            'VERB_count': float,
+            'PROPN_count': float,
+            'NOUN_count': float,
+            'ADJ_count': float,
+            'total open class': float,
+            'percent_VERB': float,
+            'percent_PROPN': float,
+            'percent_NOUN': float,
+            'percent_ADJ': float,
+            'Entropy': float,
+            'open class pos / total': float
         }
 
         df = pd.read_csv(self.verb_csv, on_bad_lines="skip", encoding="ISO-8859-1",
@@ -152,17 +171,10 @@ class GetRarestVerbs:
     """
 
     def __write_csv_file_from_df(self, output_file_path, df):
+        bert = BertConverter()
         output_path = output_file_path
         file = open(output_path, "w", encoding='utf-8', newline='')
-        fields = ["lemma", "verb form", "percent as verb", "percent as propn",
-                  "Count as verb",
-                  "Sentence", "Doc index", "Sent index", "index of verb",
-                  "tokenized sentence", "total open class"]
-        # if we can add the entropy
-        if "Entropy" in df.columns:
-            fields.append("entropy")
-        if "open class pos / total" in df.columns:
-            fields.append("%OPENCLASS")
+        fields = self.__define_fields()
         writer = csv.DictWriter(f=file, fieldnames=fields)
 
         d = print_fieldnames(fields)
@@ -172,10 +184,13 @@ class GetRarestVerbs:
             for index, row in df.iterrows():
                 sents_path = row["word"] + "_VERB.csv"
                 # with open(sents_path, encoding='utf-8') as f:
-                #TODO want more than 30 ofc
+
                 try:
                     sents_df = pd.read_csv(zip.extract(sents_path),
                                            encoding='utf-8')
+                    # get bert predictions
+                    bert.get_top_k_predictions(sents_df)
+
                     counter += 1
                     if counter == 100:
                         break
@@ -190,6 +205,22 @@ class GetRarestVerbs:
                 except KeyError:
                     print("key error!\n")
             file.close()
+    """
+        define column names in output csv
+        @:return fields(list): list of strings defining column names
+    """
+    def __define_fields(self):
+        fields = ["lemma", "verb form", "percent as verb", "percent as propn",
+                  "Count as verb",
+                  "Sentence", "Doc index", "Sent index", "index of verb",
+                  "tokenized sentence", "total open class", "BERT tag",
+                  "BERT replacements"]
+        # if we can add the entropy
+        # if "Entropy" in df.columns:
+        fields.append("entropy")
+        # if "open class pos / total" in df.columns:
+        fields.append("%OPENCLASS")
+        return fields
     """
         for an instance of a verb, defines a dictionary to write to
         the creative sentence file
@@ -217,6 +248,8 @@ class GetRarestVerbs:
         sent_index = r["sent index"]
         n_dict['Doc index'] = doc_index
         n_dict['Sent index'] = sent_index
+        n_dict["BERT tag"] = r["POS PREDICTIONS"]
+        n_dict["BERT replacements"] = r["BERT REPLACEMENTS"]
 
         n_dict["index of verb"] = r["token index"]
         n_dict["tokenized sentence"] = r["tokenized sentence"]

@@ -379,10 +379,10 @@ if __name__ == '__main__':
     #                                  )
 
     # # write with only count and all parts of speech
-    verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
-                                     fields_to_write=["count", "%"],
-                                     output_file_name=r"all_pos_count.csv",
-                                     additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
-                                                      EXTRA_COLS.TOTAL_OPEN_CLASS])
+    # verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
+    #                                  fields_to_write=["count", "%"],
+    #                                  output_file_name=r"all_pos_count.csv",
+    #                                  additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
+    #                                                   EXTRA_COLS.TOTAL_OPEN_CLASS])
 
     verb_anazlyzer.create_text_files()

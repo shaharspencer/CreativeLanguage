@@ -36,11 +36,13 @@ from tqdm import tqdm
 parent_dir = os.path.abspath('CreativeLanguage/src')
 
 # Append the parent directory to sys.path
+
+
+sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
+
 sys.path.append(parent_dir)
 print(sys.path)
-
-
-import ensemble_tagger
+from src.generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory

@@ -31,7 +31,7 @@ class BertConverter: # TODO smarter name :)
     """
     def get_top_k_predictions(self, input_dataframe, k=5) -> str: #TODO decide what the input is and adjust accordingly
         for index, row in input_dataframe.iterrows():
-            masked_tokenized_sentence = self.replace_with_token(list(row["tokenized sentence"]),
+            masked_tokenized_sentence = self.replace_with_token(row["tokenized sentence"],
                                                                row["token index"],
                                                                replace_with = "[MASK]"
                                                                )
@@ -81,7 +81,7 @@ class BertConverter: # TODO smarter name :)
         decoded_output_words = decoded_output[mask_index]
         return decoded_output_words
 
-    def replace_with_token(self, tokenized_sent: list[str], token_index: int,
+    def replace_with_token(self, tokenized_sent: tuple[str], token_index: int,
                            replace_with: str):
         sent = tokenized_sent.copy()
         sent[token_index] = replace_with

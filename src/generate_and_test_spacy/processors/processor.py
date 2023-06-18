@@ -33,7 +33,7 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
-parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/processors/ensemble_tagger')
 
 # Append the parent directory to sys.path
 sys.path.append(parent_dir)

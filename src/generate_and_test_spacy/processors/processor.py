@@ -42,8 +42,8 @@ print(sys.path)
 
 import ensemble_tagger
 
-from src.utils.path_configurations import files_directory, \
-    training_data_files_directory, spacy_files_directory
+# from src.utils.path_configurations import files_directory, \
+#     training_data_files_directory, spacy_files_directory
 
 
 usage = '''

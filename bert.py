@@ -31,7 +31,8 @@ class BertConverter: # TODO smarter name :)
     """
     def get_top_k_predictions(self, input_dataframe, k=5) -> str: #TODO decide what the input is and adjust accordingly
         for index, row in input_dataframe.iterrows():
-            masked_tokenized_sentence = self.replace_with_token(row["tokenized sentence"],
+            row_text = row["tokenized sentence"]
+            masked_tokenized_sentence = self.replace_with_token(row_text,
                                                                row["token index"],
                                                                replace_with = "[MASK]"
                                                                )

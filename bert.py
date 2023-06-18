@@ -19,7 +19,7 @@ class BertConverter: # TODO smarter name :)
     def __init__(self):
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
         self.model = TFBertForMaskedLM.from_pretrained('bert-base-cased')
-        self.processor = Processor()
+        self.processor = Processor(to_process=False)
 
     """
         returns top k predictions to replace [MASK] token

@@ -13,8 +13,8 @@ print(sys.path)
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-sys.path.append('CreativeLanguage\\src')
-sys.path.append('\\cs\\snapless\\gabis\\shaharspencer\\CreativeLanguage\\src')
+# sys.path.append('CreativeLanguage\\src')
+
 #h
 # sys.path.append('/cs/snapless/gabis/shaharspencer')
 
@@ -34,6 +34,8 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
+src_path = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+sys.path.append(src_path)
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory
@@ -77,13 +79,14 @@ class Processor:
     def __init__(self,
                  source_file =
                 r"blogtext.csv",
-                 model="en_core_web_lg", number_of_blogposts=40000,
+                 model="en_core_web_lg", number_of_blogposts=40000, to_process = True
                  ):
 
         self.__load_nlp_objects(model)
         self.__add_attrs_to_nlp()
         self.__load_docbin()
-        self.__load_attributes(source_file, number_of_blogposts)
+        if to_process:
+            self.__load_attributes(source_file, number_of_blogposts)
 
     """
         loads nlp object with requested model

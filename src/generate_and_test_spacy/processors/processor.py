@@ -9,7 +9,7 @@ print(sys.path)
 #TODO check if the pos are correct
 
 # Add missing paths
-sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
@@ -33,7 +33,6 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
-import src.generate_and_test_spacy.processors.ensemble_tagger
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory

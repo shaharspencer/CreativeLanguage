@@ -33,9 +33,10 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/generate_and_test_spacy')
-src_path = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
-sys.path.append(src_path)
+parent_dir = os.path.abspath('/cs/snapless/gabis/shaharspencer/CreativeLanguage')
+
+# Append the parent directory to sys.path
+sys.path.append(parent_dir)
 
 from src.utils.path_configurations import files_directory, \
     training_data_files_directory, spacy_files_directory

@@ -36,7 +36,7 @@ parts_of_speech = ["VERB", "PROPN", "PART", "NUM", "PUNCT",
                         "AUX", "CCONJ", "DET", "INTJ", "NOUN", "PRON",
                         "SCONJ", "CONJ",
                         "SYM"]
-parts_of_speech_to_ignore = ["X"]
+parts_of_speech_to_ignore = ["X", "SPACE"]
 
 open_class_pos = ["VERB", "PROPN", "NOUN", "ADJ"]
 
@@ -63,9 +63,18 @@ And save occurences of that word in the part of speech
                 - count occurences
 """
 
+
 class AnalyzeVerbs:
     def __init__(self, spacy_file_path, num_of_posts, model="en_core_web_lg",
                  ):
+        """
+            Initializes the AnalyzeVerbs class.
+
+            Args:
+                spacy_file_path (str): The path to the spacy file.
+                num_of_posts (int): The number of blog posts to analyze.
+                model (str, optional): The Spacy model to use. Defaults to "en_core_web_lg".
+        """
         # define how many blogposts we want to analyze
         self.number_of_posts = num_of_posts
         # define where the spacy path we want to use is located
@@ -92,6 +101,15 @@ class AnalyzeVerbs:
         define where the spacy file we want to use is
     """
     def __define_spacy_path(self, spacy_file_path):
+        """
+              Defines the path to the spacy file.
+
+              Args:
+                  spacy_file_path (str): The relative path to the spacy file.
+
+              Returns:
+                  str: The full path to the spacy file.
+        """
         spacy_path = os.path.join(paths.files_directory,
                                        paths.spacy_files_directory,
                                        spacy_file_path)
@@ -104,6 +122,12 @@ class AnalyzeVerbs:
     classified as verbs
     """
     def find_all_verbs_in_file(self)->set:
+        """
+               Retrieves all words classified as verbs from the spacy file.
+
+               Returns:
+                   list: A list of tokens classified as verbs.
+        """
         verbs = set()
         for doc in self.doc_bin.get_docs(self.nlp.vocab):
             for token in doc:
@@ -392,4 +416,4 @@ if __name__ == '__main__':
                                      additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
                                                       EXTRA_COLS.TOTAL_OPEN_CLASS])
 
-    # verb_anazlyzer.create_text_files()
+    verb_anazlyzer.create_text_files()

@@ -1,7 +1,6 @@
 import pandas as pd
 import spacy
 import zipfile
-
 from docopt import docopt
 from spacy.tokens import DocBin
 
@@ -40,8 +39,6 @@ class SpikeConverter:
                     document += NEW_DOCUMENT
                 print(f"processed blogpost number {i+j}\n")
             documents.append(document)
-
-
 
         # Create a ZIP file to store the documents
         with zipfile.ZipFile('spike_dataset_40000.zip', 'w') as zipf:

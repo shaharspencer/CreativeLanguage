@@ -1,5 +1,8 @@
+import collections
+import concurrent.futures
 import sys
-
+import multiprocessing
+# multiprocessing.set_start_method('spawn', True)
 
 
 
@@ -69,7 +72,6 @@ def multi_tagger(doc):
     sorted_values = [tags[key] for key in sorted(tags.keys())]
 
     for token, (text, tag) in zip(doc, sorted_values):
-        # prob = token.prob
         if tag != "X":
             token.pos_ = tag
     return doc
@@ -154,11 +156,28 @@ class Processor:
         Doc.set_extension("ORIGINAL_SENTENCE", default=None)
         print(f"processing file!\n")
         with tqdm(total=self.blogpost_limit) as pbar:
-            for index in range(self.blogpost_limit):
-                pbar.update(1)
-                print(str(index) + "\n", flush=True)
-                row = self.df.loc[index]
-                self.__proccess_blogpost(index, row)
+            final_docs = {}
+            # submit each task
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = []
+                for index in range(self.blogpost_limit):
+                    pbar.update(1)
+                    row = self.df.loc[index]
+                    print(f"submitting blogpost number {index}\n", flush=True)
+                    future = executor.submit(self.proccess_blogpost, index, row)
+                    futures.append(future)
+            # wait for completion of tasks and add to dictionary
+            for future in concurrent.futures.as_completed(futures):
+                index, docs = future.result()
+                final_docs[index] = docs
+                print(f"completed processing blogpost number {index}, total done are {len(final_docs)}\n", flush=True)
+            final_docs = collections.OrderedDict(sorted(final_docs.items()))
+
+            # finally add each blogposts sentences
+            for doc in final_docs.keys():
+                for sent_doc in final_docs[doc]: # for each sentence in the blogpost
+                    self.doc_bin.add(sent_doc)
+            # save to disk
             self.doc_bin.to_disk(self.output_file_path)
 
 
@@ -188,8 +207,10 @@ class Processor:
         as user data, and save to docbin
         @:param index(int): index of row to save to doc
         @ row(pd.dataFrame): row #index from main dataframe
+        @:return docs(list[int, [Doc]]) list with first entry being the blogpost number and the second a list of the generated Docs
     """
-    def __proccess_blogpost(self, index, row: pd.DataFrame)->None:
+    def proccess_blogpost(self, index, row: pd.DataFrame)->list[Doc]:
+        docs = []
         blogpost_text = self.__clean_text_data(row['text'])
         blogpost_sents = self.nlp(blogpost_text).sents
 
@@ -203,9 +224,11 @@ class Processor:
             for col_name, col_val in row.items():
                 doc.user_data[col_name] = col_val
             doc.retokenize()
-            self.doc_bin.add(doc)
+            docs.append(doc)
+            # self.doc_bin.add(doc)
             print(f"doc index: {index}, sent index: {sent_index}\n",
                   flush=True)
+        return [index, docs]
 
     """
         recompile hyphens for tokenizer so that words with hyphens between
@@ -261,7 +284,7 @@ class Processor:
 
 
 if __name__ == '__main__':
-
+    multiprocessing.freeze_support()
     args = docopt(usage)
 
     source_file = args['<file_to_process>']

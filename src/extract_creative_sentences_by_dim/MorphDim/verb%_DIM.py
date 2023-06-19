@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import csv
-import spacy
+# import spacy
 from zipfile import ZipFile
 
 from docopt import docopt
@@ -15,14 +15,14 @@ from bert import BertConverter
 usage = '''
 verb%_DIM CLI.
 Usage:
-    verb%_DIM.py <sents_dir_path> <verb_csv>
+    verb%_DIM.py <sents_dir_path> <verb_csv> <tagger>
 '''
 
 
 
 class GetRarestVerbs:
     def __init__(self, sents_dir_path,
-                 verb_csv, model="en_core_web_lg"
+                 verb_csv
                  ):
         self.verb_csv = os.path.join(
             src.utils.path_configurations.files_directory,
@@ -39,7 +39,7 @@ class GetRarestVerbs:
                                     top_and_lowest_k=20):
         # proper nouns used as verbs
 
-        df = pd.read_csv(self.verb_csv)
+        df = pd.read_csv(self.verb_csv, encoding='utf-8')
 
         sorted_dataframe = df[df['PROPN%'] > 0.8]
 
@@ -78,29 +78,11 @@ class GetRarestVerbs:
 
     """
         this method adds an "Entropy" column to each row in a dataframe
-        representing the
+        representing the entropy for that row
+        @:param data(pd.DataFrame): dataframe to analyze
     """
-    def add_entropy_column(self):
+    def add_entropy_column(self, data: pd.DataFrame)-> None:
 
-        column_dtype = {
-                'VERB_count': float,
-                'VERB%': float,
-                'PROPN_count': int,
-                'PROPN%': float,
-                'NOUN_count': int,
-                'NOUN%': float,
-                'ADJ_count': int,
-                'ADJ%': float,
-                'open class pos / total': float,
-                'total open class': int,
-                'Entropy': float
-        }
-
-        data = pd.read_csv(self.verb_csv, encoding="ISO-8859-1", on_bad_lines='skip',
-                         dtype=column_dtype)
-
-        if "Entropy" in data.columns:
-            return
         counts = data[
             ['VERB_count', 'PROPN_count', 'NOUN_count', 'ADJ_count']].to_numpy(
             dtype=np.float64)
@@ -110,48 +92,40 @@ class GetRarestVerbs:
         for i in range(counts.shape[0]):
             row_entropy = entropy(counts[i], base=2)
             entropies.append(row_entropy)
-
+        data["Entropy"] = entropies
         # Open the file in write mode
-        with open(self.verb_csv, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-
-            # Write the headers
-            writer.writerow(data.columns.tolist() + ['Entropy'])
-
-            # Write the rows with entropy values
-            for index, row in data.iterrows():
-                writer.writerow(row.tolist() + [entropies[index]])
 
     """
     a specific measure that uses entropy to find creative sentences.
     1. find lemmas that appear as verbs less than max_verb_percentange
     and are over 95% open class.
     2. 
+    @param tagger(str):
+                                 either REGULAR or ENSEMBLE:
+                                whether we want to use a regular spacy tagger
+                                or the ensemble tagger
     
     """
     #TODO generalize percentages
     #TODO add index of verb
     def explore_entropy_measures(self, output_file_name,
-                                 top_and_lowest_k):
+                                 tagger)->None:
         dtype_dict = {
-
-            'num_POSs': float,
+        #     'word': str,
             'VERB_count': float,
-            'PROPN_count': float,
-            'NOUN_count': float,
-            'ADJ_count': float,
+        #     'PROPN_count': float,
+        #     'NOUN_count': float,
+        #     'ADJ_count': float,
             'total open class': float,
-            'percent_VERB': float,
-            'percent_PROPN': float,
-            'percent_NOUN': float,
-            'percent_ADJ': float,
+            'VERB%': float,
             'Entropy': float,
             'open class pos / total': float
         }
-
-        df = pd.read_csv(self.verb_csv, on_bad_lines="skip", encoding="ISO-8859-1",
-                         dtype = dtype_dict)
-        # filter values by percentage consitions
+        converters = {'VERB_count': eval}
+        df = pd.read_csv(self.verb_csv, encoding='ISO-8859-1',
+                       converters=converters, dtype=dtype_dict)
+        self.add_entropy_column(df)
+        # filter values by percentage conditions
 
         df = df[
                  (df["VERB%"] < 0.5)
@@ -165,16 +139,20 @@ class GetRarestVerbs:
                 ]
         # sort by entropy
         df_sortedby_entropy = df.sort_values(["Entropy"], ascending=True)
-        self.__write_csv_file_from_df(output_file_name, df_sortedby_entropy)
+        self.__write_csv_file_from_df(output_file_name, df_sortedby_entropy,
+                                      tagger)
 
     """
     this function takes a dataframe with the rarest verbs 
     and write a csv with sentences that have those verbs in them.
     @:param output_path - name and dir of csv
+    @:param df(pd.DataFrame): source dataframe with info about verbs
+    @:param tagger(str): either REGULAR or ENSEMBLE:
+                                whether we want to use a regular spacy tagger
+                                or the ensemble tagger
     """
 
-    def __write_csv_file_from_df(self, output_file_path, df):
-        nlp = spacy.load("en_core_web_lg")
+    def __write_csv_file_from_df(self, output_file_path, df, tagger:str)->None:
 
         bert = BertConverter()
         output_path = output_file_path
@@ -198,21 +176,22 @@ class GetRarestVerbs:
         with ZipFile(self.sents_dir_path, 'r') as zip:
             for index, row in df.iterrows():
                 sents_path = row["word"] + "_VERB.csv"
-                # with open(sents_path, encoding='utf-8') as f:
 
                 try:
 
                     sents_df = pd.read_csv(zip.extract(sents_path),
-                                           encoding='utf-8', dtype=dtypes, converters=converters)
-                    # sents_df["tokenized sentence"] = [[token.text for token in nlp(row["sentence"])]
-                    #                                   for index, row in sents_df.iterrows()]
+                                           encoding='utf-8', dtype=dtypes,
+                                           converters=converters,
+                                           on_bad_lines='skip')
+
                     # get bert predictions
-                    bert.get_top_k_predictions(sents_df)
+
+                    bert.get_top_k_predictions(sents_df, tagger)
 
                     counter += 1
                     print(f"chosen sentence number {counter}\n")
-                    # if counter == 2000:
-                    #     break
+                    if counter == 100:
+                        break
                     for ind, r in sents_df.iterrows():
 
                         n_dict = self.__define_ndict(r=r, row=row,
@@ -291,7 +270,7 @@ if __name__ == '__main__':
                          args["<verb_csv>"])
 
     from datetime import datetime
-
+    tagger = args["<tagger>"]
     datetime = datetime.today().strftime('%Y_%m_%d')
     # output_path_morph = "morph_order_by_count_" + datetime + ".csv"
     #
@@ -301,7 +280,7 @@ if __name__ == '__main__':
     #                                 )
     # obj.explore_simple_method_by_count(
     #     output_file_name=output_path_morph)
-    obj.add_entropy_column()
+    # obj.add_entropy_column()
     output_path_entropy = "morph_order_by_entropy_and_verb_perc" + datetime + ".csv"
     obj.explore_entropy_measures(output_file_name=output_path_entropy,
-                                 top_and_lowest_k=20)
+                                 top_and_lowest_k=20, tagger=tagger)

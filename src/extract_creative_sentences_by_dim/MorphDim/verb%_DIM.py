@@ -81,6 +81,7 @@ class GetRarestVerbs:
         representing the
     """
     def add_entropy_column(self):
+
         column_dtype = {
                 'VERB_count': float,
                 'VERB%': float,
@@ -94,8 +95,10 @@ class GetRarestVerbs:
                 'total open class': int,
                 'Entropy': float
         }
+
         data = pd.read_csv(self.verb_csv, encoding="ISO-8859-1", on_bad_lines='skip',
-                          dtype= column_dtype)
+                         dtype=column_dtype)
+
         if "Entropy" in data.columns:
             return
         counts = data[
@@ -171,6 +174,8 @@ class GetRarestVerbs:
     """
 
     def __write_csv_file_from_df(self, output_file_path, df):
+        nlp = spacy.load("en_core_web_lg")
+
         bert = BertConverter()
         output_path = output_file_path
         file = open(output_path, "w", encoding='utf-8', newline='')
@@ -180,20 +185,34 @@ class GetRarestVerbs:
         d = print_fieldnames(fields)
         writer.writerow(d)
         counter = 0
+        dtypes = {
+        'lemma': str,
+        'word form': str,
+        'sentence': str,
+        'doc index': int,
+        'sent index': int,
+        'token index': int,
+        'tokenized sentence': str
+        }
+        converters = {'tokenized sentence': eval}
         with ZipFile(self.sents_dir_path, 'r') as zip:
             for index, row in df.iterrows():
                 sents_path = row["word"] + "_VERB.csv"
                 # with open(sents_path, encoding='utf-8') as f:
 
                 try:
+
                     sents_df = pd.read_csv(zip.extract(sents_path),
-                                           encoding='utf-8')
+                                           encoding='utf-8', dtype=dtypes, converters=converters)
+                    # sents_df["tokenized sentence"] = [[token.text for token in nlp(row["sentence"])]
+                    #                                   for index, row in sents_df.iterrows()]
                     # get bert predictions
                     bert.get_top_k_predictions(sents_df)
 
                     counter += 1
-                    if counter == 100:
-                        break
+                    print(f"chosen sentence number {counter}\n")
+                    # if counter == 2000:
+                    #     break
                     for ind, r in sents_df.iterrows():
 
                         n_dict = self.__define_ndict(r=r, row=row,

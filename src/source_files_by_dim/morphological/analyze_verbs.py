@@ -1,3 +1,4 @@
+import sys
 from collections import namedtuple
 from enum import Enum
 
@@ -9,6 +10,10 @@ import spacy
 from spacy.tokens import DocBin
 from zipfile import ZipFile
 from tqdm import tqdm
+sys.path.append(r"CreativeLanguage\src\utils")
+sys.path.append(r"CreativeLanguage\src\utils\path_configurations")
+
+print(sys.path)
 
 import src.utils.path_configurations
 import src.utils.path_configurations as paths
@@ -253,10 +258,12 @@ class AnalyzeVerbs:
         with ZipFile(zip_file_dir, 'w') as file_dir:
             with tqdm(desc="creating text files per verb", colour="CYAN",
                 total=len(list(self.doc_bin.get_docs(self.nlp.vocab)))) as pbar:
+                i = 0
+                for word in self.verb_dict.keys():
 
-                for i, word in enumerate(self.verb_dict.keys()):
                     pbar.update(1)
                     print(f"processing text file number {i}\n")
+                    i += 1
                     for pos in self.spacy_part_of_speech:
                         file = self.create_csv_for_pos(word, pos)
                         if file != "":
@@ -379,10 +386,10 @@ if __name__ == '__main__':
     #                                  )
 
     # # write with only count and all parts of speech
-    # verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
-    #                                  fields_to_write=["count", "%"],
-    #                                  output_file_name=r"all_pos_count.csv",
-    #                                  additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
-    #                                                   EXTRA_COLS.TOTAL_OPEN_CLASS])
+    verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
+                                     fields_to_write=["count", "%"],
+                                     output_file_name=r"all_pos_count.csv",
+                                     additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
+                                                      EXTRA_COLS.TOTAL_OPEN_CLASS])
 
-    verb_anazlyzer.create_text_files()
+    # verb_anazlyzer.create_text_files()

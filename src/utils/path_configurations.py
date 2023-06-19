@@ -3,6 +3,8 @@
 
 files_directory = r"C:\Users\User\OneDrive\Documents\CreativeLanguageOutputFiles"
 
+# files_directory = r"\cs\snapless\shaharspencer\CreativeLanguageOutputFiles"
+
 spacy_files_directory = r"training_data\spacy_data"
 
 training_data_files_directory = r"training_data\blogtext_files"

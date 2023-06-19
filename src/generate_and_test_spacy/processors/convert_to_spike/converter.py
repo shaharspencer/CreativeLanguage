@@ -23,7 +23,7 @@ class SpikeConverter:
         self.dataframe = pd.read_csv(blogcorpus, encoding='utf-8').head(20)
 
 # Create a list to store the document contents
-    def convert(self, limit = 20, JUMPS = 3):
+    def convert(self, JUMPS = 10000):
         documents = []
 
         for i in range(0, len(self.dataframe), JUMPS):

@@ -10,7 +10,7 @@ from docopt import docopt
 import src.utils.path_configurations
 from scipy.stats import entropy
 
-from bert import BertConverter
+from src.extract_creative_sentences_by_dim.Embeddings.bert import FillMask
 
 usage = '''
 verb%_DIM CLI.
@@ -87,13 +87,13 @@ class GetRarestVerbs:
             ['VERB_count', 'PROPN_count', 'NOUN_count', 'ADJ_count']].to_numpy(
             dtype=np.float64)
 
-        # Calculate the entropy for each row
+        # calculate the entropy for each row
         entropies = []
         for i in range(counts.shape[0]):
             row_entropy = entropy(counts[i], base=2)
             entropies.append(row_entropy)
         data["Entropy"] = entropies
-        # Open the file in write mode
+
 
     """
     a specific measure that uses entropy to find creative sentences.
@@ -154,7 +154,7 @@ class GetRarestVerbs:
 
     def __write_csv_file_from_df(self, output_file_path, df, tagger:str)->None:
 
-        bert = BertConverter()
+        bert = FillMask()
         output_path = output_file_path
         file = open(output_path, "w", encoding='utf-8', newline='')
         fields = self.__define_fields()

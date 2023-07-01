@@ -45,7 +45,7 @@ sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\gen
 
 sys.path.append(parent_dir)
 print(sys.path)
-from src.generate_and_test_spacy.processors import ensemble_tagger
+# from src.generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory
@@ -54,27 +54,27 @@ from src.generate_and_test_spacy.processors import ensemble_tagger
 usage = '''
 Processor CLI.
 Usage:
-    processor.py <file_to_process> <number_of_blogposts>
+    processor.py <file_to_process> <number_of_blogposts> <to_conllu>
 '''
 
-tagger = ensemble_tagger.EnsembleTagger()
+# tagger = ensemble_tagger.EnsembleTagger()
 
 """
   use this method to apply our custom pos tagger
   @:param doc tokenized doc object 
   @:return doc object with changed pos_ components
 """
-@Language.component("custom_tagger")
-def multi_tagger(doc):
-    if not doc:
-        return doc
-    tags = tagger.get_tags_list(doc)
-    sorted_values = [tags[key] for key in sorted(tags.keys())]
-
-    for token, (text, tag) in zip(doc, sorted_values):
-        if tag != "X":
-            token.pos_ = tag
-    return doc
+# @Language.component("custom_tagger")
+# def multi_tagger(doc):
+#     if not doc:
+#         return doc
+#     tags = tagger.get_tags_list(doc)
+#     sorted_values = [tags[key] for key in sorted(tags.keys())]
+#
+#     for token, (text, tag) in zip(doc, sorted_values):
+#         if tag != "X":
+#             token.pos_ = tag
+#     return doc
 
 """
 Creates a .spacy doc_bin of given csv file.
@@ -85,13 +85,13 @@ Creates a .spacy doc_bin of given csv file.
         number_of_blogposts(int): limit on how many blogposts to process
 """
 class Processor:
-    def __init__(self,
+    def __init__(self,  to_conllu,
                  source_file =
                 r"blogtext.csv",
                  model="en_core_web_lg", number_of_blogposts=40000, to_process = True
                  ):
-
-        self.__load_nlp_objects(model)
+        self.to_conllu = to_conllu
+        self.__load_nlp_objects(model, to_conllu)
         self.__add_attrs_to_nlp()
         self.__load_docbin()
         if to_process:
@@ -105,7 +105,10 @@ class Processor:
     def __load_nlp_objects(self, model):
         self.nlp = spacy.load(model)
         # add custom tagger to end of pipeline
-        self.nlp.add_pipe("custom_tagger", last=True)
+        # self.nlp.add_pipe("custom_tagger", after="ner") #TODO return if want to use factory
+        if self.to_conllu:
+            self.nlp.add_pipe("conll_formatter", last=True) # remove if serializing data
+
 
     """
         load docBin object to store serialized data
@@ -154,6 +157,7 @@ class Processor:
         Doc.set_extension("DOC_INDEX", default=None)
         Doc.set_extension("SENT_INDEX", default=None)
         Doc.set_extension("ORIGINAL_SENTENCE", default=None)
+
         print(f"processing file!\n")
         with tqdm(total=self.blogpost_limit) as pbar:
             final_docs = {}
@@ -172,13 +176,18 @@ class Processor:
                 final_docs[index] = docs
                 print(f"completed processing blogpost number {index}, total done are {len(final_docs)}\n", flush=True)
             final_docs = collections.OrderedDict(sorted(final_docs.items()))
+            # if we want to save conllu format
+            if self.to_conllu:
+                self.save_conllu_format(final_docs)
+            # if we want to save to docBin
+            else:
+                # finally add each blogposts sentences
+                for doc in final_docs.keys():
+                    for sent_doc in final_docs[doc]: # for each sentence in the blogpost
+                        self.doc_bin.add(sent_doc)
 
-            # finally add each blogposts sentences
-            for doc in final_docs.keys():
-                for sent_doc in final_docs[doc]: # for each sentence in the blogpost
-                    self.doc_bin.add(sent_doc)
-            # save to disk
-            self.doc_bin.to_disk(self.output_file_path)
+                # save to disk
+                self.doc_bin.to_disk(self.output_file_path)
 
 
     # """
@@ -218,9 +227,9 @@ class Processor:
             original_sentence = sent.text
             sentence = self.__normalize_sent(sent.text)
             doc = self.process_text(sentence)
-            doc.user_data = {"DOC_INDEX": index,
-                             "SENT_INDEX": sent_index,
-                             "ORIGINAL_SENTENCE": original_sentence}
+            doc.user_data["DOC_INDEX"]= index
+            doc.user_data["SENT_INDEX"] =  sent_index
+            doc.user_data["ORIGINAL_SENTENCE"] = original_sentence
             for col_name, col_val in row.items():
                 doc.user_data[col_name] = col_val
             doc.retokenize()
@@ -280,19 +289,29 @@ class Processor:
         sentence = sentence.strip()
         return sentence
 
-
+    """
+        save docs conllu attributes 
+        @param final_docs(dict[list[Doc]): dictionary of (blogpost number, generated docs)
+                                            to save conllu formats of
+    """
+    def save_conllu_format(self, final_docs: dict[list[Doc]]):
+        for doc in final_docs.keys():
+            for sent_doc in final_docs[doc]:  # for each sentence in the blogpost
+                pass
 
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
+    multiprocessing.freeze_support() #TODO rm
     args = docopt(usage)
 
     source_file = args['<file_to_process>']
 
     number_of_files = int(args['<number_of_blogposts>'])
 
+    to_conllu = True if args["<to_conllu>"] == "True" else False
+
     proccessor = Processor(source_file=source_file,
-                           number_of_blogposts=number_of_files)
+                           number_of_blogposts=number_of_files, to_conllu=to_conllu)
 
     proccessor.process_file()
 

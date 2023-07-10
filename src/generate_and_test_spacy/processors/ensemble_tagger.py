@@ -98,7 +98,7 @@ class EnsembleTagger():
     """
     def calculate_votes(self, votes: [list[list]])-> dict:
         polled_results = {}
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=len(votes)) as executor:
             tagging_tasks = [executor.submit(self.majority_vote, [vote,
                                                 index]) for index,
                              vote in enumerate(votes)]
@@ -165,12 +165,11 @@ class EnsembleTagger():
             raise Exception("For some reason the words are not all the same")
         for vote in tags:
             tag = vote[1]
-            if "tag" == 'X':
-                continue
-            if tag in tag_counts:
-                tag_counts[tag] += 1
-            else:
-                tag_counts[tag] = 1
+            if tag != 'X':
+                if tag in tag_counts:
+                    tag_counts[tag] += 1
+                else:
+                    tag_counts[tag] = 1
         if not tag_counts:
             majority_tag = "X"
         else:

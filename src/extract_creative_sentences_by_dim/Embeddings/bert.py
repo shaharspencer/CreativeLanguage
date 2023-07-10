@@ -18,20 +18,40 @@ class FillMask:
     """
 
     def __init__(self):
-        # self.tokenizer = DebertaTokenizer.from_pretrained(
-        #     "microsoft/deberta-v3-base")
-        # self.model = DebertaModel.from_pretrained(
-        #     "microsoft/deberta-v3-base")
 
         self.classifier = pipeline("fill-mask", "xlm-roberta-large", top_k=5)
         self.nlp = spacy.load("en_core_web_lg")
-        self.processor = Processor(to_process=False, to_conllu=False)
+        self.processor = Processor(to_process=False, to_conllu=False,
+                                   use_ensemble_tagger= True
+                                   )
 
-        text = "I love my <mask>."
+    """
+        this method receives the type of tagger we want to tag with
+        and a dataframe to tag 
+        it tags the verbs indicated by the column "index of verb"
+        according to the tagger choice
+        then appends the tags to the input dataframe as a new column
+        @:param tagger_to_use(str): either "REGULAR" or "ENSEMBLE"
+        @:return input_dataframe(pd.DataFrame): input dataframe with new 
+                                            column appended
+    """
+    def get_alternate_tagger_predictions(self, tagger,
+                                         input_dataframe: pd.DataFrame):
+        tags = []
+        for index, row in input_dataframe.iterrows():
+            sentence, verb_index = row["Sentence"], \
+                                   row["index of verb"]
+            if tagger == "ENSEMBLE":
+                doc = self.processor.process_text(sentence)
+            elif tagger == "REGULAR":
+                doc = self.nlp(sentence)
+            else:
+                raise TypeError("Tagger type is illegal\n")
+            pos = doc[verb_index].pos_
+            tags.append(pos)
+        input_dataframe[tagger + " tags"] = tags
+        return input_dataframe
 
-        predicted_tokens = self.classifier(text)
-        for token in predicted_tokens:
-            print(token)
 
     """
         returns top k predictions to replace [MASK] token
@@ -56,9 +76,9 @@ class FillMask:
                                                                      tagger)
             replacement_pos_predictions.append(pos_prediction)
             replacement_word_predictions.append(replacements)
-        self.__append_outputs_to_csv(input_dataframe,
-                                     replacement_pos_predictions,
-                                     replacement_word_predictions)
+        self.__append_replacements_to_csv(input_dataframe,
+                                          replacement_pos_predictions,
+                                          replacement_word_predictions)
         return input_dataframe
 
     """
@@ -67,13 +87,13 @@ class FillMask:
         @:param input_dataframe(
     """
 
-    def __append_outputs_to_csv(self, input_dataframe,
-                                replacement_pos_predictions: list[str],
-                                replacement_word_predictions: list[
+    def __append_replacements_to_csv(self, input_dataframe,
+                                     replacement_pos_predictions: list[str],
+                                     replacement_word_predictions: list[
                                     list[str]]) -> None:
-        input_dataframe["POS PREDICTIONS"] = pd.Series(
+        input_dataframe["POS PREDICTIONS ENSEMBLE"] = pd.Series(
             replacement_pos_predictions)
-        input_dataframe["ROBERTA REPLACEMENTS"] = pd.Series(
+        input_dataframe["ROBERTA REPLACEMENTS ENSEMBLE"] = pd.Series(
             replacement_word_predictions)
 
     """
@@ -141,7 +161,7 @@ class FillMask:
                 predicted_pos = doc[index].pos_
                 pos_dict[predicted_pos] += 1
             else:
-                raise Exception("tagger choice is not usable\n")
+                raise TypeError("tagger choice is not usable\n")
 
         return max(pos_dict, key=pos_dict.get)
 
@@ -180,17 +200,7 @@ if __name__ == '__main__':
     }
 
     df_list = [
-        r"morph_order_by_entropy_and_verb_perc2023_06_19_with_BERT.csv"]
-
-    # opened_df_zero = pd.read_csv(df_list[0],
-    # encoding="ISO-8859-1",
-    #     dtype=dtypes, converters={'tokenized sentence': eval},
-    #     on_bad_lines="skip"
-    #  )
-    #
-    # new_df_ensemble = fill_mask.get_top_k_predictions(opened_df_zero,"ENSEMBLE")
-    #
-    # new_df_ensemble.to_csv("roberta_ensembletagger.csv")
+        r"roberta_regulartagger - roberta_regulartagger.csv"]
 
     opened_df_one = pd.read_csv(df_list[0],
                                 encoding="ISO-8859-1",
@@ -198,6 +208,8 @@ if __name__ == '__main__':
                                 converters={'tokenized sentence': eval},
                                 on_bad_lines="skip"
                                 )
-
-    new_df_regular = fill_mask.get_top_k_predictions(opened_df_one, "REGULAR")
-    new_df_regular.to_csv("roberta_regulartagger.csv")
+    new_df_regular = fill_mask.get_alternate_tagger_predictions(
+        tagger="ENSEMBLE", input_dataframe=opened_df_one)
+    new_df_regular = fill_mask.get_top_k_predictions(new_df_regular,
+                                                        "ENSEMBLE")
+    new_df_regular.to_csv("roberta_regulartagger_with_ensemble_taggings_final.csv")

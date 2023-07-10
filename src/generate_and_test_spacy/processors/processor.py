@@ -45,7 +45,7 @@ sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\gen
 
 sys.path.append(parent_dir)
 print(sys.path)
-# from src.generate_and_test_spacy.processors import ensemble_tagger
+from src.generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory
@@ -57,24 +57,24 @@ Usage:
     processor.py <file_to_process> <number_of_blogposts> <to_conllu>
 '''
 
-# tagger = ensemble_tagger.EnsembleTagger()
+tagger = ensemble_tagger.EnsembleTagger()
 
 """
   use this method to apply our custom pos tagger
   @:param doc tokenized doc object 
   @:return doc object with changed pos_ components
 """
-# @Language.component("custom_tagger")
-# def multi_tagger(doc):
-#     if not doc:
-#         return doc
-#     tags = tagger.get_tags_list(doc)
-#     sorted_values = [tags[key] for key in sorted(tags.keys())]
-#
-#     for token, (text, tag) in zip(doc, sorted_values):
-#         if tag != "X":
-#             token.pos_ = tag
-#     return doc
+@Language.component("custom_tagger")
+def multi_tagger(doc):
+    if not doc:
+        return doc
+    tags = tagger.get_tags_list(doc)
+    sorted_values = [tags[key] for key in sorted(tags.keys())]
+
+    for token, (text, tag) in zip(doc, sorted_values):
+        if tag != "X":
+            token.pos_ = tag
+    return doc
 
 """
 Creates a .spacy doc_bin of given csv file.
@@ -85,13 +85,14 @@ Creates a .spacy doc_bin of given csv file.
         number_of_blogposts(int): limit on how many blogposts to process
 """
 class Processor:
-    def __init__(self,  to_conllu,
+    def __init__(self, to_conllu, use_ensemble_tagger,
                  source_file =
                 r"blogtext.csv",
-                 model="en_core_web_lg", number_of_blogposts=40000, to_process = True
+                 model="en_core_web_lg", number_of_blogposts=40000,
+                 to_process=True
                  ):
         self.to_conllu = to_conllu
-        self.__load_nlp_objects(model, to_conllu)
+        self.__load_nlp_objects(model, use_ensemble_tagger)
         self.__add_attrs_to_nlp()
         self.__load_docbin()
         if to_process:
@@ -102,10 +103,11 @@ class Processor:
         adds extra pipelines if relevant
         @:param model(str): model to load for spaCy
     """
-    def __load_nlp_objects(self, model):
+    def __load_nlp_objects(self, model, use_ensemble_tagger):
         self.nlp = spacy.load(model)
         # add custom tagger to end of pipeline
-        # self.nlp.add_pipe("custom_tagger", after="ner") #TODO return if want to use factory
+        if use_ensemble_tagger:
+            self.nlp.add_pipe("custom_tagger", after="ner")
         if self.to_conllu:
             self.nlp.add_pipe("conll_formatter", last=True) # remove if serializing data
 
@@ -204,6 +206,7 @@ class Processor:
         @:return doc(Doc): spacy doc object
     """
     def process_text(self, sentence: str)-> Doc:
+        # sent = self.__normalize_sent(sentence)
         doc = self.nlp(sentence)
         doc.retokenize()
         return doc

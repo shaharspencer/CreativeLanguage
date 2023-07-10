@@ -283,4 +283,4 @@ if __name__ == '__main__':
     # obj.add_entropy_column()
     output_path_entropy = "morph_order_by_entropy_and_verb_perc" + datetime + ".csv"
     obj.explore_entropy_measures(output_file_name=output_path_entropy,
-                                 top_and_lowest_k=20, tagger=tagger)
+                                 tagger=tagger)

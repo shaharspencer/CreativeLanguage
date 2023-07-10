@@ -102,10 +102,11 @@ class EnsembleTagger():
             tagging_tasks = [executor.submit(self.majority_vote, [vote,
                                                 index]) for index,
                              vote in enumerate(votes)]
-        # Retrieve results from completed tasks
-        for task in concurrent.futures.as_completed(tagging_tasks):
-            result = task.result()
-            polled_results[result[0]] = result[1]
+            # retrieve results from completed tasks
+
+            for task in concurrent.futures.as_completed(tagging_tasks):
+                result = task.result()
+                polled_results[result[0]] = result[1]
         return polled_results
 
     """
@@ -118,15 +119,15 @@ class EnsembleTagger():
     def get_all_votes(self, spacy_tokens: list[str])-> list[list[(str, str)]]:
         tagged_tokens_lst = []
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=len(self.tagger_funcs)) as executor:
             tagging_tasks = [executor.submit(tagger_func, spacy_tokens) for
                              tagger_func
                              in self.tagger_funcs]
 
-        # retrieve results from completed tasks
-        for task in concurrent.futures.as_completed(tagging_tasks):
-            result = task.result()
-            tagged_tokens_lst.append(result)
+            # retrieve results from completed tasks
+            for task in concurrent.futures.as_completed(tagging_tasks):
+                result = task.result()
+                tagged_tokens_lst.append(result)
 
         ordered_lst = self.create_lists_from_elements(tagged_tokens_lst)
         return ordered_lst

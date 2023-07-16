@@ -12,6 +12,7 @@ from scipy.stats import entropy
 
 from src.extract_creative_sentences_by_dim.Embeddings.bert import FillMask
 
+#TODO when saving to csv, save as utf-8
 usage = '''
 verb%_DIM CLI.
 Usage:

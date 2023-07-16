@@ -10,6 +10,7 @@ from src.generate_and_test_spacy.processors.processor import Processor
 
 
 # TODO use multiprocessing
+#TODO stable max value!!!!!
 
 
 class FillMask:
@@ -148,7 +149,6 @@ class FillMask:
                                     tagger) -> str:
         pos_dict = defaultdict(int)
         for replacement in replacements:
-
             sent = sentence.copy()
             sent[index] = replacement
             sent = " ".join(sent)
@@ -163,7 +163,11 @@ class FillMask:
             else:
                 raise TypeError("tagger choice is not usable\n")
 
-        return max(pos_dict, key=pos_dict.get)
+        return max(pos_dict, key=pos_dict.get) #TODO stabilize
+    """
+    """
+    def dict_max(self): #TODO
+        pass
 
     """
         returns top k replacemnents for [MASK] token.

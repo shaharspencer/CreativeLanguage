@@ -109,7 +109,7 @@ class Processor:
     """
         loads nlp object with requested model
         adds extra pipelines if relevant
-        @:param model(str): model to load for spaCy
+        @:param model(str): model to load for spaCyddddd
     """
 
     def __load_nlp_objects(self, model, use_ensemble_tagger):

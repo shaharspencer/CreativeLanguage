@@ -128,7 +128,7 @@ class Processor:
                               last=True)
 
     """
-       dddd load docBin object to store serialized data
+       ddddddd load docBin object to store serialized data
     """
 
     def __load_docbin(self):

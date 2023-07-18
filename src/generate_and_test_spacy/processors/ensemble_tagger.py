@@ -1,5 +1,7 @@
 # for BERT tokenizer
 import concurrent
+from collections import defaultdict, OrderedDict
+
 import stanza
 from nltk import map_tag
 
@@ -156,9 +158,9 @@ class EnsembleTagger():
         @:return tag the tag that received the majority vote
     """
     def majority_vote(self, tags_and_token):
-
-        tag_counts = {}
+        tag_counts = OrderedDict()
         tags = tags_and_token[0]
+        tags = sorted(tags, key=lambda k: k[1])
         assert len(tags) == len(self.tagger_funcs)
         index = tags_and_token[1]
         items = [item[0] for item in tags]

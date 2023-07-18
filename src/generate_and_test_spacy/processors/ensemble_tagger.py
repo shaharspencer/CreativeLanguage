@@ -62,15 +62,15 @@ class EnsembleTagger():
 
         # nltk dependencies
         # for tokenizer
-        nltk.download('averaged_perceptron_tagger')
-        nltk.download('universal_tagset')
+        # nltk.download('averaged_perceptron_tagger')
+        # nltk.download('universal_tagset')
 
 
         # stanza dependencies TODO confirm these are UD
-        stanza.download('en')
+        # stanza.download('en')
         self.stanza_pipeline = stanza.Pipeline('en',
                                                processors='tokenize,mwt,pos',
-                                               tokenize_pretokenized=True)
+                                               tokenize_pretokenized=True, download_method=None)
         # flair dependencies (UD pipeline)
         self.flair_pipeline = SequenceTagger.load("flair/upos-english")
 
@@ -156,13 +156,15 @@ class EnsembleTagger():
         @:return tag the tag that received the majority vote
     """
     def majority_vote(self, tags_and_token):
-        tag_counts = {}
 
+        tag_counts = {}
         tags = tags_and_token[0]
+        assert len(tags) == len(self.tagger_funcs)
         index = tags_and_token[1]
         items = [item[0] for item in tags]
-        if not len(set(items)) <= 1:
-            raise Exception("For some reason the words are not all the same")
+
+        assert len(set(items)) <= 1
+
         for vote in tags:
             tag = vote[1]
             if tag != 'X':

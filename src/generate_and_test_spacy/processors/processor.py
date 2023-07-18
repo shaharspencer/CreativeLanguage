@@ -55,7 +55,7 @@ from src.generate_and_test_spacy.processors import ensemble_tagger
 
 
 usage = '''
-Processor CLI.
+processor CLI.
 Usage:
     processor.py <file_to_process> <number_of_blogposts> <to_conllu>
 '''
@@ -63,7 +63,7 @@ Usage:
 tagger = ensemble_tagger.EnsembleTagger()
 
 """
-  use this method to apply our custom pos tagger
+  use this method to apply custom pos tagger
   @:param doc tokenized doc object 
   @:return doc object with changed pos_ components
 """
@@ -113,13 +113,19 @@ class Processor:
     """
 
     def __load_nlp_objects(self, model, use_ensemble_tagger):
-        self.nlp = spacy.load(model)
+        self.basic_nlp = spacy.load(model)
+        self.ensemble_nlp = None
         # add custom tagger to end of pipeline
         if use_ensemble_tagger:
-            self.nlp.add_pipe("custom_tagger", after="ner")
+            self.ensemble_nlp = spacy.load(model)
+            self.ensemble_nlp.add_pipe("custom_tagger", after="ner")
         if self.to_conllu:
-            self.nlp.add_pipe("conll_formatter",
+            if self.ensemble_nlp:
+                self.ensemble_nlp.add_pipe("conll_formatter",
                               last=True)  # remove if serializing data
+            else:
+                self.basic_nlp.add_pipe("conll_formatter",
+                              last=True)
 
     """
         load docBin object to store serialized data
@@ -197,9 +203,9 @@ class Processor:
 
             # sort dict items according to blogpost number
             final_docs = collections.OrderedDict(sorted(final_docs.items()))
-            print(f"length of docs gathered is len(final_docs)\n", flush=True)
-            print(f"length of docs gathered equals blogpost limit: "
-                  f"{len(final_docs) == self.blogpost_limit}\n", flush=True)
+            print(f"length of docs gathered is {len(final_docs)}\n",
+                  flush=True)
+            assert len(final_docs) == self.blogpost_limit
             # if we want to save conllu format
             if self.to_conllu:
                 self.save_conllu_format(final_docs)
@@ -230,7 +236,8 @@ class Processor:
     """
 
     def process_text(self, sentence: str) -> Doc:
-        doc = self.nlp(sentence)
+        doc = self.ensemble_nlp(sentence) if self.ensemble_nlp \
+            else self.basic_nlp(sentence)
         doc.retokenize()
         return doc
 
@@ -249,7 +256,7 @@ class Processor:
     def proccess_blogpost(self, index, row: pd.DataFrame) -> list[Doc]:
         docs = []
         blogpost_text = self.__clean_text_data(row['text'])
-        blogpost_sents = self.nlp(blogpost_text).sents
+        blogpost_sents = self.basic_nlp(blogpost_text).sents
 
         for sent_index, sent in enumerate(blogpost_sents):
             original_sentence = sent.text
@@ -315,6 +322,7 @@ class Processor:
         @:param sentence(str): sentence to process
         @:return sentence(str): normalized sentence
     """
+
     def __normalize_sent(self, sentence: str) -> str:
         sentence = sentence[0] + sentence[1:].lower()
         sentence = sentence.strip()
@@ -343,8 +351,8 @@ if __name__ == '__main__':
     to_conllu = True if args["<to_conllu>"] == "True" else False
 
     processor = Processor(source_file=source_file,
-                           number_of_blogposts=number_of_files,
-                           to_conllu=to_conllu,
-                           use_ensemble_tagger=True)
+                          number_of_blogposts=number_of_files,
+                          to_conllu=to_conllu,
+                          use_ensemble_tagger=True)
 
     processor.process_file()

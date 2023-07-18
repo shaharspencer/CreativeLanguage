@@ -2,14 +2,14 @@ import collections
 import concurrent.futures
 import sys
 import multiprocessing
+
 # multiprocessing.set_start_method('spawn', True)
 
 
-
-#TODO utilize GPU?
-#TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
-#TODO save tokenized list??? for prections of pos
-#TODO check if the pos are correct
+# TODO utilize GPU?
+# TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
+# TODO save tokenized list??? for prections of pos
+# TODO check if the pos are correct
 
 # Add missing paths
 # sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
@@ -18,11 +18,12 @@ import multiprocessing
 
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
 
-#h
+# h
 # sys.path.append('/cs/snapless/gabis/shaharspencer')
 
 import pandas as pd
 import spacy
+
 # activated = spacy.prefer_gpu()
 # print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
@@ -36,12 +37,14 @@ from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
+
 parent_dir = os.path.abspath('CreativeLanguage/src')
 
 # Append the parent directory to sys.path
 
 
-sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
+sys.path.append(
+    r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
 
 sys.path.append(parent_dir)
 print(sys.path)
@@ -64,6 +67,8 @@ tagger = ensemble_tagger.EnsembleTagger()
   @:param doc tokenized doc object 
   @:return doc object with changed pos_ components
 """
+
+
 @Language.component("custom_tagger")
 def multi_tagger(doc):
     if not doc:
@@ -76,6 +81,7 @@ def multi_tagger(doc):
             token.pos_ = tag
     return doc
 
+
 """
 Creates a .spacy doc_bin of given csv file.
 
@@ -84,10 +90,12 @@ Creates a .spacy doc_bin of given csv file.
         model(str) : model for spaCy to utilize, defaults to en_core_web_lg
         number_of_blogposts(int): limit on how many blogposts to process
 """
+
+
 class Processor:
     def __init__(self, to_conllu, use_ensemble_tagger,
-                 source_file =
-                r"blogtext.csv",
+                 source_file=
+                 r"blogtext.csv",
                  model="en_core_web_lg", number_of_blogposts=40000,
                  to_process=True
                  ):
@@ -103,18 +111,20 @@ class Processor:
         adds extra pipelines if relevant
         @:param model(str): model to load for spaCy
     """
+
     def __load_nlp_objects(self, model, use_ensemble_tagger):
         self.nlp = spacy.load(model)
         # add custom tagger to end of pipeline
         if use_ensemble_tagger:
             self.nlp.add_pipe("custom_tagger", after="ner")
         if self.to_conllu:
-            self.nlp.add_pipe("conll_formatter", last=True) # remove if serializing data
-
+            self.nlp.add_pipe("conll_formatter",
+                              last=True)  # remove if serializing data
 
     """
         load docBin object to store serialized data
     """
+
     def __load_docbin(self):
         self.doc_bin = DocBin(
             attrs=["ORTH", "TAG", "HEAD", "DEP", "ENT_IOB", "ENT_TYPE",
@@ -125,6 +135,7 @@ class Processor:
         load relevant attributes such as source file paths
         and output file paths
     """
+
     def __load_attributes(self, source_file, number_of_blogposts):
 
         # get a .csv file that contains the unprocessed data
@@ -155,29 +166,40 @@ class Processor:
         can limit number of blogposts via number_of_blogposts attribute
         push docBin to disk (save docBin)
     """
-    def process_file(self)-> None:
-        Doc.set_extension("DOC_INDEX", default=None)
-        Doc.set_extension("SENT_INDEX", default=None)
-        Doc.set_extension("ORIGINAL_SENTENCE", default=None)
 
-        print(f"processing file!\n")
+    def process_file(self) -> None:
+        self.__set_doc_extensions()
+        print(f"processing file!\n", flush=True)
+        print(f"cpus available: {os.cpu_count()}\n", flush=True)
         with tqdm(total=self.blogpost_limit) as pbar:
             final_docs = {}
             # submit each task
-            with concurrent.futures.ProcessPoolExecutor() as executor:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=
+                                                        os.cpu_count()) \
+                    as executor:
                 futures = []
+                # submit each blogpost for processing
                 for index in range(self.blogpost_limit):
                     pbar.update(1)
                     row = self.df.loc[index]
                     print(f"submitting blogpost number {index}\n", flush=True)
-                    future = executor.submit(self.proccess_blogpost, index, row)
+                    future = executor.submit(self.proccess_blogpost,
+                                             index, row)
                     futures.append(future)
-            # wait for completion of tasks and add to dictionary
-            for future in concurrent.futures.as_completed(futures):
-                index, docs = future.result()
-                final_docs[index] = docs
-                print(f"completed processing blogpost number {index}, total done are {len(final_docs)}\n", flush=True)
+                # wait for completion of tasks and add to dictionary
+                for task in concurrent.futures.as_completed(futures):
+                    index, docs = task.result()
+                    final_docs[index] = docs
+                    print(
+                        f"completed processing blogpost number {index}, "
+                        f"total done are {len(final_docs)}\n",
+                        flush=True)
+
+            # sort dict items according to blogpost number
             final_docs = collections.OrderedDict(sorted(final_docs.items()))
+            print(f"length of docs gathered is len(final_docs)\n", flush=True)
+            print(f"length of docs gathered equals blogpost limit: "
+                  f"{len(final_docs) == self.blogpost_limit}\n", flush=True)
             # if we want to save conllu format
             if self.to_conllu:
                 self.save_conllu_format(final_docs)
@@ -185,28 +207,29 @@ class Processor:
             else:
                 # finally add each blogposts sentences
                 for doc in final_docs.keys():
-                    for sent_doc in final_docs[doc]: # for each sentence in the blogpost
+                    for sent_doc in final_docs[
+                        doc]:  # for each sent in the blogpost
                         self.doc_bin.add(sent_doc)
 
                 # save to disk
                 self.doc_bin.to_disk(self.output_file_path)
 
+    """
+        sets Doc extensions to save metadata about each entry in spaCy object
+    """
 
-    # """
-    #     close relevant objects:
-    #     doc_bin
-    #     json file
-    #     conllu file
-    # """
-    # def close_objects(self):
-    #
+    def __set_doc_extensions(self):
+        Doc.set_extension("DOC_INDEX", default=None)
+        Doc.set_extension("SENT_INDEX", default=None)
+        Doc.set_extension("ORIGINAL_SENTENCE", default=None)
+
     """
         processes a sentence into a Doc object.
         @:param sentence(str): string to process
         @:return doc(Doc): spacy doc object
     """
-    def process_text(self, sentence: str)-> Doc:
-        # sent = self.__normalize_sent(sentence)
+
+    def process_text(self, sentence: str) -> Doc:
         doc = self.nlp(sentence)
         doc.retokenize()
         return doc
@@ -219,9 +242,11 @@ class Processor:
         as user data, and save to docbin
         @:param index(int): index of row to save to doc
         @ row(pd.dataFrame): row #index from main dataframe
-        @:return docs(list[int, [Doc]]) list with first entry being the blogpost number and the second a list of the generated Docs
+        @:return docs(list[int, [Doc]]) list with first entry being the 
+        blogpost number and the second a list of the generated Docs
     """
-    def proccess_blogpost(self, index, row: pd.DataFrame)->list[Doc]:
+
+    def proccess_blogpost(self, index, row: pd.DataFrame) -> list[Doc]:
         docs = []
         blogpost_text = self.__clean_text_data(row['text'])
         blogpost_sents = self.nlp(blogpost_text).sents
@@ -230,8 +255,8 @@ class Processor:
             original_sentence = sent.text
             sentence = self.__normalize_sent(sent.text)
             doc = self.process_text(sentence)
-            doc.user_data["DOC_INDEX"]= index
-            doc.user_data["SENT_INDEX"] =  sent_index
+            doc.user_data["DOC_INDEX"] = index
+            doc.user_data["SENT_INDEX"] = sent_index
             doc.user_data["ORIGINAL_SENTENCE"] = original_sentence
             for col_name, col_val in row.items():
                 doc.user_data[col_name] = col_val
@@ -246,20 +271,21 @@ class Processor:
         recompile hyphens for tokenizer so that words with hyphens between
         them are not split while tokenizing text
     """
+
     def recompile_hyphens(self):
         infixes = (
-                          LIST_ELLIPSES
-                          + LIST_ICONS
-                          + [
-                              r"(?<=[0-9])[+\-\*^](?=[0-9-])",
-                              r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
-                                  al=ALPHA_LOWER, au=ALPHA_UPPER, q=
-                                  CONCAT_QUOTES
-                              ),
-                              r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
+                LIST_ELLIPSES
+                + LIST_ICONS
+                + [
+                    r"(?<=[0-9])[+\-\*^](?=[0-9-])",
+                    r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
+                        al=ALPHA_LOWER, au=ALPHA_UPPER, q=
+                        CONCAT_QUOTES
+                    ),
+                    r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
 
-                      r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
-        ]
+                    r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
+                ]
         )
 
         infix_re = compile_infix_regex(infixes)
@@ -271,7 +297,8 @@ class Processor:
         @:param blogpost(str): blogpost text
         @:return blogpost(str): cleaned blogpost text
     """
-    def __clean_text_data(self, blogpost:str)->str:
+
+    def __clean_text_data(self, blogpost: str) -> str:
         # clean html expressions
         blogpost = blogpost.replace("&nbsp;", " ")
         blogpost = blogpost.replace("nbsp;", " ")
@@ -282,6 +309,7 @@ class Processor:
         blogpost = blogpost.strip()
 
         return blogpost
+
     """
         normalize sentence data for spacy pipeline
         @:param sentence(str): sentence to process
@@ -297,14 +325,15 @@ class Processor:
         @param final_docs(dict[list[Doc]): dictionary of (blogpost number, generated docs)
                                             to save conllu formats of
     """
+
     def save_conllu_format(self, final_docs: dict[list[Doc]]):
         for doc in final_docs.keys():
-            for sent_doc in final_docs[doc]:  # for each sentence in the blogpost
+            for sent_doc in final_docs[
+                doc]:  # for each sentence in the blogpost
                 pass
 
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support() #TODO rm
     args = docopt(usage)
 
     source_file = args['<file_to_process>']
@@ -313,9 +342,9 @@ if __name__ == '__main__':
 
     to_conllu = True if args["<to_conllu>"] == "True" else False
 
-    proccessor = Processor(source_file=source_file,
-                           number_of_blogposts=number_of_files, to_conllu=to_conllu)
+    processor = Processor(source_file=source_file,
+                           number_of_blogposts=number_of_files,
+                           to_conllu=to_conllu,
+                           use_ensemble_tagger=True)
 
-    proccessor.process_file()
-
-
+    processor.process_file()

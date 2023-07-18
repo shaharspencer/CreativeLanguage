@@ -173,7 +173,10 @@ class EnsembleTagger():
         if not tag_counts:
             majority_tag = "X"
         else:
-            majority_tag = max(tag_counts, key=tag_counts.get)
+            # sort the dictionary so the result is selected consistently
+            sorted_items = sorted(tag_counts.items(), key=lambda x: x[1],
+                                  reverse=True)
+            majority_tag = sorted_items[0][0]
 
 
         return [index, [tags[0][0], majority_tag]]

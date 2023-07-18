@@ -12,13 +12,10 @@ multiprocessing.set_start_method('spawn', True)
 # TODO check if the pos are correct
 
 # Add missing paths
-# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
-# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
-# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 # h
-sys.path.append(r'/cs/snapless/gabis/shaharspencer')
+#sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 
 
 import spacy
@@ -38,17 +35,11 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
-parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
-
 # Append the parent directory to sys.path
 
 
-sys.path.append(
-    r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
-
-sys.path.append(parent_dir)
 print(sys.path)
-from src.generate_and_test_spacy.processors import ensemble_tagger
+from generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory

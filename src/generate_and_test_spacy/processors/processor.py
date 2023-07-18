@@ -16,10 +16,10 @@ import multiprocessing
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 
 # h
-# sys.path.append('/cs/snapless/gabis/shaharspencer')
+sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 
 import pandas as pd
 import spacy
@@ -38,7 +38,7 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
-parent_dir = os.path.abspath('CreativeLanguage/src')
+parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
 
 # Append the parent directory to sys.path
 

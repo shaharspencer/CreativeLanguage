@@ -17,15 +17,15 @@ import multiprocessing
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
-
 # h
 sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 
 import pandas as pd
 import spacy
 
-# activated = spacy.prefer_gpu()
-# print(f"activated gpu: {activated}\n")
+
+activated = spacy.prefer_gpu()
+print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
 import pandas
 from spacy import Language
@@ -181,7 +181,7 @@ class Processor:
             final_docs = {}
             # submit each task
             with concurrent.futures.ProcessPoolExecutor(max_workers=
-                                                        os.cpu_count()) \
+                                                        3) \
                     as executor:
                 futures = []
                 # submit each blogpost for processing

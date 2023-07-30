@@ -164,8 +164,8 @@ class AnalyzeVerbs:
         # convert all letters but first letter to lowercase
         dict_entry = DictEntry(token_text=token.text,
                                token_sent_text=token.sent.text,
-                               doc_index=token.doc.user_data["DOC_INDEX"],
-                               sent_index=token.doc.user_data["SENT_INDEX"],
+                               doc_index=token.doc.user_data["doc_index"],
+                               sent_index=token.doc.user_data["sent_index"],
                                token_index=token.i,
                                tokenized_sentence=
                                tuple([token.text for token in token.sent]))

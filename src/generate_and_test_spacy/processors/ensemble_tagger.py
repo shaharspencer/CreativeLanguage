@@ -1,14 +1,10 @@
 # for BERT tokenizer
 import concurrent
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, Counter
 
 import stanza
-from nltk import map_tag
-
-from spacy import Language
 import torch
-import spacy
-from spacy.tokens import Doc
+from nltk import map_tag
 
 # to execute code concurrently
 from concurrent.futures import ThreadPoolExecutor
@@ -17,12 +13,8 @@ from concurrent.futures import ThreadPoolExecutor
 import nltk
 
 # for flair tokenizer
-import flair
 from flair.data import Sentence
 from flair.models import SequenceTagger
-
-
-#TODO exchange to universal dependencies
 
 pos_tags = [
     'ADJ',
@@ -59,36 +51,35 @@ nltk_to_spacy_pos_mapping = {
     '.': 'PUNCT'
 }
 
-class EnsembleTagger():
+
+class EnsembleTagger:
     def __init__(self):
 
-        # nltk dependencies
-        # for tokenizer
-        # nltk.download('averaged_perceptron_tagger')
-        # nltk.download('universal_tagset')
+        # confirm nltk and stanza dependencies
+        self.download_stanza_dependencies()
+        self.download_nltk_dependencies()
 
-
-        # stanza dependencies TODO confirm these are UD
-        # stanza.download('en')
+        # define stanza and flair pipelines
         self.stanza_pipeline = stanza.Pipeline('en',
                                                processors='tokenize,mwt,pos',
-                                               tokenize_pretokenized=True, download_method=None)
+                                               tokenize_pretokenized=True,
+                                               download_method=None)
         # flair dependencies (UD pipeline)
         self.flair_pipeline = SequenceTagger.load("flair/upos-english")
 
         self.tagger_funcs = [self.flair_tokenizer, self.nltk_tagger,
                              self.stanza_tagger]
 
-
-
     """
         predicts the labels for a sentence based on the majority vote
         of the chosen models. 
         @:param doc 
     """
+
     def get_tags_list(self, doc):
         word_lst = [token.text for token in doc]
-        votes = self.get_all_votes(word_lst)
+        pos_list = [[token.text, token.pos_] for token in doc]
+        votes = self.get_all_votes(spacy_tokens=word_lst, spacy_tags=pos_list)
         tags = self.calculate_votes(votes)
         return tags
 
@@ -98,11 +89,13 @@ class EnsembleTagger():
         @:param votes list of votes from each tagger 
         @:return dictionary of majority votes
     """
-    def calculate_votes(self, votes: [list[list]])-> dict:
+
+    def calculate_votes(self, votes: [list[list]]) -> dict:
         polled_results = {}
-        with ThreadPoolExecutor(max_workers=len(votes)) as executor:
+        with ThreadPoolExecutor(max_workers=2) as executor:
             tagging_tasks = [executor.submit(self.majority_vote, [vote,
-                                                index]) for index,
+                                                                  index]) for
+                             index,
                              vote in enumerate(votes)]
             # retrieve results from completed tasks
 
@@ -116,12 +109,17 @@ class EnsembleTagger():
         for each tagger, we send a list of strings and recieve a list of
         type (token_text, predicted_token_tag)
         @:param spacy_tokens list of strings from spacy's tokenizer
+        @:param spacy_tags: spacy's default pos tags for these tokens
         @:return list of lists returned by each tagger
     """
-    def get_all_votes(self, spacy_tokens: list[str])-> list[list[(str, str)]]:
-        tagged_tokens_lst = []
 
-        with ThreadPoolExecutor(max_workers=len(self.tagger_funcs)) as executor:
+    def get_all_votes(self, spacy_tokens: list[str], spacy_tags: list[list[str, str]]) -> \
+    list[list[(str, str)]]:
+        tagged_tokens_lst = []
+        tagged_tokens_lst.append(spacy_tags)
+
+        with ThreadPoolExecutor(
+                max_workers=2) as executor:
             tagging_tasks = [executor.submit(tagger_func, spacy_tokens) for
                              tagger_func
                              in self.tagger_funcs]
@@ -142,82 +140,99 @@ class EnsembleTagger():
         @:param list_of_lists list from each pos tagger
         @:return list of one list for each token
     """
-    def create_lists_from_elements(self,list_of_lists):
+
+    def create_lists_from_elements(self, list_of_lists):
         result_lists = []
         transposed = zip(*list_of_lists)
-
         for elements in transposed:
             result_lists.append(list(elements))
 
         return result_lists
-
 
     """
         finds the tag with maximum votes for some token
         @:param tags potentials tags for some token
         @:return tag the tag that received the majority vote
     """
+
     def majority_vote(self, tags_and_token):
-        tag_counts = OrderedDict()
         tags = tags_and_token[0]
         tags = sorted(tags, key=lambda k: k[1])
-        assert len(tags) == len(self.tagger_funcs)
+        assert len(tags) == len(self.tagger_funcs) + 1
         index = tags_and_token[1]
         items = [item[0] for item in tags]
 
         assert len(set(items)) <= 1
 
-        for vote in tags:
-            tag = vote[1]
-            if tag != 'X':
-                if tag in tag_counts:
-                    tag_counts[tag] += 1
-                else:
-                    tag_counts[tag] = 1
+        tag_counts = Counter(tag[1] for tag in tags if tag[1] != 'X')
         if not tag_counts:
             majority_tag = "X"
         else:
             # sort the dictionary so the result is selected consistently
             sorted_items = sorted(tag_counts.items(), key=lambda x: x[1],
                                   reverse=True)
-            majority_tag = sorted_items[0][0]
-
+            # only choose majority tag as verb
+            # if more than one tagger voted thus
+            if sorted_items[0][0] == "VERB" and sorted_items[0][1] <= 1:
+                majority_tag = sorted_items[1][0]
+            else:
+                majority_tag = sorted_items[0][0]
 
         return [index, [tags[0][0], majority_tag]]
-
 
     """
           predicts the labels for the tokens based on stanza tokenizer
           @:param doc to tag tokens in 
     """
+
     def stanza_tagger(self, doc):
         taggings = self.stanza_pipeline([doc])
         tags = [[word.text, word.upos] for word in taggings.sentences[0].words]
 
         return tags
 
-
-
     """
         predicts the labels for the tokens based on NLTK tokenizer
         @:param doc to tag tokens in 
     """
+
     def nltk_tagger(self, tokens):
-         tagged_tokens = nltk.pos_tag(tokens, tagset='universal')
-         mapped = [(word, nltk_to_spacy_pos_mapping[map_tag('en-ptb',
-                                                            'universal',
-                                                            tag)]) for word,
-                                                                       tag in
-          tagged_tokens]
-         return mapped
+        tagged_tokens = nltk.pos_tag(tokens, tagset='universal')
+        mapped = [(word, nltk_to_spacy_pos_mapping[map_tag('en-ptb',
+                                                           'universal',
+                                                           tag)]) for word,
+                                                                      tag in
+                  tagged_tokens]
+        return mapped
 
     """
           predicts the labels for the tokens based on flair tokenizer
           @:param doc to tag tokens in 
     """
-    def flair_tokenizer(self, token_list:list[str]):
+
+    def flair_tokenizer(self, token_list: list[str]):
         # since the text is pretokenized, create a sentence object out of it
         sentence = Sentence(token_list)
         self.flair_pipeline.predict(sentence)
         tags = [[token.text, token.labels[0].value] for token in sentence]
         return tags
+
+    def download_stanza_dependencies(self):
+        """
+        Check if the NLTK dependencies for tokenizer and universal_tagset
+        are downloaded, and download them if they are not already present.
+        """
+        pass
+        # stanza.download('en')
+
+    def download_nltk_dependencies(self):
+        """
+        Check if the NLTK dependencies for tokenizer and universal_tagset
+        are downloaded, and download them if they are not already present.
+        """
+        try:
+            nltk.data.find('taggers/averaged_perceptron_tagger')
+            nltk.data.find('taggers/universal_tagset')
+        except LookupError:
+            nltk.download('averaged_perceptron_tagger')
+            nltk.download('universal_tagset')

@@ -3,7 +3,7 @@ import concurrent.futures
 import sys
 import multiprocessing
 
-# multiprocessing.set_start_method('spawn', True)
+multiprocessing.set_start_method('spawn', True)
 
 
 # TODO utilize GPU?
@@ -20,7 +20,7 @@ sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 # h
 sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 
-import pandas as pd
+
 import spacy
 
 
@@ -62,13 +62,12 @@ Usage:
 
 tagger = ensemble_tagger.EnsembleTagger()
 
+
 """
   use this method to apply custom pos tagger
   @:param doc tokenized doc object 
   @:return doc object with changed pos_ components
 """
-
-
 @Language.component("custom_tagger")
 def multi_tagger(doc):
     if not doc:
@@ -90,6 +89,23 @@ Creates a .spacy doc_bin of given csv file.
         model(str) : model for spaCy to utilize, defaults to en_core_web_lg
         number_of_blogposts(int): limit on how many blogposts to process
 """
+
+"""
+    cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
+    these are all html remanants
+    @:param blogpost(str): blogpost text
+    @:return blogpost(str): cleaned blogpost text
+"""
+def __clean_text_data(blogpost: str) -> str:
+    # clean html expressions
+    blogpost = blogpost.replace("&nbsp;", " ")
+    blogpost = blogpost.replace("nbsp;", " ")
+    blogpost = blogpost.replace("&nbsp", " ")
+    blogpost = blogpost.replace("&amp;", "&")
+    blogpost = blogpost.replace("amp;", "&")
+    blogpost = blogpost.replace("&amp", "&")
+    blogpost = blogpost.strip()
+    return blogpost
 
 
 class Processor:
@@ -113,22 +129,18 @@ class Processor:
     """
 
     def __load_nlp_objects(self, model, use_ensemble_tagger):
-        self.basic_nlp = spacy.load(model)
-        self.ensemble_nlp = None
-        # add custom tagger to end of pipeline
-        if use_ensemble_tagger:
-            self.ensemble_nlp = spacy.load(model)
-            self.ensemble_nlp.add_pipe("custom_tagger", after="ner")
+        if not use_ensemble_tagger:
+            self.nlp = spacy.load(model)
+        else:
+            self.nlp = spacy.load(model)
+            self.nlp.add_pipe("custom_tagger", after="ner")
+
         if self.to_conllu:
-            if self.ensemble_nlp:
-                self.ensemble_nlp.add_pipe("conll_formatter",
-                              last=True)  # remove if serializing data
-            else:
-                self.basic_nlp.add_pipe("conll_formatter",
-                              last=True)
+            self.nlp.add_pipe("conll_formatter",
+                          last=True)
 
     """
-       ddddddd load docBin object to store serialized data
+       load docBin object to store serialized data
     """
 
     def __load_docbin(self):
@@ -141,7 +153,6 @@ class Processor:
         load relevant attributes such as source file paths
         and output file paths
     """
-
     def __load_attributes(self, source_file, number_of_blogposts):
 
         # get a .csv file that contains the unprocessed data
@@ -151,7 +162,7 @@ class Processor:
 
         self.source_file_path = source_file
         # the name of the file we want to write to
-        self.output_file_path = "data_from_first_{n}_lg_model_spacy_3.5.5." \
+        self.output_file_path = "7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5." \
                                 "spacy".format(
             n=number_of_blogposts)
         # self.output_file_path = os.path.join(files_directory,
@@ -162,10 +173,12 @@ class Processor:
         self.blogpost_limit = number_of_blogposts
         # create a dataframe from the .csv file
         self.df = pandas.read_csv(self.source_file_path, encoding='utf-8')
+        self.df['text'] = self.df['text'].fillna('')
 
     def __add_attrs_to_nlp(self, no_split_hyphens=False):
         if no_split_hyphens:
             self.nlp.tokenizer.infix_finditer = self.recompile_hyphens
+
 
     """
         iterate over rows in dataframe and create nlp object from text.
@@ -177,57 +190,44 @@ class Processor:
         self.__set_doc_extensions()
         print(f"processing file!\n", flush=True)
         print(f"cpus available: {os.cpu_count()}\n", flush=True)
-        with tqdm(total=self.blogpost_limit) as pbar:
-            final_docs = {}
-            # submit each task
-            with concurrent.futures.ProcessPoolExecutor(max_workers=
-                                                        3) \
-                    as executor:
-                futures = []
-                # submit each blogpost for processing
-                for index in range(self.blogpost_limit):
-                    pbar.update(1)
-                    row = self.df.loc[index]
-                    print(f"submitting blogpost number {index}\n", flush=True)
-                    future = executor.submit(self.proccess_blogpost,
-                                             index, row)
-                    futures.append(future)
-                # wait for completion of tasks and add to dictionary
-                for task in concurrent.futures.as_completed(futures):
-                    index, docs = task.result()
-                    final_docs[index] = docs
-                    print(
-                        f"completed processing blogpost number {index}, "
-                        f"total done are {len(final_docs)}\n",
-                        flush=True)
 
-            # sort dict items according to blogpost number
-            final_docs = collections.OrderedDict(sorted(final_docs.items()))
-            print(f"length of docs gathered is {len(final_docs)}\n",
+        data_tuples = [(self.normalize_text(row["text"]),
+                        {col: row[col] for col in self.df.columns})
+                       for row in self.df.to_dict(orient="records")]
+        for doc, context in self.nlp.pipe(data_tuples,
+                                          as_tuples=True,
+                                          n_process=4):
+            # add user data to doc
+            for col_name, col_val in context.items():
+                doc.user_data[col_name] = col_val
+            self.doc_bin.add(doc)
+            doc_index = context["doc_index"]
+            sent_index = context["sent_index"]
+            print(f"done processing doc # {doc_index}, sent # {sent_index}",
+                  end=" ",
                   flush=True)
-            assert len(final_docs) == self.blogpost_limit
-            # if we want to save conllu format
-            if self.to_conllu:
-                self.save_conllu_format(final_docs)
-            # if we want to save to docBin
-            else:
-                # finally add each blogposts sentences
-                for doc in final_docs.keys():
-                    for sent_doc in final_docs[
-                        doc]:  # for each sent in the blogpost
-                        self.doc_bin.add(sent_doc)
+        self.doc_bin.to_disk(self.output_file_path)
 
-                # save to disk
-                self.doc_bin.to_disk(self.output_file_path)
+    def normalize_text(self, text: str) -> str:
+        """
+            normalize sentence data for spacy pipeline
+            @:param doc(str): doc to process
+            @:return sentence(str): normalized sentence
+        """
+        if not text:
+            return text
+        text = text[0] + text[1:].lower()
+        text = text.strip()
+        return text
 
     """
         sets Doc extensions to save metadata about each entry in spaCy object
     """
 
     def __set_doc_extensions(self):
-        Doc.set_extension("DOC_INDEX", default=None)
-        Doc.set_extension("SENT_INDEX", default=None)
-        Doc.set_extension("ORIGINAL_SENTENCE", default=None)
+        Doc.set_extension("doc_index", default=None)
+        Doc.set_extension("sent_index", default=None)
+        Doc.set_extension("sent", default=None)
 
     """
         processes a sentence into a Doc object.
@@ -236,43 +236,9 @@ class Processor:
     """
 
     def process_text(self, sentence: str) -> Doc:
-        doc = self.ensemble_nlp(sentence) if self.ensemble_nlp \
-            else self.basic_nlp(sentence)
-        doc.retokenize()
+        doc = self.nlp(sentence)
         return doc
 
-    """
-        adds each sentence in a single blogpost to the docBin.
-        first creates a nlp object from the entire blogpost to get seperate
-        sentences.
-        then for each sentence create an nlp object, add the doc index etc
-        as user data, and save to docbin
-        @:param index(int): index of row to save to doc
-        @ row(pd.dataFrame): row #index from main dataframe
-        @:return docs(list[int, [Doc]]) list with first entry being the 
-        blogpost number and the second a list of the generated Docs
-    """
-
-    def proccess_blogpost(self, index, row: pd.DataFrame) -> list[Doc]:
-        docs = []
-        blogpost_text = self.__clean_text_data(row['text'])
-        blogpost_sents = self.basic_nlp(blogpost_text).sents
-
-        for sent_index, sent in enumerate(blogpost_sents):
-            original_sentence = sent.text
-            sentence = self.__normalize_sent(sent.text)
-            doc = self.process_text(sentence)
-            doc.user_data["DOC_INDEX"] = index
-            doc.user_data["SENT_INDEX"] = sent_index
-            doc.user_data["ORIGINAL_SENTENCE"] = original_sentence
-            for col_name, col_val in row.items():
-                doc.user_data[col_name] = col_val
-            doc.retokenize()
-            docs.append(doc)
-            # self.doc_bin.add(doc)
-            print(f"doc index: {index}, sent index: {sent_index}\n",
-                  flush=True)
-        return [index, docs]
 
     """
         recompile hyphens for tokenizer so that words with hyphens between
@@ -297,48 +263,6 @@ class Processor:
 
         infix_re = compile_infix_regex(infixes)
         return infix_re.finditer
-
-    """
-        cleans out blogpost from &nsbp; nbsp, &amp;, amp, &nbsp, nbsp;, etc
-        these are all html remanants
-        @:param blogpost(str): blogpost text
-        @:return blogpost(str): cleaned blogpost text
-    """
-
-    def __clean_text_data(self, blogpost: str) -> str:
-        # clean html expressions
-        blogpost = blogpost.replace("&nbsp;", " ")
-        blogpost = blogpost.replace("nbsp;", " ")
-        blogpost = blogpost.replace("&nbsp", " ")
-        blogpost = blogpost.replace("&amp;", "&")
-        blogpost = blogpost.replace("amp;", "&")
-        blogpost = blogpost.replace("&amp", "&")
-        blogpost = blogpost.strip()
-
-        return blogpost
-
-    """
-        normalize sentence data for spacy pipeline
-        @:param sentence(str): sentence to process
-        @:return sentence(str): normalized sentence
-    """
-
-    def __normalize_sent(self, sentence: str) -> str:
-        sentence = sentence[0] + sentence[1:].lower()
-        sentence = sentence.strip()
-        return sentence
-
-    """
-        save docs conllu attributes 
-        @param final_docs(dict[list[Doc]): dictionary of (blogpost number, generated docs)
-                                            to save conllu formats of
-    """
-
-    def save_conllu_format(self, final_docs: dict[list[Doc]]):
-        for doc in final_docs.keys():
-            for sent_doc in final_docs[
-                doc]:  # for each sentence in the blogpost
-                pass
 
 
 if __name__ == '__main__':

@@ -70,6 +70,8 @@ class ContextualizedEmbeddings:
             input_ids = self.__tokenizer.convert_tokens_to_ids(tokenized_text)
             input_ids_tensor = torch.tensor([input_ids])
             outputs = self.__model(input_ids_tensor)
+            if verb_index >= len(outputs.last_hidden_state[0]):
+                return torch.zeros(768)
             embeddings = outputs.last_hidden_state[0][verb_index]
             return embeddings
 
@@ -93,7 +95,7 @@ if __name__ == '__main__':
 
     d = ContextualizedEmbeddings().process_csv(c)
 
-    faiss = FAISS(d)
+    # faiss = FAISS(d)
 
 
 

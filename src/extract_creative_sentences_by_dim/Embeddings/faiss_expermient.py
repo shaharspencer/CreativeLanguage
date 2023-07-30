@@ -1,3 +1,5 @@
+import csv
+
 import pandas as pd
 import numpy as np
 from datasets import load_dataset, Dataset
@@ -20,19 +22,31 @@ class FAISS:
         vector_dimension = 768
 
         midpoint = np.mean(embeddings_dataset["embeddings"], axis=0)
+        midpoint = midpoint.reshape(1, -1)
 
-        x = 0
         index = faiss.IndexFlatL2(vector_dimension)
-        index.add(n=embeddings_dataset["embeddings"], x=1)
-        if not index.is_trained:
-            pass
-        # index.add(embeddings_dataset["embeddings"])
+
+        assert index.is_trained
+
+        index.add(np.asarray(embeddings_dataset["embeddings"]))
+
+        n_total = index.ntotal
 
 
-
-        # res = index.search(midpoint)
-        x = 0
-
+        D, I = index.search(midpoint, k=4227)
+        file = open("eat_VERB_output_50_limit.csv", "w", encoding='utf-8', newline='')
+        fields = ["sent_index", "sent", "distance"]
+        writer = csv.DictWriter(f=file, fieldnames=fields)
+        writer.writerow({"sent_index": "sent_index", "sent": "sent",
+                         "distance": "distance"})
+        for i, d in zip(I[0], D[0]):
+            if len(embeddings_dataset[int(i)]["tokenized sentence"]) > 50:
+                continue
+            n_dict = {"sent_index": i,
+                      "sent": embeddings_dataset[int(i)]["sentence"],
+                      "distance": float(d)}
+            writer.writerow(n_dict)
+        file.close()
 
 
 
@@ -47,6 +61,6 @@ if __name__ == '__main__':
     }
     converters = {'tokenized sentence': eval,
                   'verb embeddings':eval}
-    df = pd.read_csv('cool.csv', dtype=dtypes,converters=converters)
+    df = pd.read_csv('eat_VERB.csv', dtype=dtypes,converters=converters)
     datafiles = ["cool.csv"]
     f = FAISS(df)

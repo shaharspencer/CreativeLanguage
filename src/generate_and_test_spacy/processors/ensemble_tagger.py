@@ -92,7 +92,7 @@ class EnsembleTagger:
 
     def calculate_votes(self, votes: [list[list]]) -> dict:
         polled_results = {}
-        with ThreadPoolExecutor(max_workers=2) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             tagging_tasks = [executor.submit(self.majority_vote, [vote,
                                                                   index]) for
                              index,
@@ -119,7 +119,7 @@ class EnsembleTagger:
         tagged_tokens_lst.append(spacy_tags)
 
         with ThreadPoolExecutor(
-                max_workers=2) as executor:
+                max_workers=3) as executor:
             tagging_tasks = [executor.submit(tagger_func, spacy_tokens) for
                              tagger_func
                              in self.tagger_funcs]
@@ -173,7 +173,8 @@ class EnsembleTagger:
                                   reverse=True)
             # only choose majority tag as verb
             # if more than one tagger voted thus
-            if sorted_items[0][0] == "VERB" and sorted_items[0][1] <= 1:
+            if sorted_items[0][0] == "VERB" and sorted_items[0][1] <= 1 \
+                    and len(sorted_items) > 1:
                 majority_tag = sorted_items[1][0]
             else:
                 majority_tag = sorted_items[0][0]

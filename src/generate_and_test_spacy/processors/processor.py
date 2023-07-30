@@ -194,7 +194,7 @@ class Processor:
         data_tuples = [(self.normalize_text(row["text"]),
                         {col: row[col] for col in self.df.columns})
                        for row in self.df.to_dict(orient="records")]
-        for doc, context in self.nlp.pipe(data_tuples,
+        for doc, context in self.nlp.pipe(data_tuples, batch_size=5,
                                           as_tuples=True,
                                           n_process=4):
             # add user data to doc

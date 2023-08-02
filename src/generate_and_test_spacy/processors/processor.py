@@ -12,13 +12,18 @@ multiprocessing.set_start_method('spawn', True)
 # TODO check if the pos are correct
 
 # Add missing paths
+# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
 
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 # h
-sys.path.append(r'/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/generate_and_test_spacy')
+sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 
 
 import spacy
+
+
 activated = spacy.prefer_gpu()
 print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
@@ -33,11 +38,17 @@ from spacy.util import compile_infix_regex
 import os
 from tqdm import tqdm
 
+parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
+
 # Append the parent directory to sys.path
 
 
+sys.path.append(
+    r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
+
+sys.path.append(parent_dir)
 print(sys.path)
-from generate_and_test_spacy.processors import ensemble_tagger
+from src.generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
 #     training_data_files_directory, spacy_files_directory
@@ -151,9 +162,7 @@ class Processor:
 
         self.source_file_path = source_file
         # the name of the file we want to write to
-        self.output_file_path = "7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5." \
-                                "spacy".format(
-            n=number_of_blogposts)
+        self.output_file_path = "GPU_7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5.spacy".format(n=number_of_blogposts)
         # self.output_file_path = os.path.join(files_directory,
         #                                      spacy_files_directory,
         #                                      output_file_dir,
@@ -179,11 +188,11 @@ class Processor:
         self.__set_doc_extensions()
         print(f"processing file!\n", flush=True)
         print(f"cpus available: {os.cpu_count()}\n", flush=True)
-
+        data = self.df.head(self.blogpost_limit) if self.blogpost_limit\
+            else self.df
         data_tuples = [(self.normalize_text(row["text"]),
                         {col: row[col] for col in self.df.columns})
-                       for row in self.df.head(self.blogpost_limit).to_dict(orient="records")
-                       if self.blogpost_limit!=-1 else for row in self.df.to_dict(orient="records")]
+                       for row in data.to_dict(orient="records")]
         for doc, context in self.nlp.pipe(data_tuples, batch_size=500,
                                           as_tuples=True,
                                           n_process=10):
@@ -260,7 +269,12 @@ if __name__ == '__main__':
 
     source_file = args['<file_to_process>']
 
-    number_of_files = int(args['<number_of_blogposts>'])
+    number_of_files = args['<number_of_blogposts>']
+    if number_of_files != "None":
+        number_of_files = int(args['<number_of_blogposts>'])
+    else:
+        number_of_files = 0
+
 
     to_conllu = True if args["<to_conllu>"] == "True" else False
 

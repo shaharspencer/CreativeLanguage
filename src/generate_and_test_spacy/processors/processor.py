@@ -48,6 +48,7 @@ from src.generate_and_test_spacy.processors import ensemble_tagger
 
 usage = '''
 processor CLI.
+number of 
 Usage:
     processor.py <file_to_process> <number_of_blogposts> <to_conllu>
 '''

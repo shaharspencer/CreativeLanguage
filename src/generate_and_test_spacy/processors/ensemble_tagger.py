@@ -1,5 +1,4 @@
 # for BERT tokenizer
-import concurrent
 from collections import OrderedDict, Counter
 
 import stanza
@@ -218,4 +217,3 @@ class EnsembleTagger:
 
 if __name__ == '__main__':
     o = EnsembleTagger()
-    o.get_tags_list()

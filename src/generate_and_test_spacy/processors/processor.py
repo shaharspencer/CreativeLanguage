@@ -1,21 +1,7 @@
 import collections
 import sys
-
-
-
-# Add missing paths
-# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
-# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
-# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
-
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
-# h
-sys.path.append(r'/cs/snapless/gabis/shaharspencer')
-
-
+import os
 import spacy
-
-
 activated = spacy.prefer_gpu()
 print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
@@ -27,19 +13,27 @@ from docopt import docopt
 from spacy.lang.char_classes import ALPHA, ALPHA_LOWER, ALPHA_UPPER
 from spacy.lang.char_classes import CONCAT_QUOTES, LIST_ELLIPSES, LIST_ICONS
 from spacy.util import compile_infix_regex
-import os
+
 from tqdm import tqdm
 
+# Add missing paths
+# sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')
+# sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_matplotlib_backend')
+
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
+
+# h
+sys.path.append(r'/cs/snapless/gabis/shaharspencer')
 parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
 
 # Append the parent directory to sys.path
 
-
-sys.path.append(
-    r"C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\generate_and_test_spacy\processors\ensemble_tagger.py")
-
 sys.path.append(parent_dir)
+
 print(sys.path)
+
+
 from src.generate_and_test_spacy.processors import ensemble_tagger
 
 # from src.utils.path_configurations import files_directory, \
@@ -186,7 +180,7 @@ class Processor:
         data_tuples = [(self.normalize_text(row["text"]),
                         {col: row[col] for col in self.df.columns})
                        for row in data.to_dict(orient="records")]
-        for doc, context in self.nlp.pipe(data_tuples, batch_size=500,
+        for doc, context in self.nlp.pipe(data_tuples, batch_size=1000,
                                           as_tuples=True,
                                           n_process=10):
             # add user data to doc

@@ -1,9 +1,6 @@
 import collections
-import concurrent.futures
 import sys
-import multiprocessing
 
-multiprocessing.set_start_method('spawn', True)
 
 
 # TODO utilize GPU?

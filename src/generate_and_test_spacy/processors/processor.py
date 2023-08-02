@@ -15,12 +15,10 @@ multiprocessing.set_start_method('spawn', True)
 
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 # h
-#sys.path.append(r'/cs/snapless/gabis/shaharspencer')
+sys.path.append(r'/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/generate_and_test_spacy')
 
 
 import spacy
-
-
 activated = spacy.prefer_gpu()
 print(f"activated gpu: {activated}\n")
 print(f"spacy version: {spacy.__version__}\n")
@@ -153,7 +151,9 @@ class Processor:
 
         self.source_file_path = source_file
         # the name of the file we want to write to
-        self.output_file_path = "../tests/CPU_7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5.spacy"
+        self.output_file_path = "7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5." \
+                                "spacy".format(
+            n=number_of_blogposts)
         # self.output_file_path = os.path.join(files_directory,
         #                                      spacy_files_directory,
         #                                      output_file_dir,
@@ -182,10 +182,11 @@ class Processor:
 
         data_tuples = [(self.normalize_text(row["text"]),
                         {col: row[col] for col in self.df.columns})
-                       for row in self.df.head(self.blogpost_limit).to_dict(orient="records")]
+                       for row in self.df.head(self.blogpost_limit).to_dict(orient="records")
+                       if self.blogpost_limit!=-1 else for row in self.df.to_dict(orient="records")]
         for doc, context in self.nlp.pipe(data_tuples, batch_size=500,
                                           as_tuples=True,
-                                          n_process=1):
+                                          n_process=10):
             # add user data to doc
             for col_name, col_val in context.items():
                 doc.user_data[col_name] = col_val

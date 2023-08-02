@@ -6,9 +6,6 @@ import stanza
 import torch
 from nltk import map_tag
 
-# to execute code concurrently
-from concurrent.futures import ThreadPoolExecutor
-
 # for NLTK tokenizer
 import nltk
 
@@ -90,18 +87,13 @@ class EnsembleTagger:
         @:return dictionary of majority votes
     """
 
-    def calculate_votes(self, votes: [list[list]]) -> dict:
-        polled_results = {}
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            tagging_tasks = [executor.submit(self.majority_vote, [vote,
-                                                                  index]) for
-                             index,
-                             vote in enumerate(votes)]
+    def calculate_votes(self, votes: [list[list[str, str]]]) -> list:
+        polled_results = []
+        zipped_lists = zip(*votes)
+        for zipped_token in zipped_lists:
+            result = self.majority_vote(zipped_token)
             # retrieve results from completed tasks
-
-            for task in concurrent.futures.as_completed(tagging_tasks):
-                result = task.result()
-                polled_results[result[0]] = result[1]
+            polled_results.append(result)
         return polled_results
 
     """
@@ -118,19 +110,11 @@ class EnsembleTagger:
         tagged_tokens_lst = []
         tagged_tokens_lst.append(spacy_tags)
 
-        with ThreadPoolExecutor(
-                max_workers=3) as executor:
-            tagging_tasks = [executor.submit(tagger_func, spacy_tokens) for
-                             tagger_func
-                             in self.tagger_funcs]
+        for func in self.tagger_funcs:
+            result = func(spacy_tokens)
+            tagged_tokens_lst.append(result)
 
-            # retrieve results from completed tasks
-            for task in concurrent.futures.as_completed(tagging_tasks):
-                result = task.result()
-                tagged_tokens_lst.append(result)
-
-        ordered_lst = self.create_lists_from_elements(tagged_tokens_lst)
-        return ordered_lst
+        return tagged_tokens_lst
 
     """
         this method recieves a list of lists, each one is a list returned 
@@ -155,16 +139,10 @@ class EnsembleTagger:
         @:return tag the tag that received the majority vote
     """
 
-    def majority_vote(self, tags_and_token):
-        tags = tags_and_token[0]
-        tags = sorted(tags, key=lambda k: k[1])
-        assert len(tags) == len(self.tagger_funcs) + 1
-        index = tags_and_token[1]
-        items = [item[0] for item in tags]
+    def majority_vote(self, tags_and_token)->list[str, str]:
+        assert len(tags_and_token) == len(self.tagger_funcs) + 1
 
-        assert len(set(items)) <= 1
-
-        tag_counts = Counter(tag[1] for tag in tags if tag[1] != 'X')
+        tag_counts = Counter(tag[1] for tag in tags_and_token if tag[1] != 'X')
         if not tag_counts:
             majority_tag = "X"
         else:
@@ -179,7 +157,7 @@ class EnsembleTagger:
             else:
                 majority_tag = sorted_items[0][0]
 
-        return [index, [tags[0][0], majority_tag]]
+        return [tags_and_token[0][0], majority_tag]
 
     """
           predicts the labels for the tokens based on stanza tokenizer
@@ -237,3 +215,7 @@ class EnsembleTagger:
         except LookupError:
             nltk.download('averaged_perceptron_tagger')
             nltk.download('universal_tagset')
+
+if __name__ == '__main__':
+    o = EnsembleTagger()
+    o.get_tags_list()

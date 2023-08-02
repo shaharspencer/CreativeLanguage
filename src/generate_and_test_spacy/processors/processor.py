@@ -73,9 +73,9 @@ def multi_tagger(doc):
     if not doc:
         return doc
     tags = tagger.get_tags_list(doc)
-    sorted_values = [tags[key] for key in sorted(tags.keys())]
 
-    for token, (text, tag) in zip(doc, sorted_values):
+    for token, (text, tag) in zip(doc, tags):
+        assert token.text == text
         if tag != "X":
             token.pos_ = tag
     return doc
@@ -125,7 +125,7 @@ class Processor:
     """
         loads nlp object with requested model
         adds extra pipelines if relevant
-        @:param model(str): model to load for spaCyddddd
+        @:param model(str): model to load for spaCy
     """
 
     def __load_nlp_objects(self, model, use_ensemble_tagger):
@@ -162,9 +162,7 @@ class Processor:
 
         self.source_file_path = source_file
         # the name of the file we want to write to
-        self.output_file_path = "7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5." \
-                                "spacy".format(
-            n=number_of_blogposts)
+        self.output_file_path = "../tests/CPU_7_30_2023_data_from_first_{n}_lg_model_spacy_3.5.5.spacy"
         # self.output_file_path = os.path.join(files_directory,
         #                                      spacy_files_directory,
         #                                      output_file_dir,
@@ -193,10 +191,10 @@ class Processor:
 
         data_tuples = [(self.normalize_text(row["text"]),
                         {col: row[col] for col in self.df.columns})
-                       for row in self.df.to_dict(orient="records")]
-        for doc, context in self.nlp.pipe(data_tuples, batch_size=5,
+                       for row in self.df.head(self.blogpost_limit).to_dict(orient="records")]
+        for doc, context in self.nlp.pipe(data_tuples, batch_size=500,
                                           as_tuples=True,
-                                          n_process=4):
+                                          n_process=1):
             # add user data to doc
             for col_name, col_val in context.items():
                 doc.user_data[col_name] = col_val

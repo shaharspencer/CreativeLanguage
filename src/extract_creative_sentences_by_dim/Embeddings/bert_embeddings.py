@@ -1,4 +1,5 @@
 import pandas as pd
+from datasets import Dataset
 from transformers import pipeline, AutoTokenizer, AutoModel
 
 from transformers import RobertaTokenizer
@@ -25,11 +26,13 @@ class ContextualizedEmbeddings:
                class. The constructor loads the pre-trained 'roberta-base'
                model and tokenizer.
             """
+            self.device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu")
             model_name = 'roberta-base'
-            self.__model = AutoModel.from_pretrained(model_name)
-            self.__tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.__model = AutoModel.from_pretrained(model_name).to(self.device)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        def process_csv(self, csv)->pd.DataFrame:
+        def process_dataset(self, dataset:Dataset)->Dataset:
             """
                Processes the CSV data to compute contextualized embeddings for each row.
 
@@ -39,19 +42,17 @@ class ContextualizedEmbeddings:
                Returns:
                    pd.DataFrame: The updated DataFrame with the computed embeddings.
             """
-            embeddings = []
-            for _, row in csv.iterrows():
-                tokenized_sentence, verb_index = row["tokenized sentence"], row["token index"]
-                e = self.contextualized_embeddings(tokenized_text=tokenized_sentence,
-                                                   verb_index=verb_index)
-                embeddings.append(pd.Series(e.detach().numpy()))
-            csv["verb embeddings"] = pd.Series(embeddings)
-            return csv
+
+            embeddings_dataset = dataset.map(lambda row: self.contextualized_embeddings(row)
+            )
+
+            return embeddings_dataset
 
 
 
 
-        def contextualized_embeddings(self, tokenized_text: tuple, verb_index: int)\
+
+        def contextualized_embeddings(self, row)\
                 ->torch.tensor:
             """
                    Returns the contextualized embeddings for a specific verb
@@ -67,13 +68,18 @@ class ContextualizedEmbeddings:
                         tokenized_text.
 
             """
-            input_ids = self.__tokenizer.convert_tokens_to_ids(tokenized_text)
+            tokenized_sent = row["tokenized sentence"]
+            token_index = row["token index"]
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokenized_sent)
             input_ids_tensor = torch.tensor([input_ids])
             outputs = self.__model(input_ids_tensor)
-            if verb_index >= len(outputs.last_hidden_state[0]):
+            self.tokenizer.encode
+            if token_index >= len(outputs.last_hidden_state[0]):
                 return torch.zeros(768)
-            embeddings = outputs.last_hidden_state[0][verb_index]
-            return embeddings
+                #raise exception
+            embeddings = outputs.last_hidden_state[0][token_index]
+            row["context embedding"] = embeddings.detach().numpy()
+            return row
 
 
 if __name__ == '__main__':
@@ -93,7 +99,7 @@ if __name__ == '__main__':
     c = pd.read_csv("graduate_VERB.csv", encoding='ISO-8859-1', dtype=dtypes,
                     converters=converters)
 
-    d = ContextualizedEmbeddings().process_csv(c)
+    d = ContextualizedEmbeddings().process_d
 
     # faiss = FAISS(d)
 

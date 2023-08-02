@@ -3,11 +3,6 @@ import sys
 
 
 
-# TODO utilize GPU?
-# TODO save absolute index OR in verb_path, save index of verb AND indexes in sentence for replacement
-# TODO save tokenized list??? for prections of pos
-# TODO check if the pos are correct
-
 # Add missing paths
 # sys.path.append('C:\\Users\\User\\PycharmProjects\\CreativeLanguageWithVenv')
 # sys.path.append('C:\\Program Files\\JetBrains\\PyCharm 2022.2.1\\plugins\\python\\helpers\\pycharm_display')

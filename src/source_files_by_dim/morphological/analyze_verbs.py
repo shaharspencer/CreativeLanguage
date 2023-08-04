@@ -1,5 +1,7 @@
+
 import sys
 from collections import namedtuple
+from datetime import datetime
 from enum import Enum
 
 from docopt import docopt
@@ -130,11 +132,16 @@ class AnalyzeVerbs:
                    list: A list of tokens classified as verbs.
         """
         verbs = set()
+        print("getting all verbs in file\n")
         for doc in self.doc_bin.get_docs(self.nlp.vocab):
+            doc_index = doc.user_data["doc_index"]
+            sent_index = doc.user_data["sent_index"]
+            print(f"processing doc number {doc_index}, "
+                  f"sent index {sent_index}\n")
             for token in doc:
-                if not self.verify_we_want_to_add_token(token):
-                    continue
-                verbs.add(token.lemma_.lower())
+                # add token to set of instances of verbs
+                if self.verify_we_want_to_add_token(token):
+                    verbs.add(token.lemma_.lower())
         return verbs
 
     """
@@ -145,8 +152,8 @@ class AnalyzeVerbs:
     """
     def analyze_verbs(self):
         for doc in self.doc_bin.get_docs(self.nlp.vocab):
-            doc_index = doc.user_data["doc index"]
-            sent_index = doc.user_data["sent index"]
+            doc_index = doc.user_data["doc_index"]
+            sent_index = doc.user_data["sent_index"]
             print(f"processing doc number {doc_index}, "
                   f"sent index {sent_index}\n")
             for token in doc:
@@ -166,12 +173,12 @@ class AnalyzeVerbs:
         self.add_token_template_to_dict(token)
         # convert all letters but first letter to lowercase
         dict_entry = DictEntry(token_text=token.text,
-                               token_sent_text=token.sent.text,
+                               token_sent_text=token.doc.text,
                                doc_index=token.doc.user_data["doc_index"],
                                sent_index=token.doc.user_data["sent_index"],
                                token_index=token.i,
                                tokenized_sentence=
-                               tuple([token.text for token in token.sent]))
+                               tuple([token.text for token in token.doc]))
         self.verb_dict[token.lemma_.lower()][token.pos_]["Instances"].add \
             (dict_entry)
         self.verb_dict[token.lemma_.lower()][token.pos_]["lemma"] = \
@@ -278,7 +285,7 @@ class AnalyzeVerbs:
     def create_text_files(self):
         from datetime import datetime
         datetime = datetime.today().strftime('%Y_%m_%d')
-        folder_name = r"first_{n}_posts_with_lg".format(n=self.number_of_posts) + datetime
+        folder_name = r"NO_BUG_first_{n}_posts_with_lg".format(n=self.number_of_posts) + datetime
         zip_file_dir = os.path.join(paths.files_directory, paths.morphological_dimension_directory,
                                     paths.morphological_dimension_source_files,
          folder_name + ".zip")
@@ -413,9 +420,10 @@ if __name__ == '__main__':
     #                                  )
 
     # # write with only count and all parts of speech
+    date = datetime.today().strftime('%Y_%m_%d')
     verb_anazlyzer.write_dict_to_csv(pos_to_use=open_class_pos,
                                      fields_to_write=["count", "%"],
-                                     output_file_name=r"all_pos_count.csv",
+                                     output_file_name=f"NO_BUG_openclass_pos_count_{date}.csv",
                                      additional_cols=[EXTRA_COLS.PERCENTAGE_AS_OPEN_CLASS_POS,
                                                       EXTRA_COLS.TOTAL_OPEN_CLASS])
 

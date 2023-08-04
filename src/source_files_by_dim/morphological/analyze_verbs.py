@@ -7,6 +7,7 @@ from spacy.tokens import DocBin
 import csv
 import os
 import spacy
+print(spacy.__version__)
 from spacy.tokens import DocBin
 from zipfile import ZipFile
 from tqdm import tqdm
@@ -116,7 +117,7 @@ class AnalyzeVerbs:
 
         return spacy_path
 
-
+    #TODO optimize runtime
     """
     creates a set of all verbs that were at some point in the files
     classified as verbs
@@ -143,13 +144,14 @@ class AnalyzeVerbs:
         @:param doc_limit = doc index to stop at
     """
     def analyze_verbs(self):
-        for i, sentence in enumerate(self.doc_bin.get_docs(self.nlp.vocab)):
-            print(f"processing sentence number {i}\n")
-
-            for token in sentence:
+        for doc in self.doc_bin.get_docs(self.nlp.vocab):
+            doc_index = doc.user_data["doc index"]
+            sent_index = doc.user_data["sent index"]
+            print(f"processing doc number {doc_index}, "
+                  f"sent index {sent_index}\n")
+            for token in doc:
                 if (token.lemma_.lower() in self.words_classed_as_verb):
                     self.add_token_to_dict(token)
-
 
     """
         adds current instance of word to dictionary
@@ -157,6 +159,7 @@ class AnalyzeVerbs:
         :return bool True if added
                      False else
     """
+    #TODO check if problem was solved for index if i use doc instead of sent
     def add_token_to_dict(self, token)->bool:
         if token.pos_ in parts_of_speech_to_ignore:
             return False

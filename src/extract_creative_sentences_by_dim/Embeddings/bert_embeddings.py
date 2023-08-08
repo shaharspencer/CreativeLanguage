@@ -1,12 +1,9 @@
 import datasets
 import numpy as np
 import pandas as pd
-from datasets import Dataset, Features, Value
+from datasets import Dataset
+from transformers import pipeline, AutoTokenizer, AutoModel
 
-from transformers import pipeline, AutoTokenizer, AutoModel, \
-    RobertaTokenizerFast
-
-#TODO length of input ids is weird!!!!!!!!!!!!
 from transformers import RobertaTokenizer
 from transformers import RobertaModel
 import torch
@@ -33,14 +30,12 @@ class ContextualizedEmbeddings:
             """
             self.device = torch.device(
                 "cuda" if torch.cuda.is_available() else "cpu")
+            print(f"using device: {self.device}")
             model_name = 'roberta-base'
-
-            self.tokenizer = RobertaTokenizerFast.from_pretrained(model_name,
-                                                    add_prefix_space=True)
             self.__model = AutoModel.from_pretrained(model_name).to(self.device)
-            # self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        def process_dataset(self, dataset: Dataset)->Dataset:
+        def process_dataset(self, dataset)->Dataset:
             """
                Processes the CSV data to compute contextualized embeddings for each row.
 
@@ -51,10 +46,10 @@ class ContextualizedEmbeddings:
                    pd.DataFrame: The updated DataFrame with the computed embeddings.
             """
 
-            embeddings_dataset = dataset.map(self.contextualized_embeddings, batched=True)
+            embeddings_dataset = dataset.apply(self.contextualized_embeddings, axis=1)
 
-            filename = "celebrate_tensor_file.tsv"
-            embed_lst = embeddings_dataset["context embedding"]
+            filename = "see_tensor_file.tsv"
+            embed_lst = embeddings_dataset["context embedding"].to_list()
             np.savetxt(filename, embed_lst, delimiter="\t")
 
             return embeddings_dataset
@@ -79,20 +74,15 @@ class ContextualizedEmbeddings:
                         tokenized_text.
 
             """
-            # TODO bug???
-
             tokenized_sent = row["tokenized sentence"]
             token_index = row["token index"]
-            input_ids_tensors = self.tokenizer.batch_encode_plus(tokenized_sent,
-                                                         is_split_into_words=
-                                                         True, return_tensors="pt",
-                                                         padding=True)["input_ids"]
-            # input_ids_tensor = torch.tensor(input_ids, device=self.device)
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokenized_sent)
+            input_ids_tensor = torch.tensor([input_ids], device=self.device)
             # with torch.no_grad():
-            outputs = self.__model(input_ids_tensors)
-            # outputs = self.__model(input_ids_tensor) #TODO test this
-            embeddings = outputs.last_hidden_state[0][[index + 1 for index in token_index]].  \
-                detach().numpy()
+            outputs = self.__model(input_ids_tensor)
+            # outputs = self.__model(input_ids_tensor)
+            embeddings = outputs.last_hidden_state[0][token_index].\
+                cpu().numpy()
             row["context embedding"] = embeddings
             return row
 
@@ -111,19 +101,13 @@ if __name__ == '__main__':
         'token index': int,
     }
     converters = {'tokenized sentence': eval}
-    c = pd.read_csv("graduate_VERB.csv", encoding='utf-8', dtype=dtypes,
+    c = pd.read_csv("see_VERB.csv", encoding='utf-8', dtype=dtypes,
                     converters=converters)
-    # features = datasets.Features({'lemma': Value('string'),
-    #     'word form': Value('string'),
-    #     'sentence': str,
-    #     'doc index': int,
-    #     'sent index': int,
-    #     'token index': int,
-    #                               'tokenized sentence': eval     })
-    # csv_filename = "see_VERB_meta_file.csv"
-    c = Dataset.from_pandas(c)
-    # c.to_csv(csv_filename, sep='\t', index=False)
-    #
+
+    csv_filename = "see_VERB_meta_file.csv"
+    
+    c.to_csv(csv_filename, sep='\t', index=False)
+
     d = ContextualizedEmbeddings().process_dataset(c)
 
 

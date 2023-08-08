@@ -1,12 +1,15 @@
+import datasets
+import numpy as np
 import pandas as pd
-from datasets import Dataset
+from datasets import Dataset, Features, Value
+
 from transformers import pipeline, AutoTokenizer, AutoModel
 
 from transformers import RobertaTokenizer
 from transformers import RobertaModel
 import torch
 
-
+#TODO time efficiency!!!!!!!!!!!1
 
 #C:\Users\User\anaconda3\envs\myCreativeEnv\python.exe C:\Users\User\PycharmProjects\CreativeLanguageWithVenv\src\extract_creative_sentences_by_dim\Embeddings\bert_embeddings.py
 # Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: ['lm_head.layer_norm.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.bias', 'lm_head.dense.weight']
@@ -30,9 +33,9 @@ class ContextualizedEmbeddings:
                 "cuda" if torch.cuda.is_available() else "cpu")
             model_name = 'roberta-base'
             self.__model = AutoModel.from_pretrained(model_name).to(self.device)
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name, add_prefix_space=True)
 
-        def process_dataset(self, dataset:Dataset)->Dataset:
+        def process_dataset(self, dataset: Dataset)->Dataset:
             """
                Processes the CSV data to compute contextualized embeddings for each row.
 
@@ -43,15 +46,18 @@ class ContextualizedEmbeddings:
                    pd.DataFrame: The updated DataFrame with the computed embeddings.
             """
 
-            embeddings_dataset = dataset.map(lambda row: self.contextualized_embeddings(row)
-            )
+            embeddings_dataset = dataset.map(self.contextualized_embeddings, batched=True)
+
+            filename = "celebrate_tensor_file.tsv"
+            embed_lst = embeddings_dataset["context embedding"].to_list()
+            np.savetxt(filename, embed_lst, delimiter="\t")
 
             return embeddings_dataset
 
 
 
 
-
+        @torch.no_grad()
         def contextualized_embeddings(self, row)\
                 ->torch.tensor:
             """
@@ -70,15 +76,16 @@ class ContextualizedEmbeddings:
             """
             tokenized_sent = row["tokenized sentence"]
             token_index = row["token index"]
-            input_ids = self.tokenizer.convert_tokens_to_ids(tokenized_sent)
-            input_ids_tensor = torch.tensor([input_ids])
+            input_ids = self.tokenizer.batch_encode_plus(tokenized_sent,
+                                                         is_split_into_words=
+                                                         True)["input_ids"]
+            input_ids_tensor = torch.tensor([input_ids], device=self.device)
+            # with torch.no_grad():
             outputs = self.__model(input_ids_tensor)
-            self.tokenizer.encode
-            if token_index >= len(outputs.last_hidden_state[0]):
-                return torch.zeros(768)
-                #raise exception
-            embeddings = outputs.last_hidden_state[0][token_index]
-            row["context embedding"] = embeddings.detach().numpy()
+            # outputs = self.__model(input_ids_tensor)
+            embeddings = outputs.last_hidden_state[0][token_index].\
+                cpu().numpy()
+            row["context embedding"] = embeddings
             return row
 
 
@@ -96,12 +103,21 @@ if __name__ == '__main__':
         'token index': int,
     }
     converters = {'tokenized sentence': eval}
-    c = pd.read_csv("graduate_VERB.csv", encoding='ISO-8859-1', dtype=dtypes,
+    c = pd.read_csv("graduate_VERB.csv", encoding='utf-8', dtype=dtypes,
                     converters=converters)
+    # features = datasets.Features({'lemma': Value('string'),
+    #     'word form': Value('string'),
+    #     'sentence': str,
+    #     'doc index': int,
+    #     'sent index': int,
+    #     'token index': int,
+    #                               'tokenized sentence': eval     })
+    # csv_filename = "see_VERB_meta_file.csv"
+    c = Dataset.from_pandas(c)
+    # c.to_csv(csv_filename, sep='\t', index=False)
+    #
+    d = ContextualizedEmbeddings().process_dataset(c)
 
-    d = ContextualizedEmbeddings().process_d
-
-    # faiss = FAISS(d)
 
 
 

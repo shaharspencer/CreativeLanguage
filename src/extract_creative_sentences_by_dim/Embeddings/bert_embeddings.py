@@ -3,8 +3,10 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset, Features, Value
 
-from transformers import pipeline, AutoTokenizer, AutoModel
+from transformers import pipeline, AutoTokenizer, AutoModel, \
+    RobertaTokenizerFast
 
+#TODO length of input ids is weird!!!!!!!!!!!!
 from transformers import RobertaTokenizer
 from transformers import RobertaModel
 import torch
@@ -32,8 +34,11 @@ class ContextualizedEmbeddings:
             self.device = torch.device(
                 "cuda" if torch.cuda.is_available() else "cpu")
             model_name = 'roberta-base'
+
+            self.tokenizer = RobertaTokenizerFast.from_pretrained(model_name,
+                                                    add_prefix_space=True)
             self.__model = AutoModel.from_pretrained(model_name).to(self.device)
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name, add_prefix_space=True)
+            # self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         def process_dataset(self, dataset: Dataset)->Dataset:
             """
@@ -49,7 +54,7 @@ class ContextualizedEmbeddings:
             embeddings_dataset = dataset.map(self.contextualized_embeddings, batched=True)
 
             filename = "celebrate_tensor_file.tsv"
-            embed_lst = embeddings_dataset["context embedding"].to_list()
+            embed_lst = embeddings_dataset["context embedding"]
             np.savetxt(filename, embed_lst, delimiter="\t")
 
             return embeddings_dataset
@@ -74,17 +79,20 @@ class ContextualizedEmbeddings:
                         tokenized_text.
 
             """
+            # TODO bug???
+
             tokenized_sent = row["tokenized sentence"]
             token_index = row["token index"]
-            input_ids = self.tokenizer.batch_encode_plus(tokenized_sent,
+            input_ids_tensors = self.tokenizer.batch_encode_plus(tokenized_sent,
                                                          is_split_into_words=
-                                                         True)["input_ids"]
-            input_ids_tensor = torch.tensor([input_ids], device=self.device)
+                                                         True, return_tensors="pt",
+                                                         padding=True)["input_ids"]
+            # input_ids_tensor = torch.tensor(input_ids, device=self.device)
             # with torch.no_grad():
-            outputs = self.__model(input_ids_tensor)
-            # outputs = self.__model(input_ids_tensor)
-            embeddings = outputs.last_hidden_state[0][token_index].\
-                cpu().numpy()
+            outputs = self.__model(input_ids_tensors)
+            # outputs = self.__model(input_ids_tensor) #TODO test this
+            embeddings = outputs.last_hidden_state[0][[index + 1 for index in token_index]].  \
+                detach().numpy()
             row["context embedding"] = embeddings
             return row
 

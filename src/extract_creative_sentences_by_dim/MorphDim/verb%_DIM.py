@@ -9,6 +9,7 @@ from docopt import docopt
 
 import src.utils.path_configurations
 from scipy.stats import entropy
+from langdetect import detect
 
 from src.extract_creative_sentences_by_dim.Embeddings.bert import FillMask
 
@@ -95,6 +96,8 @@ class GetRarestVerbs:
             entropies.append(row_entropy)
         data["Entropy"] = entropies
 
+        data.to_csv("with_entropies.csv", encoding='utf-8')
+
 
     """
     a specific measure that uses entropy to find creative sentences.
@@ -113,7 +116,7 @@ class GetRarestVerbs:
                                  tagger)->None:
         dtype_dict = {
         #     'word': str,
-            'VERB_count': float,
+        #     'VERB_count': float,
         #     'PROPN_count': float,
         #     'NOUN_count': float,
         #     'ADJ_count': float,
@@ -186,15 +189,16 @@ class GetRarestVerbs:
                                            on_bad_lines='skip')
 
                     # get bert predictions
-
                     bert.get_top_k_predictions(sents_df, tagger)
 
                     counter += 1
                     print(f"chosen sentence number {counter}\n")
-                    if counter == 100:
+                    if counter == 120:
                         break
                     for ind, r in sents_df.iterrows():
-
+                        # confirm the sentence is in english
+                        if not detect(r["sentence"]) == "en":
+                            continue
                         n_dict = self.__define_ndict(r=r, row=row,
                                                      fields=fields)
 
@@ -212,8 +216,8 @@ class GetRarestVerbs:
         fields = ["lemma", "verb form", "percent as verb", "percent as propn",
                   "Count as verb",
                   "Sentence", "Doc index", "Sent index", "index of verb",
-                  "tokenized sentence", "total open class", "BERT tag",
-                  "BERT replacements"]
+                  "tokenized sentence", "total open class", "ENSEMBLE tag",
+                  "ENSEMBLE replacements"]
         # if we can add the entropy
         # if "Entropy" in df.columns:
         fields.append("entropy")
@@ -247,12 +251,12 @@ class GetRarestVerbs:
         sent_index = r["sent index"]
         n_dict['Doc index'] = doc_index
         n_dict['Sent index'] = sent_index
-        n_dict["BERT tag"] = r["POS PREDICTIONS"]
-        n_dict["BERT replacements"] = r["BERT REPLACEMENTS"]
+        #TODO return these
+        n_dict["ENSEMBLE tag"] = r["POS PREDICTIONS ENSEMBLE"]
+        n_dict["ENSEMBLE replacements"] = r["ROBERTA REPLACEMENTS ENSEMBLE"]
 
         n_dict["index of verb"] = r["token index"]
         n_dict["tokenized sentence"] = r["tokenized sentence"]
-
 
         return n_dict
 

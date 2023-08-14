@@ -2,7 +2,6 @@ import copy
 from collections import defaultdict
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import spacy
 from transformers import DebertaTokenizer, DebertaModel
 from transformers import pipeline
@@ -113,21 +112,21 @@ class FillMask:
     def __predict_single_row(self, row: pd.Series, tagger: str) \
             -> tuple[list[str], str]:
         row_text = list(copy.deepcopy(row["tokenized sentence"]))
-        try:
-            masked_tokenized_sentence = self.replace_with_token(row_text,
+        # try:
+        masked_tokenized_sentence = self.replace_with_token(row_text,
                                                                 row[
-                                                                    "index of verb"],
+                                                                    "token index"],
                                                                 replace_with="<mask>"
                                                                 )
-        except Exception:
-            return ([""], "")
+        # except Exception:
+        #     return ([""], "")
         replacements = self.__get_top_k_replacements(
             " ".join(masked_tokenized_sentence))
         pos_predictions = self.__get_top_k_pos_predictions(replacements,
                                                            tagger=tagger,
                                                            sentence=row_text,
                                                            index=row[
-                                                               "index of verb"]
+                                                               "token index"]
                                                            )
         return replacements, pos_predictions
 

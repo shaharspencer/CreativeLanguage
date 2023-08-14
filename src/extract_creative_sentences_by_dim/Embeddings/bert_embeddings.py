@@ -3,10 +3,12 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset
 from transformers import pipeline, AutoTokenizer, AutoModel
-
+#TODO figure out if map for dataset will be faster than apply AND make requirements file
 from transformers import RobertaTokenizer
 from transformers import RobertaModel
 import torch
+
+#https://www.youtube.com/watch?v=ZMDRoscHe5o - tensorflow: possibly can do using code
 
 #TODO time efficiency!!!!!!!!!!!1
 
@@ -50,7 +52,7 @@ class ContextualizedEmbeddings:
 
             filename = "see_tensor_file.tsv"
             embed_lst = embeddings_dataset["context embedding"].to_list()
-            np.savetxt(filename, embed_lst, delimiter="\t")
+            # np.savetxt(filename, embed_lst, delimiter="\t")
 
             return embeddings_dataset
 
@@ -58,15 +60,19 @@ class ContextualizedEmbeddings:
 
 
         @torch.no_grad()
-        def contextualized_embeddings(self, row)\
+        def contextualized_embeddings(self, row, name_of_index_col,
+                                      name_of_sent_col)\
                 ->torch.tensor:
             """
                    Returns the contextualized embeddings for a specific verb
                    in a tokenized sentence.
                    Args:
-                       tokenized_text (tuple): The tokenized text.
-                       verb_index (int): The index representing the position
-                       of the verb in the tokenized text.
+                       row (pd.Dataframe): row containing information
+                       about the sentence.
+                       name_of_index_col (str): the name of the column in which
+                                    the token indices are stored.
+                       name_of_sent_col (str): the name of the column in which the
+                                                tokenized sentences are stored.
                    Returns:
                        torch.tensor: The embeddings of the verb as a tensor.
                    Raises:
@@ -74,17 +80,18 @@ class ContextualizedEmbeddings:
                         tokenized_text.
 
             """
-            tokenized_sent = row["tokenized sentence"]
-            token_index = row["token index"]
+            token_index = row[name_of_index_col]
+            tokenized_sent = row[name_of_sent_col]
             input_ids = self.tokenizer.convert_tokens_to_ids(tokenized_sent)
             input_ids_tensor = torch.tensor([input_ids], device=self.device)
-            # with torch.no_grad():
             outputs = self.__model(input_ids_tensor)
-            # outputs = self.__model(input_ids_tensor)
-            embeddings = outputs.last_hidden_state[0][token_index].\
+            embeddings = outputs.last_hidden_state[0][token_index]. \
                 cpu().numpy()
-            row["context embedding"] = embeddings
+            row["contextualized embedding"] = embeddings
             return row
+
+
+
 
 
 if __name__ == '__main__':

@@ -47,7 +47,7 @@ class ExtractClauses:
         sent = "The man who loves to fly watched a movie."
         nlp_sent = self.nlp(sent)
         for token in nlp_sent:
-            subtree = self.extract_subtree_two(token)
+            subtree = self.extract_subtree_two(token, orig_token_index=token.i)
         y = "hi"
         # for doc in self.doc_bin.get_docs(self.nlp.vocab):
         #     for token in doc:
@@ -105,6 +105,19 @@ class ExtractClauses:
                 relevant_subtree.append(token)
 
         return relevant_subtree
+
+    def extract_subtree(self, token: spacy.tokens) -> list[
+                                                          spacy.tokens] | None:
+        if token.dep_ in NON_RELEVANT_DEPS or not is_valid_token(token):
+            return None
+
+        subtree = [token]
+        for child in token.children:
+            child_subtree = self.extract_subtree(child)
+            if child_subtree:
+                subtree.extend(child_subtree)
+
+        return subtree
 
     def extract_all_relevant_dep_clauses(self, token: spacy.tokens,
                                          subtree: list[spacy.tokens]):

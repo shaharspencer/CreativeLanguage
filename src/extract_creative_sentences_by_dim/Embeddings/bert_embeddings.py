@@ -19,9 +19,6 @@ import torch
 # Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
 # You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
-import csv
-
-
 class ContextualizedEmbeddings:
 
         def __init__(self):
@@ -89,6 +86,11 @@ class ContextualizedEmbeddings:
                 cpu().numpy()
             row["contextualized embedding"] = embeddings
             return row
+        #https://huji.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=06d1c8ff-e73e-4237-b97f-afe000587e95
+        # recitation about transformers and token ids
+        # i want encoder-only
+
+        # check if i can use pipeline with pretokenized text
 
 
 

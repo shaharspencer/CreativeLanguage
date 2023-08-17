@@ -1,0 +1,42 @@
+LOUVAIN
+
+install networkx:
+https://networkx.org/documentation/stable/install.html
+
+install louvain:
+https://pypi.org/project/python-louvain/
+
+louvain library code example:
+https://github.com/vatsal220/medium_articles/blob/main/louvaine_algo/louvaine.ipynb
+
+louvain explanation on youtube:
+https://www.youtube.com/watch?v=0zuiLBOIcsw
+
+louvain explanation with GPU:
+https://medium.com/walmartglobaltech/demystifying-louvains-algorithm-and-its-implementation-in-gpu-9a07cdd3b010
+
+we possibly want to do this:
+- have each edge represent the distance between two nodes AKA embeddings.
+- find communities in that graph.
+
+
+AGGROGAMATIVE CLUSTERING
+
+youtube python example:
+https://www.youtube.com/watch?v=lQt92mh0N8I
+
+
+QUESTION:
+can choose method for dendogram. which method should i use? "ward" is for
+data that is well formed (?)
+
+how should i initially visualize data to decide method?
+
+
+there is an sklearn normalize method that can normalize data (in youtube vid above)
+
+
+
+
+
+visualize data - https://orangedatamining.com/download/#windows

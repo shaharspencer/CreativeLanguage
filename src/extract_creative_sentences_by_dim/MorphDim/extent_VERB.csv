@@ -1,0 +1,3 @@
+lemma,word form,sentence,doc index,sent index,token index,tokenized sentence
+extent,extent,The betting station even extent the operating hours to 2am!,31442,3,4,"('The', 'betting', 'station', 'even', 'extent', 'the', 'operating', 'hours', 'to', '2', 'am', '!')"
+extent,extent,"I decided to extent my search through the www (thanks to my friend noufal, who incidentally had made arrangements for my transportation as well by gifting me his bike).",23774,27,3,"('I', 'decided', 'to', 'extent', 'my', 'search', 'through', 'the', 'www', '(', 'thanks', 'to', 'my', 'friend', 'noufal', ',', 'who', 'incidentally', 'had', 'made', 'arrangements', 'for', 'my', 'transportation', 'as', 'well', 'by', 'gifting', 'me', 'his', 'bike', ')', '.')"

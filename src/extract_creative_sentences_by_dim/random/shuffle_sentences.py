@@ -7,27 +7,6 @@ from sklearn.model_selection import train_test_split
 from src.extract_creative_sentences_by_dim.Embeddings import bert_embeddings
 
 
-def open_csv(csv_path: str) -> pd.DataFrame:
-    """
-    opens csv with correct datatypes and converters.
-    :param csv_path: path to open
-    :return: df: opened dataframe with correct dtypes and
-                                converters.
-    """
-    dtypes = {
-        'lemma': str,
-        'word form': str,
-        'sentence': str,
-        'doc index': int,
-        'sent index': int,
-        'token index': int,
-    }
-    converters = {'tokenized sentence': eval}
-    # open csv
-    df = pd.read_csv(csv_path, dtype=dtypes, encoding='utf-8',
-                     converters=converters)
-
-    return df
 
 
 class ShuffleSentences:
@@ -36,7 +15,7 @@ class ShuffleSentences:
         random.seed(self.random_seed)
         self.embedder = bert_embeddings.ContextualizedEmbeddings()
 
-    def create_embeddings(self, csv_path, k):
+    def create_embeddings(self, csv_path:str, k:int, output_file_prefix: str):
         """
            Process and embed data for a specified CSV file.
 
@@ -51,24 +30,52 @@ class ShuffleSentences:
            Args:
                csv_path (str): Path to the input CSV file.
                k (int): Number of rows to subset from the dataset.
+               output_file_prefix (str): prefix to add to outputs files name.
 
            Returns:
                None
            """
-
-        df = open_csv(csv_path)
-        data_subset = self.get_data_subset(df, k)
+        d = self.open_csv(csv_path)
+        # data_subset = self.get_data_subset(df, k)
+        data_subset = d
         train, test = train_test_split(data_subset, test_size=0.2,
                                        random_state=self.random_seed)
-        test = self.randomize_test(test=test)
+        # test = self.randomize_test(test=test)
 
-        test = self.process_and_embed_data(test, randomized=True)
+        test = self.process_and_embed_data(test, randomized=False)
         train = self.process_and_embed_data(train, randomized=False)
 
-        self.output_files(train=train, test=test)
+        self.output_files(train=train, test=test,
+                          output_file_prefix=output_file_prefix, k=k)
 
+    def open_csv(self, csv_path: str) -> pd.DataFrame:
+        """
+        opens csv with correct datatypes and converters.
+        :param csv_path: path to open
+        :return: df: opened dataframe with correct dtypes and
+                                    converters.
+        """
+        dtypes = {
+            'lemma': str,
+            'word form': str,
+            'sentence': str,
+            'doc index': int,
+            'sent index': int,
+            'token index': int,
+        }
+        converters = {'tokenized sentence': eval}
+        # open csv
+        df = pd.read_csv(csv_path, dtype=dtypes, encoding='utf-8',
+                         converters=converters)
+        df = self.get_data_subset(df, k=316)
+        df_2 = pd.read_csv("embeddings files/earn_VERB.csv", dtype=dtypes, encoding='utf-8',
+                           converters=converters)
+        df_concat = pd.concat([df, df_2])
 
-    def output_files(self, train: pd.DataFrame, test: pd.DataFrame)-> None:
+        return df_concat
+
+    def output_files(self, train: pd.DataFrame, test: pd.DataFrame,
+                     output_file_prefix: str, k: int)-> None:
         """
            Save contextualized embeddings and corresponding metadata to files.
 
@@ -82,6 +89,9 @@ class ShuffleSentences:
            Args:
                train (pd.DataFrame): The training dataset.
                test (pd.DataFrame): The test dataset.
+               output_file_prefix (str): prefix to add to outputs file name.
+               k (int): subset of how many rows were taken from original df,
+                        for unique output file names.
 
            Returns:
                None
@@ -89,18 +99,17 @@ class ShuffleSentences:
         dataset = pd.concat([test, train])
 
         contextualized_embeddings = dataset[["contextualized embedding"]]
-        filename = "eat_tensor_file_1000.tsv"
+        filename = output_file_prefix + "_tensor_file_" + str(k) + ".tsv"
         embed_lst = contextualized_embeddings["contextualized embedding"].\
             to_list()
         np.savetxt(filename, embed_lst, delimiter="\t")
 
         metadata = dataset.drop(columns=["contextualized embedding"])
-        self.save_metadata(metadata)
+        self.save_metadata(output_file_prefix, metadata)
 
-    def save_metadata(self, metadata: pd.DataFrame):
-        metadata_file = "eat_tensor_metadata_1000.tsv"
+    def save_metadata(self, output_file_prefix: str, metadata: pd.DataFrame):
+        metadata_file = output_file_prefix + "_tensor_metadata_1000.tsv"
         metadata.to_csv(metadata_file, sep='\t', index=False)
-
 
 
     def randomize_test(self, test: pd.DataFrame) -> pd.DataFrame:
@@ -202,4 +211,4 @@ class ShuffleSentences:
 
 if __name__ == '__main__':
     s = ShuffleSentences()
-    s.create_embeddings("eat_VERB.csv", k=1000)
+    s.create_embeddings("eat_VERB.csv", k=1000, output_file_prefix="eat_earn")

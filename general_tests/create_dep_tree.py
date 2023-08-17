@@ -4,18 +4,20 @@ import os
 from spacy import displacy
 import pandas as pd
 
+from src.generate_and_test_spacy.processors.processor import Processor
 
 class Renderer:
-    def __init__(self, model_to_use = "en_core_web_lg"):
-        self.nlp = self.initialize_nlp(model_to_use)
+    def __init__(self):
+        self.nlp = Processor(to_conllu=False, use_ensemble_tagger=True,
+                             to_process=False).get_nlp()
 
-    def initialize_nlp(self, model):
-        return spacy.load(model)
-    #     nlp.tokenizer.infix_finditer = self.recompile_hyphens()
-    #     special_case = [{ORTH: "I"}, {ORTH: "'m"}]
-    #     nlp.tokenizer.add_special_case("I'm", special_case)
-    #
-    #     return nlp
+    # def initialize_nlp(self, model):
+    #     return spacy.load(model)
+    # #     nlp.tokenizer.infix_finditer = self.recompile_hyphens()
+    # #     special_case = [{ORTH: "I"}, {ORTH: "'m"}]
+    # #     nlp.tokenizer.add_special_case("I'm", special_case)
+    # #
+    # #     return nlp
     #
     # def recompile_hyphens(self):
     #     infixes = (
@@ -48,19 +50,19 @@ class Renderer:
     takes a csv file with a column names "Sentence" and outputs a rendering
     for each sentence in the file
     """
-    def create_renderings_with_csv_file(self, csv_path, output_dir):
-        sents_df = pd.read_csv(csv_path, encoding='utf-8')
-        for ind, r in sents_df.iterrows():
-            self.output_sent_to_svg(r["Sentence"],
-                                    os.path.join(output_dir, str(ind) + ".svg"))
+    # def create_renderings_with_csv_file(self, csv_path, output_dir):
+    #     sents_df = pd.read_csv(csv_path, encoding='utf-8')
+    #     for ind, r in sents_df.iterrows():
+    #         self.output_sent_to_svg(r["Sentence"],
+    #                                 os.path.join(output_dir, str(ind) + ".svg"))
 
 
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
 
-    sent =  "I have to keep giving it up to God over and over again."
-    renderer = Renderer(model_to_use="en_core_web_lg")
-    renderer.output_sent_to_svg(sent, "sent.svg")
+    sent = "Voyager (ya, still have jetlag...watching anything that hits the screen here)."
+    renderer = Renderer()
+    renderer.output_sent_to_svg(sent, "sent_2.svg")
 
 
 

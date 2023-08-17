@@ -44,7 +44,7 @@ usage = '''
 processor CLI.
 number of 
 Usage:
-    processor.py <file_to_process> <number_of_blogposts> <to_conllu>
+    processor.py <file_to_process> <number_of_blogposts> <to_conllu> <to_process>
 '''
 
 tagger = ensemble_tagger.EnsembleTagger()
@@ -97,11 +97,13 @@ def __clean_text_data(blogpost: str) -> str:
 
 class Processor:
     def __init__(self, to_conllu, use_ensemble_tagger,
+                 to_process,
                  source_file=
                  r"blogtext.csv",
                  model="en_core_web_lg", number_of_blogposts=40000,
-                 to_process=True
+
                  ):
+        self.nlp = None
         self.to_conllu = to_conllu
         self.__load_nlp_objects(model, use_ensemble_tagger)
         self.__add_attrs_to_nlp()
@@ -109,6 +111,14 @@ class Processor:
         if to_process:
             self.__load_attributes(source_file, number_of_blogposts)
 
+    def get_nlp(self):
+        """
+        get nlp object held by the processor class
+        :return: self.nlp (): nlp object held by processor
+        """
+        if not self.nlp:
+            raise ReferenceError("nlp has not yet been initialized")
+        return self.nlp
     """
         loads nlp object with requested model
         adds extra pipelines if relevant
@@ -262,12 +272,13 @@ if __name__ == '__main__':
     else:
         number_of_files = 0
 
+    to_process = True if args["<to_process>"] == "True" else False
 
     to_conllu = True if args["<to_conllu>"] == "True" else False
 
     processor = Processor(source_file=source_file,
                           number_of_blogposts=number_of_files,
                           to_conllu=to_conllu,
-                          use_ensemble_tagger=True)
+                          use_ensemble_tagger=True, to_process=to_process)
 
     processor.process_file()

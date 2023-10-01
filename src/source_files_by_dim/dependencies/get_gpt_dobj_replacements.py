@@ -9,6 +9,7 @@ os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
 import sys
 
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
+sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 
 from src.source_files_by_dim.dependencies.dependency_list.gpt2_code \
     import GPT2TextGenerator

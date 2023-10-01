@@ -11,6 +11,7 @@ import sys
 
 
 # Add the directory containing the 'src' module to sys.path
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject')
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
 

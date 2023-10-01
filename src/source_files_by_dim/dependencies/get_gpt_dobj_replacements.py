@@ -2,6 +2,8 @@ import pandas as pd
 from tqdm import tqdm
 tqdm.pandas()
 
+import docopt
+
 import os
 
 os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
@@ -27,6 +29,12 @@ from src.generate_and_test_spacy.processors.processor import Processor
 
 nlp = Processor(to_conllu=False, use_ensemble_tagger=True,
                              to_process=False).get_nlp()
+
+usage = '''
+get_gpt_dobj_replacements.py CLI.
+Usage:
+    get_gpt_dobj_replacements.py <file_to_process> 
+'''
 
 class DobjGPTReplacements:
     """
@@ -134,6 +142,6 @@ class DobjGPTReplacements:
 
 
 if __name__ == '__main__':
-    path = r"src\source_files_by_dim\dependencies\dependency_list\eat_dobj_examples_sentences.csv"
-    d = DobjGPTReplacements(source_csv=path)
+    args = docopt.docopt(usage)
+    d = DobjGPTReplacements(source_csv=args["<file_to_process>"])
     d.generate_replacements()

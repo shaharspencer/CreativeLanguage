@@ -18,6 +18,8 @@ def truncate_noun_dobj_pred(g, last_token_index, last_token_text):
          bool: True if the last token is a noun, False otherwise.
      """
     tokenized_text = nlp(g)
+    if len(tokenized_text) < last_token_index:
+        return None
     assert tokenized_text[last_token_index].text == last_token_text
     for child in tokenized_text[last_token_index].children:
         if child.dep_ == "dobj" and child.pos_ == "NOUN"\

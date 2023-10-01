@@ -70,6 +70,7 @@ class GPT2TextGenerator:
          Returns:
              list of str: A list of generated text sequences.
          """
+        print(sent_to_complete)
         generated_texts = []
         ret = self.generator(sent_to_complete, max_new_tokens=6,
                              num_return_sequences=15)

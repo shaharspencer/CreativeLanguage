@@ -9,6 +9,7 @@ os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
 
 import sys
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src')
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject')
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 

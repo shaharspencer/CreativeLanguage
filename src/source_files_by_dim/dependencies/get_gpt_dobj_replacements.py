@@ -126,6 +126,6 @@ class DobjGPTReplacements:
 
 
 if __name__ == '__main__':
-    path = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\source_files_by_dim\dependencies\dependency_list\eat_dobj_examples_sentences.csv"
+    path = r"src\source_files_by_dim\dependencies\dependency_list\eat_dobj_examples_sentences.csv"
     d = DobjGPTReplacements(source_csv=path)
     d.generate_replacements()

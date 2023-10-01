@@ -66,7 +66,7 @@ class DobjGPTReplacements:
         """
         csv = pd.read_csv(source_csv, encoding='utf-8', header=0,
                           names=['lemma (V)', 'sentence', 'verb index',
-                                 'verb text', 'dobj', 'dobj index']).head(10)
+                                 'verb text', 'dobj', 'dobj index'])
         return csv
 
 

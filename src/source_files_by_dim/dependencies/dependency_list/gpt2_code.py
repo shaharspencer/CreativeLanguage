@@ -20,7 +20,7 @@ def truncate_noun_dobj_pred(g, last_token_index, last_token_text):
     tokenized_text = nlp(g)
     if len(tokenized_text) < last_token_index:
         return None
-    assert tokenized_text[last_token_index].text == last_token_text
+    if tokenized_text[last_token_index].text != last_token_text: return None
     for child in tokenized_text[last_token_index].children:
         if child.dep_ == "dobj" and child.pos_ == "NOUN"\
                 and child.i > last_token_index:
@@ -81,7 +81,7 @@ class GPT2TextGenerator:
             # else check if this is the type of prediction we want & add
             truncated_sent = filter_func(item["generated_text"],
                            last_token_index, last_token_text)
-            if (truncated_sent) and not ( truncated_sent in generated_texts):
+            if (truncated_sent) and not (truncated_sent in generated_texts):
                 generated_texts.append(truncated_sent)
 
         return generated_texts
@@ -91,7 +91,7 @@ class GPT2TextGenerator:
 
 if __name__ == '__main__':
     gpt = GPT2TextGenerator()
-    gpt.text_generator_method(sent_to_complete="I am eating a",
+    gpt.text_generator_method(sent_to_complete="i simply love fruits lor..today they wanted to go foodcourt 6, den we go lor..there got no food to eat",
                               filter_func=truncate_noun_dobj_pred,
-                              last_token_index=2,
-                              last_token_text="eating", k=4)
+                              last_token_index=24,
+                              last_token_text="eat", k=4)

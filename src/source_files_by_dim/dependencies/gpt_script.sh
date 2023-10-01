@@ -19,4 +19,4 @@ module load cuda/11.7
 
 
 # Assuming you have a requirements.txt file listing all the dependencies
-python get_gpt_dobj_replacements.py
+python get_gpt_dobj_replacements.py /cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/source_files_by_dim/dependencies/dependency_list/eat_dobj_examples_sentences.csv

@@ -6,7 +6,8 @@ import docopt
 
 import os
 
-os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
+#TODO use for local
+# os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
 
 
 import sys

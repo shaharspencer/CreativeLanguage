@@ -8,15 +8,12 @@ os.environ['HF_DATASETS_CACHE'] = r"C:\Users\User\.cache\huggingface"
 
 
 import sys
-sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
 
-# h
-sys.path.append(r'/cs/snapless/gabis/shaharspencer')
-parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
 
-# Append the parent directory to sys.path
+# Add the directory containing the 'src' module to sys.path
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src')
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguage/src/')
 
-sys.path.append(parent_dir)
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 

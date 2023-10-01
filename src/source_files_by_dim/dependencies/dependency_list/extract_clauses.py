@@ -36,7 +36,7 @@ class ExtractClauses:
         self.doc_bin = DocBin().from_disk(spacy_path)
 
     def trial(self):
-        csv_file_path = 'eat_clause_example_yay.csv'
+        csv_file_path = 'eat_dobj_examples_sentences.csv'
         self.get_dobj(csv_file_path)
 
     # def get_clause(self, token):
@@ -59,7 +59,8 @@ class ExtractClauses:
         with open(csv_file_path, 'w', encoding='utf-8',
                   newline='') as csv_file:
             # create a CSV writer object
-            fieldnames = ["lemma (V)", "sentence",
+            fieldnames = ["lemma (V)", "sentence", "verb index",
+                          "verb text",
                           "dobj",
                           "dobj index"]
             csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -75,13 +76,16 @@ class ExtractClauses:
                     counter += 1
                     if counter == 2000:
                         return
-                    self.write_token_row_dobj(writer, token=token)
+                    self.write_token_row_dobj(writer, token=token,
+                                             )
 
     def write_token_row_dobj(self, writer, token: spacy.tokens):
         dobj_lst = self.get_all_dobjs(token)
         for dobj_tuple in dobj_lst:
             n_dict = {"lemma (V)": token.lemma_.lower(),
                       "sentence": token.doc.text,
+                      "verb index": token.i,
+                     "verb text": token.text,
                       "dobj": dobj_tuple[0],
                       "dobj index": dobj_tuple[1]}
             writer.writerow(n_dict)

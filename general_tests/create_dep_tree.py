@@ -41,6 +41,9 @@ class Renderer:
 
     def output_sent_to_svg(self, sent: str, output_path: str):
         sent = self.nlp(sent)
+        print(sent)
+        for token in sent:
+            print(token.lemma_)
 
         svg = spacy.displacy.render(sent, style="dep")
         output_path = pathlib.Path(output_path)
@@ -60,7 +63,7 @@ class Renderer:
 if __name__ == '__main__':
     # sent = "In het kader van kernfusie op aarde:  MAAK JE EIGEN WATERSTOFBOM   How to build an H-Bomb From: ascott@tartarus.uwa.edu.au (Andrew Scott) Newsgroups: rec.humor Subject: How To Build An H-Bomb (humorous!)"
 
-    sent = "Just watched honey - am inspired once again (though not by the stilted acting) to 'shake my tailfeather'."
+    sent = "ba in cognitive science"
     renderer = Renderer()
     renderer.output_sent_to_svg(sent, "sent_2.svg")
 

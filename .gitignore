@@ -111,3 +111,6 @@ translations/
 *.align
 api_key.txt
 *tmp*
+
+*.csv
+*.svg

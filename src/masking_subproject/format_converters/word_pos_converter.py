@@ -9,6 +9,7 @@ likes VERB
 to PRP
 run VERB
 """
+
 from docopt import docopt
 
 usage = '''
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_proccess>"]
     n_sentences = int(args["<n_sentences>"])
-    output_file = f'../files/output_with_pos_{n_sentences}_sentences.txt'
+    output_file = f'../files/output_with_pos_UD_tags_{n_sentences}_sentences.txt'
 
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())

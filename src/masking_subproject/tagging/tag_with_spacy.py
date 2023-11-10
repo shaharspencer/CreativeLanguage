@@ -31,7 +31,7 @@ if __name__ == '__main__':
     file_to_process = args["<file_to_proccess>"]
     n_sentences = int(args["<n_sentences>"])
 
-    output_file = '../files/output_with_pos_SPACY_tags_10_sentences.txt'
+    output_file = '../files/tags_data/output_with_pos_SPACY_tags_10_sentences.txt'
 
     nlp = spacy.load("en_core_web_lg")
 

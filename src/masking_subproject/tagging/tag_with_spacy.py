@@ -23,14 +23,31 @@ number of
 Usage:
     word_pos_converter.py <file_to_proccess> <n_sentences>
 '''
+from spacy.tokens import Doc
+
+class WhitespaceTokenizer(object):
+    def __init__(self, vocab):
+        self.vocab = vocab
+
+    def __call__(self, text):
+        words = text.split(' ')
+        # All tokens 'own' a subsequent space character in this tokenizer
+        spaces = [True] * len(words)
+        return Doc(self.vocab, words=words, spaces=spaces)
+
+nlp = spacy.load("en_core_web_lg")
+nlp.tokenizer = WhitespaceTokenizer(nlp.vocab)
+
 
 def convert_conllu_to_tagged_text(conllu_content, output_file: str,
                                   sentence_limit: int | None):
-    nlp = spacy.load("en_core_web_lg")
     with open(output_file, 'w', encoding='utf-8') as f:
         sentence_count = 0
         for sentence in conllu_content:
-            sentence_text = sentence.metadata["text"]
+            # sentence_text = sentence.metadata["text"]
+            sentence_text = " ".join([str(w) for w in sentence if w["xpos"] != None])
+            if "Google's" in sentence_text:
+                x = 0
             doc = nlp(sentence_text)
 
             for token in doc:

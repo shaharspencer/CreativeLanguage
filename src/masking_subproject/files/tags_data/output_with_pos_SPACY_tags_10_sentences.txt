@@ -18,9 +18,7 @@ engine NOUN
 ( PUNCT
 and CCONJ
 now ADV
-e NOUN
-- NOUN
-mail NOUN
+e-mail NOUN
 ) PUNCT
 wares NOUN
 into ADP
@@ -32,7 +30,7 @@ operating NOUN
 system NOUN
 ? PUNCT
 
-[ X
+[ PUNCT
 via ADP
 Microsoft PROPN
 Watch PROPN

@@ -25,7 +25,7 @@ from conllu import parse
 from typing import List
 
 def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
-                                    output_file, sentence_limit=10):
+                                    output_file, sentence_limit):
     with open(output_file, 'w') as f:
         sentence_count = 0
         for sentence in conllu_content:
@@ -48,7 +48,7 @@ def run(file_to_process: str, n_sentences: int | None) -> str:
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
 
-    convert_conllu_to_custom_format(conllu_content, output_file)
+    convert_conllu_to_custom_format(conllu_content, output_file, sentence_limit=n_sentences)
 
     print(f'data converted and saved to {output_file} with UD pos')
     return output_file

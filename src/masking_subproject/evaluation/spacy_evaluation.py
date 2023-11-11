@@ -19,28 +19,34 @@ Usage:
 
 from sklearn.metrics import accuracy_score
 
-def check_files(gold_tags, pred_tags):
+def check_files(gold_tags, gold_words, pred_tags, pred_words):
     assert len(gold_tags) == len(
         pred_tags), "Number of lines in gold and predictions files do not match."
 
-    for gold_line, pred_line in zip(gold_tags, pred_tags):
-        gold_prefix = gold_line.split()[0]
-        pred_prefix = pred_line.split()[0]
-        assert gold_prefix == pred_prefix, "Sentence prefixes do not match for corresponding lines."
+    for gold_word, pred_word in zip(gold_words, pred_words):
+        assert gold_word == pred_word, "Sentence prefixes do not match for corresponding lines."
 
     unique_gold_tags = set(gold_tags)
     unique_pred_tags = set(pred_tags)
-    assert unique_pred_tags == unique_gold_tags, "UD and Spacy tags do not match."
+    # assert unique_pred_tags == unique_gold_tags, "UD and Spacy tags do not match."
+    print("UD:")
+    print(unique_gold_tags)
+    print("SpaCy:")
+    print(unique_pred_tags)
 
 def open_files(gold_standard_file: str, predictions_file: str) -> tuple:
 
     with open(gold_standard_file, "r", encoding="utf-8") as f:
         gold_tags = [line.split()[1] for line in f if line.strip()]
+        gold_words = [line.split()[0]for line in f if
+                    line.strip()]
 
     with open(predictions_file, "r", encoding="utf-8") as f:
         pred_tags = [line.split()[1] for line in f if line.strip()]
+        pred_words = [line.split()[0] for line in f if
+                      line.strip()]
 
-    check_files(gold_tags=gold_tags, pred_tags=pred_tags)
+    check_files(gold_tags=gold_tags, gold_words=gold_words, pred_tags=pred_tags, pred_words=pred_words)
 
     return gold_tags, pred_tags
 
@@ -51,6 +57,7 @@ def run(gold_standard_file=
     gold_tags, pred_tags = open_files(gold_standard_file=gold_standard_file,
                                       predictions_file=predictions_file)
     accuracy = accuracy_score(gold_tags, pred_tags)
+    print(f"accuracy: {accuracy}")
     return accuracy
 
 

@@ -71,7 +71,6 @@ BuzzMachine PROPN
 post NOUN
 argues VERB
 that SCONJ
-Google's _
 Google PROPN
 's PART
 rush NOUN
@@ -81,7 +80,6 @@ might AUX
 backfire VERB
 -- PUNCT
 which PRON
-we've _
 we PRON
 've AUX
 all ADV
@@ -89,7 +87,6 @@ heard VERB
 before ADV
 , PUNCT
 but CCONJ
-it's _
 it PRON
 's AUX
 particularly ADV
@@ -133,7 +130,6 @@ money NOUN
 maker NOUN
 ? PUNCT
 
-I'm _
 I PRON
 'm AUX
 staying VERB

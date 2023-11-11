@@ -30,6 +30,8 @@ def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
         sentence_count = 0
         for sentence in conllu_content:
             for token_info in sentence:
+                if token_info["xpos"] == None:
+                    continue
                 word = token_info['form']
                 pos_tag = token_info['upos']
                 f.write(f"{word} {pos_tag}\n")
@@ -40,13 +42,8 @@ def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
                 break
 
 
-
-if __name__ == '__main__':
-    args = docopt(usage)
-    file_to_process = args["<file_to_proccess>"]
-    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != \
-                                                "None" else None
-    output_file = f'../files/output_with_pos_UD_tags_{n_sentences}_sentences.txt'
+def run(file_to_process: str, n_sentences: int | None) -> str:
+    output_file = f'../files/tags_data/output_with_pos_UD_tags_{n_sentences}_sentences.txt'
 
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
@@ -54,3 +51,13 @@ if __name__ == '__main__':
     convert_conllu_to_custom_format(conllu_content, output_file)
 
     print(f'data converted and saved to {output_file} with UD pos')
+    return output_file
+
+
+
+if __name__ == '__main__':
+    args = docopt(usage)
+    file_to_process = args["<file_to_proccess>"]
+    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != \
+                                                "None" else None
+    run(file_to_process=file_to_process, n_sentences=n_sentences)

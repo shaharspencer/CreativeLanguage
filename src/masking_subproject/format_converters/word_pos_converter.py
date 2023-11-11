@@ -8,6 +8,8 @@ Bobby NOUN
 likes VERB
 to PRP
 run VERB
+
+with UD pos taggings
 """
 
 from docopt import docopt
@@ -42,7 +44,8 @@ def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
 if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_proccess>"]
-    n_sentences = int(args["<n_sentences>"])
+    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != \
+                                                "None" else None
     output_file = f'../files/output_with_pos_UD_tags_{n_sentences}_sentences.txt'
 
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:
@@ -50,4 +53,4 @@ if __name__ == '__main__':
 
     convert_conllu_to_custom_format(conllu_content, output_file)
 
-    print(f'Data converted and saved to {output_file}')
+    print(f'data converted and saved to {output_file} with UD pos')

@@ -1,3 +1,18 @@
+"""
+This file converts the conllu formatted data to the following format:
+John NOUN
+loves VERB
+Mary NOUN
+
+Bobby NOUN
+likes VERB
+to PRP
+run VERB
+
+with spaCy tags
+"""
+
+
 import spacy
 from conllu import parse
 from docopt import docopt
@@ -29,9 +44,10 @@ def convert_conllu_to_tagged_text(conllu_content, output_file,
 if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_proccess>"]
-    n_sentences = int(args["<n_sentences>"])
+    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != \
+                                                "None" else None
 
-    output_file = '../files/tags_data/output_with_pos_SPACY_tags_10_sentences.txt'
+    output_file = f'../files/tags_data/output_with_pos_SPACY_tags_{n_sentences}.txt'
 
     nlp = spacy.load("en_core_web_lg")
 

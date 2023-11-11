@@ -1,8 +1,9 @@
 """
-This file converts the raw conllu data to the dollowing sentence format:
+This file converts the raw conllu data to the following sentence format:
 John loves Mary
 Bobby likes to run
 """
+
 from docopt import docopt
 
 usage = '''
@@ -38,7 +39,8 @@ def convert_conllu_to_raw_sentences(conllu_content, sentence_limit=10):
 if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_proccess>"]
-    n_sentences = int(args["<n_sentences>"])
+    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != \
+                                                "None" else None
 
 
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:

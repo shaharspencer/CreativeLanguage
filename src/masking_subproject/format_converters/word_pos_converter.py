@@ -30,11 +30,12 @@ def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
         sentence_count = 0
         for sentence in conllu_content:
             for token_info in sentence:
-                if token_info["xpos"] == None:
+                if token_info["xpos"] == None or not token_info["form"]:
                     continue
                 word = token_info['form']
                 pos_tag = token_info['upos']
-                f.write(f"{word} {pos_tag}\n")
+                token_id = token_info['id']-1
+                f.write(f"{word} {pos_tag} {sentence_count} {token_id}\n")
             f.write("\n")
             sentence_count += 1
 
@@ -43,7 +44,7 @@ def convert_conllu_to_custom_format(conllu_content: List[List[dict]],
 
 
 def run(file_to_process: str, n_sentences: int | None) -> str:
-    output_file = f'../files/tags_data/output_with_pos_UD_tags_{n_sentences}_sentences.txt'
+    output_file = f'../files/tags_data/output_with_pos_UD_tags_{n_sentences}_sentences.csv'
 
     with open(file_to_process, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())

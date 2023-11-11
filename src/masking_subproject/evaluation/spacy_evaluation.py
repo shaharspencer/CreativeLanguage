@@ -6,6 +6,9 @@ It provides functions to open files containing gold-standard and predicted POS t
 metric such as accuracy.
 
 """
+import os.path
+
+import pandas as pd
 from docopt import docopt
 
 usage = '''
@@ -19,46 +22,61 @@ Usage:
 
 from sklearn.metrics import accuracy_score
 
-def check_files(gold_tags, gold_words, pred_tags, pred_words):
-    assert len(gold_tags) == len(
-        pred_tags), "Number of lines in gold and predictions files do not match."
+def check_files(df_gold: pd.DataFrame, df_pred: pd.DataFrame) -> bool:
+    try:
+        assert len(df_gold) == len(df_pred), "Number of lines in gold and predictions files do not match."
+        concatenated_tokens = df_gold["Token"] + " " + df_pred["Token"]
 
-    for gold_word, pred_word in zip(gold_words, pred_words):
-        assert gold_word == pred_word, "Sentence prefixes do not match for corresponding lines."
+        # Create a new column in df_gold indicating whether the tokens match
+        df_gold["Tokens_Match"] = concatenated_tokens.str.split().str[0] == \
+                                  concatenated_tokens.str.split().str[1]
 
-    unique_gold_tags = set(gold_tags)
-    unique_pred_tags = set(pred_tags)
-    # assert unique_pred_tags == unique_gold_tags, "UD and Spacy tags do not match."
-    print("UD:")
-    print(unique_gold_tags)
-    print("SpaCy:")
-    print(unique_pred_tags)
+        assert df_gold["Token"].equals(df_pred["Token"]), "Tokens do not match for corresponding lines."
 
-def open_files(gold_standard_file: str, predictions_file: str) -> tuple:
+        print("Files are matching!")
+        return True
+    except AssertionError as e:
+        print(f"AssertionError: {e}")
+        mismatch_indices = df_gold.index[df_gold["Token"] != df_pred["Token"]].tolist()
+        print(f"Mismatched indices: {mismatch_indices}")
+        return False
+def open_files(gold_standard_file: str, predictions_file: str) -> \
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    # define column names
+    columns = ['Token', 'POS', 'Sentence_Count', 'Token_Index']
 
-    with open(gold_standard_file, "r", encoding="utf-8") as f:
-        gold_tags = [line.split()[1] for line in f if line.strip()]
-        gold_words = [line.split()[0]for line in f if
-                    line.strip()]
+    # Read the file into a DataFrame
+    df_gold = pd.read_csv(gold_standard_file, sep=' ', header=None, names=columns)
+    df_pred = pd.read_csv(predictions_file, sep=' ', header=None, names=columns)
 
-    with open(predictions_file, "r", encoding="utf-8") as f:
-        pred_tags = [line.split()[1] for line in f if line.strip()]
-        pred_words = [line.split()[0] for line in f if
-                      line.strip()]
+    check_files(df_gold, df_pred)
+    # Create a new DataFrame with the specified columns
+    df_combined = pd.DataFrame({
+        'Sentence_Index': df_gold['Sentence_Count'],
+        'Token_Index': df_gold['Token_Index'],
+        'Token': df_gold['Token'],
+        'Gold_Standard_Tag': df_gold['POS'],
+        'Spacy_Tag': df_pred['POS']
+    })
 
-    check_files(gold_tags=gold_tags, gold_words=gold_words, pred_tags=pred_tags, pred_words=pred_words)
-
-    return gold_tags, pred_tags
+    return df_gold, df_pred, df_combined
 
 
-def run(gold_standard_file=
+def run(n_sentences, gold_standard_file=
         r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_with_pos_UD_tags_10_sentences.txt",
-        predictions_file=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_with_pos_SPACY_tags_10_sentences.txt") -> float:
-    gold_tags, pred_tags = open_files(gold_standard_file=gold_standard_file,
+        predictions_file=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_with_pos_SPACY_tags_10_sentences.txt",
+        ) -> str:
+    postfix = f"UD_Spacy_combined_tags_{n_sentences}_sentences.csv"
+    output_path = os.path.join(r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data",postfix)
+    gold_tags, pred_tags, df_combined = open_files(gold_standard_file=gold_standard_file,
                                       predictions_file=predictions_file)
-    accuracy = accuracy_score(gold_tags, pred_tags)
+
+    df_combined.to_csv(output_path, sep=' ', index=False, header=False,
+                       encoding='utf-8')
+
+    accuracy = accuracy_score(gold_tags["POS"], pred_tags['POS'])
     print(f"accuracy: {accuracy}")
-    return accuracy
+    return output_path
 
 
 if __name__ == '__main__':

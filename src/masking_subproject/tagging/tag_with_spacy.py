@@ -51,7 +51,8 @@ def convert_conllu_to_tagged_text(conllu_content, output_file: str,
             doc = nlp(sentence_text)
 
             for token in doc:
-                f.write(f"{token.text} {token.pos_}\n")
+                if token.text.strip():
+                    f.write(f"{token.text} {token.pos_} {sentence_count} {token.i}\n")
 
             f.write("\n")
             sentence_count += 1
@@ -60,7 +61,7 @@ def convert_conllu_to_tagged_text(conllu_content, output_file: str,
                 break
 
 def run(raw_data_file: str, n_sentences: int | None) -> str:
-    output_file = f'../files/tags_data/output_with_pos_SPACY_tags_{n_sentences}_sentences.txt'
+    output_file = f'../files/tags_data/output_with_pos_SPACY_tags_{n_sentences}_sentences.csv'
 
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())

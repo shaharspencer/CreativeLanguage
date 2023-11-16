@@ -39,35 +39,39 @@ nlp = spacy.load("en_core_web_lg")
 nlp.tokenizer = WhitespaceTokenizer(nlp.vocab)
 
 
-def convert_conllu_to_tagged_text(conllu_content, output_file: str,
-                                  sentence_limit: int | None):
-    with open(output_file, 'w', encoding='utf-8') as f:
-        sentence_count = 0
-        for sentence in conllu_content:
-            # sentence_text = sentence.metadata["text"]
-            sentence_text = " ".join([str(w) for w in sentence if w["xpos"] != None])
-            if "Google's" in sentence_text:
-                x = 0
-            doc = nlp(sentence_text)
+from typing import List
+import pandas as pd
 
-            for token in doc:
-                if token.text.strip():
-                    f.write(f"{token.text} {token.pos_} {sentence_count} {token.i}\n")
+def convert_conllu_to_dataframe(conllu_content: List[List[dict]], sentence_limit=50000):
+    data = []
+    sentence_count = 0
 
-            f.write("\n")
-            sentence_count += 1
+    for sentence in conllu_content:
+        sentence_text = " ".join(
+            [str(w) for w in sentence if w["xpos"] != None])
+        doc = nlp(sentence_text)
+        for token in doc:
 
-            if sentence_limit is not None and sentence_count >= sentence_limit:
-                break
+            data.append({'Word': token.text, 'POS_Tag': token.pos_, 'Sentence_Count': sentence_count, 'Token_ID': token.i})
+
+        sentence_count += 1
+
+        if sentence_limit is not None and sentence_count >= sentence_limit:
+            break
+
+    df = pd.DataFrame(data)
+    return df
+
 
 def run(raw_data_file: str, n_sentences: int | None) -> str:
     output_file = f'../files/tags_data/output_with_pos_SPACY_tags_{n_sentences}_sentences.csv'
 
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
-
-    convert_conllu_to_tagged_text(conllu_content, output_file,
-                                  sentence_limit=n_sentences)
+    #TODO return sentence_count functionality
+    d = convert_conllu_to_dataframe(conllu_content
+           )
+    d.to_csv(output_file, encoding='utf-8', sep=',', index=False)
 
     print(f'data converted and saved to {output_file} with spaCy POS tags')
 

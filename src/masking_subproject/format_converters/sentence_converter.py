@@ -3,6 +3,7 @@ This file converts the raw conllu data to the following sentence format:
 John loves Mary
 Bobby likes to run
 """
+import csv
 
 from docopt import docopt
 
@@ -15,7 +16,7 @@ Usage:
 
 from conllu import parse
 
-def convert_conllu_to_raw_sentences(conllu_content, sentence_limit=10):
+def convert_conllu_to_raw_sentences(conllu_content, sentence_limit=10)->list:
     raw_sentences = []
     current_sentence = []
     sentence_count = 0
@@ -33,9 +34,6 @@ def convert_conllu_to_raw_sentences(conllu_content, sentence_limit=10):
     return raw_sentences
 
 
-
-
-
 if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_proccess>"]
@@ -48,11 +46,11 @@ if __name__ == '__main__':
 
     raw_sentences = convert_conllu_to_raw_sentences(conllu_content, n_sentences)
 
-    output_file = f'../files/output_raw_sentences_{n_sentences}_sentences.txt'
-
-    with open(output_file, 'w', encoding='utf-8') as output:
+    output_file = f'../files/output_raw_sentences_{n_sentences}_sentences.csv'
+    with open(output_file, 'w', encoding='utf-8', newline='') as output:
+        csv_writer = csv.writer(output)
         for sentence in raw_sentences:
-            output.write(sentence + '\n')
+            csv_writer.writerow([sentence])
 
     print(f'data converted and saved to {output_file} with raw sentences')
 

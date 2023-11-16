@@ -75,7 +75,7 @@ def mask_and_predict(sentence_text: str,
             replacement_pos = fillmask.predict(tokenized_text=sentence_splitted, index=i)
             mask_tags.append(replacement_pos)
         else:
-            mask_tags.append(" ")
+            mask_tags.append("None")
     assert len(mask_tags) == len(sentence_splitted)
     return mask_tags
 
@@ -87,8 +87,8 @@ def convert_conllu_to_masked_tagged_text(conllu_content,
     preds = []
     for sentence in conllu_content:
         sentence_text = " ".join([str(w) for w in sentence if w["xpos"] != None])
-        condition = (combined_df['Sentence_Index'] == sentence_count) & (combined_df['UD_POS'] != combined_df['SPACY_POS'])
-        relevant_indices = combined_df.loc[condition, 'Token_Index'].tolist()
+        condition = (combined_df['Sentence_Count'] == sentence_count) & (combined_df['UD_POS'] != combined_df['SPACY_POS'])
+        relevant_indices = combined_df.loc[condition, 'Token_ID'].tolist()
         m = mask_and_predict(sentence_text=sentence_text,
                                fillmask=obj, relevant_indices=relevant_indices)
         assert len(m) == len([str(w) for w in sentence if w["xpos"] != None])
@@ -109,12 +109,13 @@ def run(raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\sr
 
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
-    c_df = pd.read_csv(combined_dataframe, sep=' ', header=None,
-                       names=['Sentence_Index', 'Token_Index', 'Word', 'UD_POS', 'SPACY_POS'])
+    c_df = pd.read_csv(combined_dataframe, sep=' ',
+                       names=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS'], skiprows=2)
+
     new_combined_df = convert_conllu_to_masked_tagged_text(conllu_content,
                                          sentence_limit=n_sentences, combined_df=c_df)
-    new_combined_df.to_csv(output_file, sep=' ', index=False, header=False,
-                       encoding='utf-8')
+    new_combined_df.to_csv(output_file, index=False,
+                       encoding='utf-8', columns=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS', "Mask_Tags"])
     return output_file
 
 

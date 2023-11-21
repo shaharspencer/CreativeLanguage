@@ -27,11 +27,13 @@ class FillMask:
         replacements = self.replace_token(masked_text=masked)
         r_pos = []
         for r in replacements:
-            tagger = nlp(r)
-            if not len(tokenized_text) == len(tagger):
+            try:
+                tagger = nlp(r)
+            except Exception:
                 y = 0
-            new_pos = tagger[index].pos_
-            r_pos.append(new_pos)
+            if len(tokenized_text) == len(tagger):
+                new_pos = tagger[index].pos_
+                r_pos.append(new_pos)
         pos_counts = Counter(r_pos)
 
         # Get the most common POS tag
@@ -58,6 +60,7 @@ class WhitespaceTokenizer(object):
 
     def __call__(self, text):
         words = text.split(' ')
+        words = [word for word in words if word.strip()]  # Remove empty tokens
         spaces = [True] * len(words)
         return Doc(self.vocab, words=words, spaces=spaces)
 
@@ -81,8 +84,9 @@ def mask_and_predict(sentence_text: str,
 
 
 def convert_conllu_to_masked_tagged_text(conllu_content,
-                                         sentence_limit: int | None, combined_df: pd.DataFrame):
-    obj = FillMask(top_k=1)
+                                         sentence_limit: int | None, combined_df: pd.DataFrame,
+                                         masking_k):
+    obj = FillMask(top_k=masking_k)
     sentence_count = 0
     preds = []
     for sentence in conllu_content:
@@ -103,17 +107,18 @@ def convert_conllu_to_masked_tagged_text(conllu_content,
 
 
 
-def run(raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
-        n_sentences: int | None = 50, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50_sentences.csv") -> str:
-    output_file = f'../files/tags_data/output_with_masked_POS_{n_sentences}_sentences.csv'
+def run(masking_k, raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
+        n_sentences: int | None = 50, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50_sentences.csv",
+        ) -> str:
+    output_file = f'../files/tags_data/output_with_masked_POS_{n_sentences}_sentences_top{masking_k}.csv'
 
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
     c_df = pd.read_csv(combined_dataframe, sep=' ',
-                       names=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS'], skiprows=2)
+                       names=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS',"Mask_Tags"], skiprows=2)
 
     new_combined_df = convert_conllu_to_masked_tagged_text(conllu_content,
-                                         sentence_limit=n_sentences, combined_df=c_df)
+                                         sentence_limit=n_sentences, combined_df=c_df, masking_k=masking_k)
     new_combined_df.to_csv(output_file, index=False,
                        encoding='utf-8', columns=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS', "Mask_Tags"])
     return output_file

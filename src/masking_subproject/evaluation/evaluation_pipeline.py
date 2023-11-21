@@ -24,7 +24,7 @@ def run(raw_data_file=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\maski
                                          n_sentences=n_sentences)
     combined_tags_file = spacy_evaluation.run(gold_standard_file=ud_tags_file,
                          predictions_file=spacy_tags_file, n_sentences=n_sentences)
-    mask_combined = tag_with_mask.run(combined_dataframe=combined_tags_file, n_sentences=n_sentences)
+    mask_combined = tag_with_mask.run(combined_dataframe=combined_tags_file, n_sentences=n_sentences, masking_k=5)
     mask_evaluation = masking_evaluation.run(data_file_path=mask_combined)
 
 

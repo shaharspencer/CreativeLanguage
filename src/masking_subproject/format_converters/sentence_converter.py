@@ -22,9 +22,10 @@ def convert_conllu_to_raw_sentences(conllu_content, sentence_limit=10)->list:
     sentence_count = 0
 
     for sentence in conllu_content:
-        for token_info in sentence:
-            current_sentence.append(token_info['form'])
-        raw_sentences.append(" ".join(current_sentence))
+
+        sentence_text = " ".join(
+                [str(w) for w in sentence if w["xpos"] != None])
+        raw_sentences.append(sentence_text)
         current_sentence = []
         sentence_count += 1
 

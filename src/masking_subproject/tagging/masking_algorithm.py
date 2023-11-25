@@ -17,7 +17,10 @@ from sklearn.metrics import accuracy_score
 from spacy import tokens
 from spacy.tokens import Doc
 from conllu import parse
-spacy.require_gpu()
+if spacy.prefer_gpu():
+    print("using GPU")
+else:
+    print("not using gpu")
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
 sys.path.append(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/")
@@ -99,6 +102,7 @@ class RareTokensAlgorithm:
     def iterate_over_sentences(self, conllu_content,
                                target_df: pd.DataFrame, fill_mask: FillMask, k:int):
         tags, token_list = [], []
+        c = 0
         for sentence in conllu_content:
             sentence_text = " ".join(
                 [str(w) for w in sentence if w["xpos"] != None])
@@ -115,6 +119,8 @@ class RareTokensAlgorithm:
                                          fill_mask=fill_mask)
                 tags.append(tag)
                 token_list.append(token)
+            print(c)
+            c+=1
 
         target_df[f'Only_Mask_Tags_{k}'] = tags
         return target_df
@@ -182,7 +188,8 @@ class RareTokensAlgorithm:
 
 if __name__ == '__main__':
 
-        prefix = r"\cs\snapless\gabis\shaharspencer\CreativeLanguageProject\src"
+        # prefix = r"\cs\snapless\gabis\shaharspencer\CreativeLanguageProject\src"
+        prefix = r"C:\Users\User\PycharmProjects\CreativeLanguage\src"
         obj = RareTokensAlgorithm(rarity_dataframe=os.path.join(prefix,
                                  r"masking_subproject\files\source_files\ENSEMBLE_first_40000_posts_openclass_pos_count_2023_08_04.csv"))
         obj.run(conllu_file=os.path.join(prefix, r"masking_subproject\files\raw_data\en_ewt-ud-test.conllu"),

@@ -112,6 +112,5 @@ translations/
 api_key.txt
 *tmp*
 
-*.csv
+
 *.svg
-*.conllu

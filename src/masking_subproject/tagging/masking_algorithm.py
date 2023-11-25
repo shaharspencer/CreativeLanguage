@@ -22,6 +22,16 @@ if spacy.prefer_gpu():
 else:
     print("not using gpu")
 sys.path.append(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/")
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
+
+# h
+sys.path.append(r'/cs/snapless/gabis/shaharspencer')
+parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
+
+# Append the parent directory to sys.path
+
+sys.path.append(parent_dir)
+sys.path.append(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject")
 # sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 # sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
 sys.path.append(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/")

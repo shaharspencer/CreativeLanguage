@@ -1,3 +1,5 @@
+
+
 """
 for each sample:
     Decide if we think that spacy is going to make an error (e.g., we think it’s rare or creative)
@@ -6,10 +8,16 @@ for each sample:
     else:
     return spacy’s prediction
 """
+import sys
+
 import pandas as pd
 import spacy
+from sklearn.metrics import accuracy_score
 from spacy import tokens
 from spacy.tokens import Doc
+from conllu import parse
+sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
+sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
 
 from src.masking_subproject.tagging.tag_with_mask import FillMask
 
@@ -29,7 +37,7 @@ nlp.tokenizer = WhitespaceTokenizer(nlp.vocab)
 
 
 class RareTokensAlgorithm:
-    def __init__(self, rarity_dataframe, masking_k):
+    def __init__(self, rarity_dataframe):
         """
         @:param rarity_dataframe (str): helps us deterimne frequencies of token lemmas in corpus
         """
@@ -39,68 +47,76 @@ class RareTokensAlgorithm:
         self.rarity_dataframe = self.filter_rarity_dataframe(self.rarity_dataframe) #TODO
         # self.target_dataframe = "" #TODO
 
-        self.fill_mask = FillMask(top_k=masking_k)
+    def run(self, conllu_file, target_dataframe, output_file):
 
-    def run(self, sentence_dataframe, target_dataframe, output_file):
-        sentences = self.open_sentences_dataframe(sentence_dataframe)
+        with open(conllu_file, 'r', encoding='utf-8') as conllu_file:
+            conllu_content = parse(conllu_file.read())
         target = self.open_target_dataframe(target_dataframe)
-        result = self.iterate_over_sentences(sentences_df=sentences, target_df=target)
-        result.to_csv(output_file, index=False,
-                         encoding='utf-8',
-                         columns=['Sentence_Count', 'Token_ID', 'Word',
-                                  'UD_POS', 'SPACY_POS', "Mask_Tags",
-                                  'Combined_Algorithm_Tags'])
+
+        # Define a list to keep track of all new columns added
+        all_new_columns = []
+
+        for masking_k in range(1, 11):
+            fill_mask = FillMask(top_k=masking_k)
+            new_columns = [f"Only_Mask_Tags_{n}" for n in
+                           range(1, masking_k + 1)]
+            all_new_columns.extend(
+                new_columns)  # Add new columns to the tracking list
+
+            result = self.iterate_over_sentences(conllu_content=conllu_content,
+                                                 target_df=target,
+                                                 fill_mask=fill_mask,
+                                                 k=masking_k)
+
+            # Retrieve existing columns in the target DataFrame
+            existing_columns = target.columns.tolist()
+
+            # Save all the columns including newly added ones
+            columns_to_save = existing_columns + all_new_columns
+
+            # Save the DataFrame to CSV
+            result.to_csv(output_file, index=False,
+                          encoding='utf-8',
+                          columns=columns_to_save)
+
+            # Calculate accuracy
+            accuracy = accuracy_score(result['UD_POS'],
+                                      result[f'Only_Mask_Tags_{masking_k}'])
+            print(
+                f'Accuracy of Only Mask tags compared to UD_POS: {accuracy}, k={masking_k}')
 
     def open_target_dataframe(self,path_to_file)->pd.DataFrame:
-        c_df = pd.read_csv(path_to_file, sep=',',
+        c_df = pd.read_csv(path_to_file, sep=' ',
                            names=['Sentence_Count', 'Token_ID', 'Word',
-                                  'UD_POS', 'SPACY_POS'], skiprows=1, index_col=False)
+                                  'UD_POS', 'SPACY_POS'], skiprows=2, index_col=False)
         return c_df
 
-    def open_sentences_dataframe(self, sentences_df_path) -> pd.DataFrame:
-        sentences_df = pd.read_csv(sentences_df_path, encoding='utf-8',
-                                   header=None)
 
-        # Assign column names manually
-        sentences_df.columns = ["sentence"]
-        return sentences_df
 
-    def iterate_over_sentences(self, sentences_df:pd.DataFrame,
-                               target_df:pd.DataFrame):
-        tags,tagged_token = [], []
-        # for each row, tokenize the sentence
-        for index, row in sentences_df.iterrows():
-            # process row, TODO figre how to get rows contents
-            tokenized_text = row["sentence"].split()
-            row_nlp = nlp(row["sentence"])
+    def iterate_over_sentences(self, conllu_content,
+                               target_df: pd.DataFrame, fill_mask: FillMask, k: int):
+        tags, token_list = [], []
+        for sentence in conllu_content:
+            sentence_text = " ".join(
+                [str(w) for w in sentence if w["xpos"] != None])
+
+            # process row,
+            row_nlp = nlp(sentence_text)
+            tokenized_text = sentence_text.split()
+            assert len(row_nlp) == len(
+                [str(w) for w in sentence if w["xpos"] != None])
             for token in row_nlp:
-                # Find the corresponding row in target_df using 'Sentence_Count' and 'Token_ID'
-                target_row = target_df[
-                    (target_df['Sentence_Count'] == index) &
-                    (target_df['Token_ID'] == token.i)
-                    ]
-                try:
-                    if not target_row.iloc[0]['Word'] == token.text:
-                        if target_df[
-                    (target_df['Sentence_Count'] == index) &
-                    (target_df['Token_ID'] == token.i + 1)
-                    ]:
-                except Exception:
-                    z = 0
-                tag = self.tag_by_rarity(token=token,
-                                         tokenized_sentence_text=tokenized_text)
-                tags.append(tag)
-                tagged_token.append(token)
 
-        target_df['Combined_Algorithm_Tags'] = tags
+                tag = self.tag_by_rarity(token=token,
+                                         tokenized_sentence_text=tokenized_text,
+                                         fill_mask=fill_mask)
+                tags.append(tag)
+                token_list.append(token)
+
+        target_df[f'Only_Mask_Tags_{k}'] = tags
         return target_df
 
-
-
-
-
-
-    def open_rarity_dataframe(self, dataframe_path)->pd.DataFrame:
+    def open_rarity_dataframe(self, dataframe_path) -> pd.DataFrame:
         dtype_dict = {
             #     'word': str,
             #     'VERB_count': float,
@@ -147,25 +163,25 @@ class RareTokensAlgorithm:
             return False
 
     def tag_by_rarity(self, token: spacy.tokens,
-                      tokenized_sentence_text: list[str])->str:
+                      tokenized_sentence_text: list[str], fill_mask: FillMask)->str:
         """
         This method first checks if the token is rare.
         if so, it tags by the masking algorithm.
         else, it tags by the regular spacy tagger
         """
-        if not token.pos_ == "VERB" or not self.check_token_is_rare_from_dataframe(token=token):
-            return token.pos_
-        # check according to dataframe if token.lemma_ is rare
-        else:
-            return self.fill_mask.mask(tokenized_text=tokenized_sentence_text,
+        # if not token.pos_ == "VERB" or not self.check_token_is_rare_from_dataframe(token=token):
+        #     return token.pos_
+        # # check according to dataframe if token.lemma_ is rare
+        # else:
+        return fill_mask.predict(tokenized_text=tokenized_sentence_text,
                                           index=token.i)
 
 
 if __name__ == '__main__':
-    obj = RareTokensAlgorithm(rarity_dataframe=
-                             r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\source_files\ENSEMBLE_first_40000_posts_openclass_pos_count_2023_08_04.csv",
-                             masking_k=1)
 
-    obj.run(sentence_dataframe=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\output_raw_sentences_50000_sentences.csv",
-            target_dataframe=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_with_masked_POS_50000_sentences_top5.csv"
-            ,output_file="output.csv")
+
+        obj = RareTokensAlgorithm(rarity_dataframe=
+                                 r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\source_files\ENSEMBLE_first_40000_posts_openclass_pos_count_2023_08_04.csv")
+        obj.run(conllu_file=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
+                target_dataframe=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv"
+                ,output_file=f"output_only_mask.csv")

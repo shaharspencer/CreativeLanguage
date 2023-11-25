@@ -2,6 +2,7 @@ import pandas as pd
 import spacy
 from conllu import parse
 from docopt import docopt
+from sklearn.metrics import accuracy_score
 from transformers import pipeline
 from collections import Counter
 
@@ -20,6 +21,7 @@ class FillMask:
     def __init__(self, top_k):
         self.classifier = pipeline("fill-mask", "xlm-roberta-large",
                                    top_k=top_k)
+        self.top_k = top_k
 
 
     def predict(self, tokenized_text: list[str], index) -> str:
@@ -102,26 +104,38 @@ def convert_conllu_to_masked_tagged_text(conllu_content,
 
         if sentence_limit is not None and sentence_count >= sentence_limit:
             break
-    combined_df["Mask_Tags"] = preds
+    combined_df[f"Mask_Tags_{masking_k}"] = preds
     return combined_df
 
+def evaluate_masking(data: pd.DataFrame, k:int):
 
+    #columns=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS', "Mask_Tags"]
+    # data = pd.read_csv(data_file_path, encoding='utf-8')
 
-def run(masking_k, raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
-        n_sentences: int | None = 50, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50_sentences.csv",
+    # filter rows where Mask_Tags is not None
+    masked_data = data[data['Mask_Tags'].notnull()]
+
+    accuracy = accuracy_score(masked_data['UD_POS'], masked_data[f'Mask_Tags_{k}'])
+
+    print(f'Accuracy of Mask_Tags compared to UD_POS: {accuracy}, k={k}')
+
+def run(raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
+        n_sentences: int | None = 50000, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv",
         ) -> str:
-    output_file = f'../files/tags_data/output_with_masked_POS_{n_sentences}_sentences_top{masking_k}.csv'
-
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
+    output_file = "all_mask_results_on_spacy_mistakes_1_to_10.csv"
     c_df = pd.read_csv(combined_dataframe, sep=' ',
-                       names=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS',"Mask_Tags"], skiprows=2)
+                       names=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS'], skiprows=2)
+    for mask_i in range(1, 11):
+        additional_cols = [f"Mask_Tags_{i}" for i in range(1,mask_i+1)]
+        new_combined_df = convert_conllu_to_masked_tagged_text(conllu_content,
+                                             sentence_limit=n_sentences, combined_df=c_df, masking_k=mask_i)
+        evaluate_masking(new_combined_df, k=mask_i)
+        new_combined_df.to_csv(output_file, index=False,
+                           encoding='utf-8', columns=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS', "Mask_Tags_5"] + additional_cols)
 
-    new_combined_df = convert_conllu_to_masked_tagged_text(conllu_content,
-                                         sentence_limit=n_sentences, combined_df=c_df, masking_k=masking_k)
-    new_combined_df.to_csv(output_file, index=False,
-                       encoding='utf-8', columns=['Sentence_Count', 'Token_ID', 'Word', 'UD_POS', 'SPACY_POS', "Mask_Tags"])
-    return output_file
+    return ""
 
 
 
@@ -129,7 +143,8 @@ def run(masking_k, raw_data_file: str = r"C:\Users\User\PycharmProjects\Creative
 if __name__ == '__main__':
     args = docopt(usage)
     file_to_process = args["<file_to_process>"]
-    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != "None" else None
+    n_sentences = int(args["<n_sentences>"]) if args["<n_sentences>"] != "None" \
+        else None
     if file_to_process == "None" and not n_sentences:
         run()
     else:

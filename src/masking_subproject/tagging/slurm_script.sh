@@ -1,7 +1,7 @@
 #!/bin/bash
 #!/bin/bash
 #SBATCH --gres=gpu:a5000:1  # Replace <number_of_gpus> with the number of GPUs you need
-#SBATCH --time=40:00:00           # Set the maximum time your job needs to run (e.g., 1:00:00 for one hour)
+#SBATCH --time=40:00:00 # Set the maximum time your job needs to run (e.g., 1:00:00 for one hour)
 #SBATCH --job-name=my_gpu_job
 #SBATCH --output=processor_output.out     # Custom output file for standard output
 #SBATCH --error=processor_output.out     # Custom output file for standard error

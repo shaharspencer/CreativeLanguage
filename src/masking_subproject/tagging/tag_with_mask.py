@@ -90,7 +90,7 @@ def mask_and_predict(sentence_text: str,
 
 
 def convert_conllu_to_masked_tagged_text(conllu_content,
-                                         sentence_limit: int | None, combined_df: pd.DataFrame,
+                                         sentence_limit: int, combined_df: pd.DataFrame,
                                          masking_k):
     obj = FillMask(top_k=masking_k)
     sentence_count = 0
@@ -124,7 +124,7 @@ def evaluate_masking(data: pd.DataFrame, k:int):
     print(f'Accuracy of Mask_Tags compared to UD_POS: {accuracy}, k={k}')
 
 def run(raw_data_file: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\raw_data\en_ewt-ud-test.conllu",
-        n_sentences: int | None = 50000, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv",
+        n_sentences: int = 50000, combined_dataframe: str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv",
         ) -> str:
     with open(raw_data_file, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())

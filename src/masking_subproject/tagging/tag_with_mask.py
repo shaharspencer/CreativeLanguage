@@ -39,9 +39,13 @@ class FillMask:
         pos_counts = Counter(r_pos)
 
         # Get the most common POS tag
-        most_common_pos = pos_counts.most_common(1)[0][0]
-
-        return most_common_pos
+        if r_pos:  # Check if r_pos is not empty
+            pos_counts = Counter(r_pos)
+            most_common_pos = pos_counts.most_common(1)[0][0]
+            return most_common_pos
+        else:
+            # Handle the case when no valid replacements were found
+            return "NoValidReplacements"
 
     def mask_text(self, sentence_tokens: list[str], index: int)-> str:
         masked_text = " ".join(["<mask>" if j == index else t for j, t in

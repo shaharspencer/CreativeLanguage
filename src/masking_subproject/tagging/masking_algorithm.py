@@ -94,7 +94,7 @@ class RareTokensAlgorithm:
 
 
     def iterate_over_sentences(self, conllu_content,
-                               target_df: pd.DataFrame, fill_mask: FillMask, k: int):
+                               target_df: pd.DataFrame, fill_mask: FillMask, k:int):
         tags, token_list = [], []
         for sentence in conllu_content:
             sentence_text = " ".join(

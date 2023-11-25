@@ -18,6 +18,7 @@ from spacy.tokens import Doc
 from conllu import parse
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage\src")
 sys.path.append(r"C:\Users\User\PycharmProjects\CreativeLanguage")
+sys.path.append(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/")
 
 from src.masking_subproject.tagging.tag_with_mask import FillMask
 

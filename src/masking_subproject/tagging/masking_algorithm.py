@@ -201,8 +201,7 @@ if __name__ == '__main__':
 
         prefix = r"\cs\snapless\gabis\shaharspencer\CreativeLanguageProject\src"
         # prefix = r"C:\Users\User\PycharmProjects\CreativeLanguage\src"
-        obj = RareTokensAlgorithm(rarity_dataframe=os.path.join(prefix,
-                                 r"masking_subproject\files\source_files\ENSEMBLE_first_40000_posts_openclass_pos_count_2023_08_04.csv"))
-        obj.run(conllu_file=os.path.join(prefix, r"masking_subproject\files\raw_data\en_ewt-ud-test.conllu"),
-                target_dataframe=os.path.join(prefix, r"masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv")
+        obj = RareTokensAlgorithm(rarity_dataframe=r"\\cs\\snapless\\gabis\\shaharspencer\\CreativeLanguageProject\\src\\masking_subproject\\files\\source_files\\ENSEMBLE_first_40000_posts_openclass_pos_count_2023_08_04.csv")
+        obj.run(conllu_file=os.path.join(prefix, r"\\cs\\snapless\\gabis\\shaharspencer\\CreativeLanguageProject\\src\\masking_subproject\files\raw_data\en_ewt-ud-test.conllu"),
+                target_dataframe=os.path.join(prefix, r"\\cs\\snapless\\gabis\\shaharspencer\\CreativeLanguageProject\\src\\masking_subproject\files\tags_data\UD_Spacy_combined_tags_50000_sentences.csv")
                 ,output_file=f"output_only_mask.csv")

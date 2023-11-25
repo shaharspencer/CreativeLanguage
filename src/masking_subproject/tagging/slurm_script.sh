@@ -13,7 +13,7 @@ module load cuda/11.7
 source /cs/snapless/gabis/shaharspencer/VENV_25_11/bin/activate
 module load cuda/11.7
 
-python -m spacy download en_core_web_lg
+#python -m spacy download en_core_web_lg
 
 
 # Assuming you have a requirements.txt file listing all the dependencies

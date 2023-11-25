@@ -12,7 +12,7 @@
 # Load required CUDA module
 
 module load cuda/11.7
-source /cs/snapless/gabis/shaharspencer/gpu_env/bin/activate
+source /cs/snapless/gabis/shaharspencer/myGPUenv/bin/activate
 module load cuda/11.7
 
 

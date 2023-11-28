@@ -195,7 +195,7 @@ class RareTokensAlgorithm:
         # else:
         return fill_mask.predict(tokenized_text=tokenized_sentence_text,
                                           index=token.i)
-
+#TODO some reason iterates a lot further than expected
 
 if __name__ == '__main__':
 

@@ -23,7 +23,6 @@ class FillMask:
                                    top_k=top_k)
         self.top_k = top_k
 
-
     def predict(self, tokenized_text: list[str], index) -> str:
         masked = self.mask_text(sentence_tokens=tokenized_text, index=index)
         replacements = self.replace_token(masked_text=masked)
@@ -57,7 +56,7 @@ class FillMask:
         for r in replacements:
             res.append(masked_text.replace("<mask>", r["token_str"]))
 
-        return res
+        return replacements
 
 
 class WhitespaceTokenizer(object):

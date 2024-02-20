@@ -3,12 +3,12 @@ import random
 import uuid
 
 import pandas as pd
-import spacy
+
 from conllu import SentenceList
 from docopt import docopt
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
-from spacy.tokens import Doc
+
 from conllu import parse
 i = 0
 usage = '''
@@ -21,18 +21,7 @@ def open_conllu(conllu_file_path)-> SentenceList:
     with open(conllu_file_path, 'r', encoding='utf-8') as conllu_file:
         conllu_content = parse(conllu_file.read())
     return conllu_content
-class WhitespaceTokenizer(object):
-    def __init__(self, vocab):
-        self.vocab = vocab
 
-    def __call__(self, text):
-        words = text.split(' ')
-        words = [word for word in words if word.strip()]  # Remove empty tokens
-        spaces = [True] * len(words)
-        return Doc(self.vocab, words=words, spaces=spaces)
-
-nlp = spacy.load("en_core_web_lg")
-nlp.tokenizer = WhitespaceTokenizer(nlp.vocab)
 def evaluate_mask_relative_improvements(csv_path:str = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_only_mask.csv")->list:
     acuuracies = []
     #open dataframe
@@ -96,6 +85,9 @@ def frequency_band_graphs(pos, frequency_band_json: str, tags_data: str, freq_ba
             band_list.append(-1)
 
     tags_data["freq_band"] = band_list
+    filtered_df = tags_data[tags_data['freq_band'] > 94].copy()
+
+    filtered_df.to_csv(f"rarest_tags_for_{pos}.csv", encoding='utf-8')
     tags_data.to_csv(f"tags_data_pos_{pos}_with_freq_band.csv",
     encoding = 'utf-8')
     # filter df to get the lowest band

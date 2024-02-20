@@ -1,0 +1,5 @@
+,Unnamed: 0,Sentence_Count,Token_ID,Word,UD_POS,SPACY_POS,Only_Mask_Tags_1,Only_Mask_Tags_2,Only_Mask_Tags_3,Only_Mask_Tags_4,Only_Mask_Tags_5,Only_Mask_Tags_6,Only_Mask_Tags_7,Only_Mask_Tags_8,Only_Mask_Tags_9,lemma,freq_band
+4264,4264,199,54,Islamist,PROPN,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,Islamist,96
+11088,11088,862,32,16th,NOUN,ADJ,NUM,NUM,NUM,NUM,NUM,NUM,NUM,NUM,NUM,16th,100
+11392,11392,881,7,memorial,NOUN,ADJ,NOUN,NOUN,NOUN,NOUN,NOUN,NOUN,NOUN,NOUN,NOUN,memorial,98
+12501,12501,963,5,virtuoso,NOUN,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,ADJ,virtuoso,96

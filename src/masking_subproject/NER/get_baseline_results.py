@@ -1,6 +1,6 @@
 import json
 from typing import Tuple, List, Dict, Any
-from base_functions import get_spacy_ners_from_conllu_sent, get_gold_ner, load_data
+from base_functions import get_spacy_ners_from_conllu_sent, get_gold_ner, load_data, measure_spacy_success
 import pandas as pd
 import spacy
 from conllu import parse
@@ -15,10 +15,13 @@ from sklearn.metrics import accuracy_score
 def get_spacy_measures(data):
     ners = {}
     for sent_index, sent in enumerate(data):
-        ners[sent.metadata["sent_id"]] = {"spacy_default_tags": get_spacy_ners_from_conllu_sent(sent), "gold_tags": get_gold_ner(sent)}
+        ners[sent.metadata["sent_id"]] = {"pred_tags": get_spacy_ners_from_conllu_sent(sent), "gold_tags": get_gold_ner(sent)}
         print(sent_index)
     with open("ner_results.json", "w") as outfile:
         json.dump(ners, outfile)
+
+    print("spacy baseline results")
+    print(measure_spacy_success(ners))
 
 
 

@@ -2,3 +2,7 @@ This repository contains code pertaining to an NLP & ML project that searches fo
 The project utilizes various machine learning libraries and models, such as RoBERTa, word embeddings, and statistical methods, 
 to identify creative sentences within the dataset and build an ML model that recognizes creative occurences of natural language.
 The code is written with a focus on efficiency as the dataset is very large and processing times grow quickly as we analyze more of the data.
+
+
+interesting occurences:
+'answers-20111024202518AA18Sg7_ans-0002'

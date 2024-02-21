@@ -139,33 +139,26 @@ def get_gold_ner(sent: conllu.models.TokenList):
     return named_entities
 
 
-def calculate_aggregated_metrics(gold_tags, predicted_tags):
-    tp = len(set(gold_tags) & set(predicted_tags))
-    fp = len(predicted_tags) - tp
-    fn = len(gold_tags) - tp
 
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+from spacy.scorer import Scorer
 
-    return precision, recall, f1_score
+def measure_spacy_success(sentences: dict):
+    correct_predictions, total_predicted_entities, total_gold_entities = 0, 0, 0
+    for key, data in sentences.items():
+        gold_entities = data["gold_tags"]
+        pred_entities = data["pred_tags"]
+        for pred_entity in pred_entities:
+            if pred_entity in gold_entities:
+                correct_predictions += 1
 
-# Aggregate all gold and predicted tags
-all_gold_tags = []
-all_predicted_tags = []
+            total_predicted_entities +=1
+        total_gold_entities += len(gold_entities)
 
-for sent_id, data in ner_results.items():
-    gold_tags = [(entity['text'], entity['label']) for entity in data['gold_tags']]
-    predicted_tags = [(entity['text'], entity['label']) for entity in data['spacy_default_tags']]
-    all_gold_tags.extend(gold_tags)
-    all_predicted_tags.extend(predicted_tags)
+    precision = correct_predictions / total_predicted_entities
+    recall = correct_predictions / total_gold_entities
 
-# Calculate aggregated metrics
-aggregated_precision, aggregated_recall, aggregated_f1_score = calculate_aggregated_metrics(all_gold_tags, all_predicted_tags)
-
-print("Aggregated Precision:", aggregated_precision)
-print("Aggregated Recall:", aggregated_recall)
-print("Aggregated F1-score:", aggregated_f1_score)
+    return {"recall": recall, "precision": precision}
 
 
 
+# TODO i need to measure only for tokens that were correctly recognized as named entities

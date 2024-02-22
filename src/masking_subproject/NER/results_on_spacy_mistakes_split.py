@@ -1,3 +1,16 @@
+import sys
+sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
+
+# h
+sys.path.append(r'/cs/snapless/gabis/shaharspencer')
+parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
+
+# Append the parent directory to sys.path
+
+sys.path.append(parent_dir)
+
+print(sys.path)
+
 import conllu.models
 
 

@@ -15,8 +15,8 @@ print(sys.path)
 import conllu.models
 
 
-from src.masking_subproject.NER.base_functions import get_spacy_ners_from_conllu_sent, get_nlp, get_gold_ner, load_data, get_spacy_ners_from_list_sent, NER_MAP
-from src.masking_subproject.tagging.tag_with_mask import FillMask
+from base_functions import get_spacy_ners_from_conllu_sent, get_nlp, get_gold_ner, load_data, get_spacy_ners_from_list_sent, NER_MAP
+from ..tagging.tag_with_mask import FillMask
 
 fill_masks = {"1": FillMask(top_k=1),}
               # "9": FillMask(top_k=9)}

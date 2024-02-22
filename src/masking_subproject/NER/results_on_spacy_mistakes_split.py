@@ -69,5 +69,5 @@ def predict_on_spacy_mistakes(data: list[conllu.models.TokenList]):
 
 
 if __name__ == '__main__':
-    data = load_data(r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\NER\raw_data\en_ewt-ud-test.conllu")
+    data = load_data(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/masking_subproject/files/raw_data/en_ewt-ud-test.conllu")
     predict_on_spacy_mistakes(data)

@@ -1,5 +1,6 @@
 import conllu.models
 
+
 from src.masking_subproject.NER.base_functions import get_spacy_ners_from_conllu_sent, get_nlp, get_gold_ner, load_data, get_spacy_ners_from_list_sent, NER_MAP
 from src.masking_subproject.tagging.tag_with_mask import FillMask
 
@@ -69,5 +70,5 @@ def predict_on_spacy_mistakes(data: list[conllu.models.TokenList]):
 
 
 if __name__ == '__main__':
-    data = load_data(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/masking_subproject/files/raw_data/en_ewt-ud-test.conllu")
+    data = load_data(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/masking_subproject/NER/raw_data/en_ewt-ud-test.conllu")
     predict_on_spacy_mistakes(data)

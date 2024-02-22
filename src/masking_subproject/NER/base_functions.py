@@ -2,6 +2,8 @@ from typing import Tuple, List, Dict, Any
 
 import pandas as pd
 import spacy
+if spacy.prefer_gpu():
+    print("using gpu!")
 from conllu import parse
 import conllu
 from spacy import tokens

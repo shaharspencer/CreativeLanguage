@@ -1,4 +1,5 @@
 import sys
+import os
 sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
 
 # h

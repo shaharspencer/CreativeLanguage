@@ -4,6 +4,8 @@ sys.path.append('/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/')
 
 # h
 sys.path.append(r'/cs/snapless/gabis/shaharspencer')
+sys.path.append(r'/cs/snapless/gabis/shaharspencer/CreativeLanguageProject')
+sys.path.append(r'/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/')
 parent_dir = os.path.abspath(r'CreativeLanguageProject/src')
 
 # Append the parent directory to sys.path
@@ -16,9 +18,9 @@ import conllu.models
 
 
 from base_functions import get_spacy_ners_from_conllu_sent, get_nlp, get_gold_ner, load_data, get_spacy_ners_from_list_sent, NER_MAP
-from ..tagging.tag_with_mask import FillMask
+from src.masking_subproject.tagging.tag_with_mask import FillMask
 
-fill_masks = {"1": FillMask(top_k=1),}
+fill_masks = {"1": FillMask(top_k=1), "2": FillMask(top_k=2), "3": FillMask(top_k=3)}
               # "9": FillMask(top_k=9)}
 def replace_tokens(tokens:list[str], start_index:int, end_index: int, replecament_token: str):
     masked_tokens = tokens[:start_index] + [replecament_token] + tokens[end_index:]
@@ -58,7 +60,7 @@ def predict_on_spacy_mistakes(data: list[conllu.models.TokenList]):
     res_dict = {str(k): {"correct_preds": 0} for k in k_s}
     # masked_ners = {}
     for index, sent in enumerate(data):
-        print(index)
+        print(index, flush=True)
         # predict named entities in sentence
         sent_text = " ".join([t['form'] for t in sent])
         sent_nlp = nlp(sent_text)
@@ -84,5 +86,6 @@ def predict_on_spacy_mistakes(data: list[conllu.models.TokenList]):
 
 
 if __name__ == '__main__':
+    # data = load_data(r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\NER\raw_data\en_ewt-ud-test.conllu")
     data = load_data(r"/cs/snapless/gabis/shaharspencer/CreativeLanguageProject/src/masking_subproject/NER/raw_data/en_ewt-ud-test.conllu")
     predict_on_spacy_mistakes(data)

@@ -28,7 +28,23 @@ NER_MAP = {
 "GPE": "LOC",
 "LOC": "LOC",
 "ORG": "ORG",
-"PERSON": "PER"}
+"PERSON": "PER",
+'': "O",
+"CARDINAL": "O",
+"DATE": "O",
+"EVENT": "O",
+"FAC": "O",
+"LANGUAGE": "O",
+"LAW" : "O",
+"MONEY":"O",
+"NORP":"O",
+"ORDINAL":"O",
+"PERCENT": "O",
+"PRODUCT":"O",
+"QUANTITY":"O",
+"TIME":"O",
+"WORK_OF_ART":"O",
+}
 
 #TODO case where we have a ner that wasnt recognized by spacy
 def load_data(raw_data_file):
@@ -150,6 +166,8 @@ def measure_spacy_success(sentences: dict):
         for pred_entity in pred_entities:
             if pred_entity in gold_entities:
                 correct_predictions += 1
+            else:
+                z= 0
 
             total_predicted_entities +=1
         total_gold_entities += len(gold_entities)

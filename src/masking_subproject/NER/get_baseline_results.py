@@ -15,16 +15,16 @@ from sklearn.metrics import accuracy_score
 def get_spacy_measures(data):
     ners = {}
     for sent_index, sent in enumerate(data):
-        ners[sent.metadata["sent_id"]] = {"pred_tags": get_spacy_ners_from_conllu_sent(sent), "gold_tags": get_gold_ner(sent)}
+        gold_tags = get_gold_ner(sent)
+        pred_tags = get_spacy_ners_from_conllu_sent(sent)
+
+        ners[sent.metadata["sent_id"]] = {"pred_tags": pred_tags, "gold_tags": gold_tags}
         print(sent_index)
     with open("ner_results.json", "w") as outfile:
         json.dump(ners, outfile)
 
     print("spacy baseline results")
     print(measure_spacy_success(ners))
-
-
-
 
 
 if __name__ == '__main__':

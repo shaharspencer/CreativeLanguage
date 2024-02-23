@@ -84,9 +84,9 @@ class RareTokensAlgorithm:
             # Plotting the graph
         plt.figure(figsize=(8, 5))
         plt.plot(k_values, accuracies, marker='o', linestyle='-')
-        plt.title('Accuracy of Masking Algorithm for Different k Values\n'
-                  'frequency band gt 95\n'
-                  'use mask for only Nouns and Propns\n')
+#         plt.title('Accuracy of Masking Algorithm for Different k Values\n'
+#                   'mask for: frequency band(NOUN) >= 95, frequency band(PROPN) >= 90 \n'
+# )
         plt.plot(k_values, [spacy_accuracy] * len(k_values), linestyle='--',
                  label='Spacy Prediction')  # Straight line for Spacy's accuracy
         plt.xlabel('k values')
@@ -96,11 +96,11 @@ class RareTokensAlgorithm:
         # Adding labels to each point
         for i, txt in enumerate(accuracies):
             plt.annotate(f'{txt:.6f}', (k_values[i], accuracies[i]),
-                         textcoords="offset points", xytext=(0, 5),
-                         ha='center')
+                         textcoords="offset points", xytext=(0, -50),  # Adjust y-offset to move text below the point
+                         ha='center', rotation=45)
 
-        plt.annotate(f'{spacy_accuracy:.6f}', (k_values[-1], spacy_accuracy),
-                     textcoords="offset points", xytext=(0, 5), ha='center')
+        plt.annotate(f'SpaCy accuracy: {spacy_accuracy:.6f}', (k_values[-1], spacy_accuracy),
+                     textcoords="offset points", xytext=(-70, 5), ha='center')
 
         plt.tight_layout()
         plt.show()
@@ -118,7 +118,9 @@ class RareTokensAlgorithm:
         if token_spacy_pos not in ["NOUN", "PROPN"]:
             return False
         try:
-            if self.rarity_json[token_spacy_pos][token_lemma] >= 95:
+            if token_spacy_pos == "NOUN" and self.rarity_json[token_spacy_pos][token_lemma] >= 95:
+                return True
+            if token_spacy_pos == "PROPN" and self.rarity_json[token_spacy_pos][token_lemma] >= 90:
                 return True
         except KeyError:
             return False

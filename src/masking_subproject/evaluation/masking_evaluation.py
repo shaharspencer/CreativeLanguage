@@ -149,16 +149,16 @@ if __name__ == '__main__':
     #     run(data_file_path=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\output_with_masked_POS_50000_sentences.csv")
     # else:
     #     run(data_file_path=data_file)
-    evaluate_mask_relative_improvements()
+    # evaluate_mask_relative_improvements()
     # pos_list = ["NOUN", "VERB", "ADJ", "ADP", "ADV", "DET", "PROPN" ]
     # for pos in pos_list:
     #     evaluate_specific_pos_accuracy(pos=pos)
     # mask_accuracy()
     #
-    # freq_band_json=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\word_frequencies\freq_bands_100.json"
-    # tags_data = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\mask_tags_data\output_only_mask.csv"
-    # # add_lemmas(pd.read_csv(tags_data, encoding='utf-8'))
-    # for i in range(90, 101):
-    #     for pos in ["NOUN", "VERB", "ADJ", "ADP", "ADV", "DET", "PROPN" ]:
-    #         frequency_band_graphs(pos=pos, frequency_band_json=freq_band_json, tags_data=tags_data, freq_band_min=i)
+    freq_band_json=r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\word_frequencies\freq_bands_100.json"
+    tags_data = r"C:\Users\User\PycharmProjects\CreativeLanguage\src\masking_subproject\files\tags_data\mask_tags_data\output_only_mask.csv"
+    # add_lemmas(pd.read_csv(tags_data, encoding='utf-8'))
+    for i in range(90, 101):
+        for pos in ["NOUN", "PROPN" ]:
+            frequency_band_graphs(pos=pos, frequency_band_json=freq_band_json, tags_data=tags_data, freq_band_min=i)
 
